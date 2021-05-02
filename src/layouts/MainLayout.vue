@@ -1,0 +1,119 @@
+<template>
+  <q-layout view="hHh lpR fFf">
+    <q-header bordered class="bg-primary text-white">
+      <q-toolbar>
+        <q-btn dense flat round icon="menu" @click="left = !left" />
+
+        <q-toolbar-title>
+          <!-- <q-avatar>
+            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
+          </q-avatar> -->
+          JNTUA Result Analyser
+        </q-toolbar-title>
+      </q-toolbar>
+    </q-header>
+
+    <q-drawer v-model="left" side="left" overlay bordered>
+      <!-- drawer content -->
+      <div class="q-pa-md">
+        <q-list class="rounded-borders text-primary">
+          <q-item
+            clickable
+            v-ripple
+            :active="link === 'single-result'"
+            @click="link = 'single-result'"
+            active-class="bg-primary"
+            to="/single-result"
+          >
+            <q-item-section avatar>
+              <q-icon name="person_outline" />
+            </q-item-section>
+
+            <q-item-section>Single result</q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            v-ripple
+            :active="link === 'multi-result'"
+            @click="link = 'multi-result'"
+            active-class="bg-primary"
+            to="/multi-result"
+          >
+            <q-item-section avatar>
+              <q-icon name="person_add_alt" />
+            </q-item-section>
+
+            <q-item-section>Multi result</q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            v-ripple
+            :active="link === 'sem-result'"
+            @click="link = 'sem-result'"
+            active-class="bg-primary"
+            to="/sem-result"
+          >
+            <q-item-section avatar>
+              <q-icon name="school" />
+            </q-item-section>
+
+            <q-item-section>Sem Result</q-item-section>
+          </q-item>
+
+          <q-separator spaced />
+
+          <q-item
+            clickable
+            v-ripple
+            :active="link === 'feedback'"
+            @click="link = 'feedback'"
+            active-class="bg-primary"
+            to="/feedback"
+          >
+            <q-item-section avatar>
+              <q-icon name="feedback" />
+            </q-item-section>
+
+            <q-item-section>Feedback</q-item-section>
+          </q-item>
+
+          <q-item
+            clickable
+            v-ripple
+            :active="link === 'help'"
+            @click="link = 'help'"
+            active-class="bg-primary"
+          >
+            <q-item-section avatar>
+              <q-icon name="help" />
+            </q-item-section>
+
+            <q-item-section>Help</q-item-section>
+          </q-item>
+        </q-list>
+      </div>
+    </q-drawer>
+
+    <q-page-container>
+      <router-view />
+    </q-page-container>
+  </q-layout>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      left: false,
+      link: "single-result"
+    };
+  }
+};
+</script>
+<style lang="sass">
+.bg-primary
+  color: white
+  background: #F2C037
+</style>

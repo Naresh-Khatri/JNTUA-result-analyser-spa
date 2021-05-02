@@ -1,0 +1,153 @@
+<template>
+  <div class="card">
+    <div class="q-pa-md">
+      <div v-if="sent" class="centerr">
+        <div
+          value="df  "
+          style="height: 100%; background: white;border-radius: 20px; padding: 20px"
+        >
+          <h3 style="text-align: center; margin: 10px;">Thank you!</h3>
+          <h5 style="text-align: center; margin: 10px;">
+            We'll mail you at
+            <span style="color: black; text-decoration: underline ;">{{
+              this.email
+            }}</span>
+          </h5>
+
+          <div class="flex flex-center q-mb-lg">
+            <q-img
+              src="../assets/thank-you.gif"
+              alt=""
+              style="width: 80%; border-radius:20px"
+            />
+          </div>
+          <div class="flex flex-center">
+            <q-btn to="/" color="primary" label="Home" size="large" />
+          </div>
+        </div>
+      </div>
+      <div v-else>
+        <q-stepper
+          vertical
+          color="primary"
+          style="border-radius:20px"
+          v-model="ok"
+        >
+          <h3 style="text-align: center; margin: 10px;">Send Us a Message!</h3>
+          <q-input
+            outlined
+            class="q-mx-lg q-my-sm q-mt-xl"
+            v-model="name"
+            label="Name(Optional)"
+            type="text"
+          />
+          <q-input
+            outlined
+            class="q-mx-lg"
+            v-model="email"
+            label="Email(Optional)"
+            type="email"
+            :rules="[
+              val =>
+                (val &&
+                  val.length > 10 &&
+                  val.includes('@') &&
+                  val.includes('.')) ||
+                'Invalid Email'
+            ]"
+          />
+          <div>
+            <q-input
+              class="q-ma-lg"
+              v-model="message"
+              filled
+              type="textarea"
+              style="background-color: white"
+              label="Message"
+            />
+          </div>
+          <q-btn
+            color="primary"
+            label="Submit"
+            style="margin-left:40%;"
+            @click="onSubmit"
+          />
+        </q-stepper>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import axios from "axios";
+import config from '../api.config.js'
+
+export default {
+  data() {
+    return {
+      name: "",
+      email: "",
+      message: "",
+      sent: false,
+      ok: ""
+    };
+  },
+  methods: {
+    onSubmit() {
+      var payload = {
+        name: this.name,
+        email: this.email,
+        message: this.message
+      };
+
+      console.log(payload);
+      axios
+        // .post("https://apiv1.plasmatch.in/SendMessage/", payload)
+        .post(config.feedbacks, payload)
+
+        .then(response => {
+          if (response.status === 201) {
+            this.$q.notify({
+              type: "positive",
+              message: "Message Sent!",
+              position: "top",
+              duration: 50
+            });
+            console.log(response);
+            this.sent = !this.sent;
+          }
+        })
+        .catch(error => {
+          if (error.response) {
+            console.log("bad requset");
+            this.$q.notify({
+              type: "negative",
+              message: "Enter A Valid Email or Try Again Later :(",
+              position: "top",
+              duration: 50
+            });
+          }
+        });
+    }
+  }
+};
+</script>
+<style>
+#map {
+  min-height: 500px;
+  max-height: 500px;
+  min-width: 300px;
+  max-width: 700px;
+}
+.card {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 100px;
+  border-radius: 5px;
+}
+.centerr {
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
