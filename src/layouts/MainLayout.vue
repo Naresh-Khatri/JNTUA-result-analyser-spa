@@ -1,16 +1,19 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header bordered class="bg-primary text-white">
-      <q-toolbar>
-        <q-btn dense flat round icon="menu" @click="left = !left" />
-
-        <q-toolbar-title>
-          <!-- <q-avatar>
-            <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
-          </q-avatar> -->
-          JNTUA Result Analyser
-        </q-toolbar-title>
-      </q-toolbar>
+    <q-header class=" bg-white text-black " style="height:100px">
+      <div class="bg-primary text-white">
+        <q-toolbar>
+          <q-btn dense flat round icon="menu" @click="left = !left" />
+          <q-space />
+          <q-btn flat round disabled dense icon="search" class="q-mr-xs" />
+          <q-btn flat round disabled dense icon="group_add" />
+        </q-toolbar>
+        <q-toolbar inset>
+          <q-toolbar-title
+            ><strong>JNTUA</strong> Results analyser</q-toolbar-title
+          >
+        </q-toolbar>
+      </div>
     </q-header>
 
     <q-drawer v-model="left" side="left" overlay bordered>
@@ -81,6 +84,7 @@
 
           <q-item
             clickable
+            disabled
             v-ripple
             :active="link === 'help'"
             @click="link = 'help'"
@@ -96,7 +100,7 @@
       </div>
     </q-drawer>
 
-    <q-page-container>
+    <q-page-container class="bg-grey-4">
       <router-view />
     </q-page-container>
   </q-layout>

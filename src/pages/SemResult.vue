@@ -18,36 +18,47 @@
         />
       </q-btn-group>
     </div>
-    <LineChart
-      style="height:80vh"
-      :chart-data="datacollection"
-      :options="{
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          yAxes: [
-            {
-              ticks: {
-                beginAtZero: true,
-                min: 0,
-                max: 10
+    <Tip title="Info" desc="This graph contains all the student with their SPGAs,
+                            Tap on any point to know more"/>
+    <div
+      style="overflow-x: auto;">
+      <LineChart
+        style="height:70vh; width:1600px"
+        :chart-data="datacollection"
+        :options="{
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: {
+            padding: 40
+          },
+          scales: {
+            yAxes: [
+              {
+                ticks: {
+                  beginAtZero: true,
+                  min: 0,
+                  max: 10
+                }
               }
-            }
-          ]
-        }
-      }"
-    />
+            ]
+          }
+        }"
+      />
+    </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import config from '../api.config.js'
 
 import LineChart from "../charts/LineChart.vue";
+import config from "../api.config.js";
+import Tip from '../components/Tip.vue'
+
 export default {
   components: {
-    LineChart
+    LineChart,
+    Tip,
   },
   data() {
     return {
@@ -68,10 +79,9 @@ export default {
       var studentNames = [];
       var studentSGPAs = [];
       axios
-        .get(
-          `${config.semestergpa}?ordering=-sgpa&search=${this.sem}`
-        )
+        .get(`${config.semestergpa}?ordering=-sgpa&semester=${this.sem}`)
         .then(response => {
+          console.log(response.data)
           response.data.forEach(ele => {
             studentNames.push(ele.student.name);
             studentSGPAs.push(ele.sgpa);

@@ -1,18 +1,51 @@
 <template>
   <div>
-    <div class="flex row flex-center no-wrap q-ma-lg">
+    <div
+      class="flex row flex-center no-wrap q-mt-md q-pa-lg q-mx-lg bg-white rounded"
+    >
       <!-- <q-icon
         name="arrow_back_ios_new"
         style="font-size: 3em;"
         @click="decRollNo()"
       /> -->
+      <q-dialog v-model="resultNotFoundDialog">
+        <q-card>
+          <q-card-section class="row items-center q-pb-none">
+            <div class="text-h6">Result Not Found</div>
+            <q-space />
+            <q-btn icon="close" flat round dense v-close-popup />
+          </q-card-section>
+
+          <q-card-section>
+            If you think your hall ticket number is correct then go to feedback
+            section and provide us the hall ticket number range of your batch
+            like this and we'll update our database
+            <q-space />
+            <div class="flex flex-center " style="flex-direction:column">
+              <div class="row">
+                <q-chip label="19fh1a0501" /> - <q-chip label="19fh1a0562" />
+              </div>
+              <q-btn
+                label="Feedback"
+                class="q-ma-md"
+                color="primary"
+                size="md"
+                to="feedback"
+              />
+            </div>
+          </q-card-section>
+        </q-card>
+      </q-dialog>
       <div>
-        <div class="flex flex-center">
+        <div class="flex flex-center row">
           <q-radio v-model="sem" val="1" label="Sem 1" /><q-radio
             v-model="sem"
             val="2"
             label="Sem 2"
           />
+        </div>
+        <div class="flex flex-center">
+          <q-checkbox v-model="supply" label="Supply" />
         </div>
         <div>
           <div v-for="(rollNo, index) in rollNoList" :key="index">
@@ -30,13 +63,6 @@
                   />
                 </template>
               </q-input>
-              <!-- <q-icon
-                size="md"
-                name="remove_circle"
-                color="negative"
-                v-show="rollNoList.length > 1"
-                @click="rollNoList.splice(index, 1)"
-              /> -->
             </div>
           </div>
           <div class="flex flex-center">
@@ -60,17 +86,47 @@
           </div>
         </div>
       </div>
-      <!-- <q-icon
-        name="arrow_forward_ios"
-        style="font-size: 3em;"
-        @click="incRollNo()"
-      /> -->
     </div>
     <div v-if="datasets.length">
+      <div class="flex flex-center">
+        <q-card
+          class="q-pa-sm q-ma-md rounded"
+          flat
+          style="display:flex; flex-wrap:wrap; justify-content:center"
+        >
+          <div v-for="(student, index) in studentsList" :key="index">
+            <div class="text-center">
+              <q-knob
+                readonly
+                :value="student.sgpa"
+                show-value
+                size="90px"
+                label="dsf"
+                :thickness="0.22"
+                :max="10"
+                color="green"
+                track-color="grey-3"
+                class="text-primary q-ma-lg"
+                style="margin-bottom:4px;"
+              />
+              <div
+                class="text-grey"
+                style="max-width:150px;font-size:1.1em; word-break: break-word;"
+              >
+                {{ student.name }}
+              </div>
+            </div>
+          </div>
+        </q-card>
+      </div>
+      <Tip
+        title="Tip"
+        desc="You can click on any student's name label to remove them from the chart"
+      />
       <q-tabs
         v-model="chartName"
         indicator-color="primary"
-        class="text-primary"
+        class="text-primary rounded bg-white q-mb-sm q-mx-lg"
       >
         <q-tab name="radar" icon="radar" label="Radar" />
         <q-tab name="line" icon="show_chart" label="Line" />
@@ -79,7 +135,7 @@
       <q-tab-panels
         v-model="chartName"
         animated
-        class="shadow-2 rounded-borders"
+        class="q-mx-sm shadow-2 rounded"
       >
         <q-tab-panel name="radar">
           <RadarChart
@@ -149,28 +205,34 @@
 
 <script>
 import axios from "axios";
-import config from '../api.config.js'
+import config from "../api.config.js";
 import { backgroundColors, borderColors } from "../colors/colors";
 
 import RadarChart from "../charts/RadarChart.vue";
 import BarChart from "../charts/BarChart.vue";
 import LineChart from "../charts/LineChart.vue";
 
+import Tip from "../components/Tip.vue";
+
 export default {
   components: {
     RadarChart,
     BarChart,
-    LineChart
+    LineChart,
+    Tip
   },
   data() {
     return {
       datacollection: {},
       rollNoList: ["19fh1a0546", "19fh1a0514", "19fh1a0507"],
       sem: "1",
+      supply: false,
       studentNameList: [],
       datasets: [],
       chartName: "radar",
       subjectNames: [],
+      studentsList: [],
+      resultNotFoundDialog: false,
       backgroundColors: backgroundColors,
       borderColors: borderColors,
       g_to_gp: {
@@ -195,15 +257,21 @@ export default {
         var gradePoints = [];
         axios
           .get(
-            `${config.results}?search=${this.rollNoList[i]},${this.sem}`
+            `${config.results}?student__id=${this.rollNoList[i]}&semester=${
+              this.sem
+            }${this.supply ? "a" : ""}`
           )
           .then(response => {
+            if (response.data.length > 0) {
+              this.$q.notify({
+                type: "positive",
+                message: `Result retrieved`
+              });
+            }
             if (response.data.length <= 20) {
               //if rollNo is left empty then api will send all the rows
               //setting it to large no like 20 helps to detect it
               gradePoints = [];
-              console.log(response.data);
-
               response.data.forEach(ele => {
                 //console.log(ele);
                 if (this.subjectNames.length < response.data.length)
@@ -212,6 +280,7 @@ export default {
               });
 
               this.studentNameList.push(response.data[0].student.name);
+              this.addToSGPAList(response.data[0].student.id);
               this.datasets.push({
                 label: response.data[0].student.name,
                 data: gradePoints,
@@ -225,6 +294,11 @@ export default {
           })
           .catch(error => {
             console.log(error);
+            this.resultNotFoundDialog = true;
+            this.$q.notify({
+              type: "negative",
+              message: `Result not found`
+            });
           })
           .finally(() => {
             this.drawChart();
@@ -244,10 +318,10 @@ export default {
         "rgba(75, 192, 192, 0.2)",
         "rgba(255, 159, 64, 0.2)",
         "rgba(153, 102, 255, 0.2)",
-        "rgba(255, 205, 86, 0.2)",
-        "rgba(54, 162, 235, 0.2)",
         "rgba(201, 203, 207, 0.2)",
         "rgba(255, 99, 132, 0.2)",
+        "rgba(255, 205, 86, 0.2)",
+        "rgba(54, 162, 235, 0.2)",
         "rgb(255, 99, 132)",
         "rgb(75, 192, 192)",
         "rgb(255, 205, 86)",
@@ -258,15 +332,32 @@ export default {
         "rgb(75, 192, 192)",
         "rgb(255, 159, 64)",
         "rgb(153, 102, 255)",
-        "rgb(255, 205, 86)",
         "rgb(54, 162, 235)",
-        "rgb(201, 203, 207)",
-        "rgb(255, 99, 132)"
+        "rgb(255, 205, 86)",
+        "rgb(255, 99, 132)",
+        "rgb(201, 203, 207)"
       ];
-      console.log("colors reset");
-      console.log(this.backgroundColors);
-      console.log(this.borderColors);
-    }
+      this.studentsList = [];
+    },
+    addToSGPAList(rollNo) {
+      axios
+        .get(`${config.semestergpa}?student__id=${rollNo}&semester=${this.sem}`)
+        .then(async response => {
+          {
+            this.studentsList.push(
+              Object.assign(response.data[0].student, {
+                sgpa: response.data[0].sgpa
+              })
+            );
+          }
+        });
+    },
+    removeEmptyRoll() {}
   }
 };
 </script>
+<style>
+.rounded {
+  border-radius: 20px;
+}
+</style>
