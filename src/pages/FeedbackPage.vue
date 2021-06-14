@@ -7,13 +7,6 @@
           style="height: 100%; background: white;border-radius: 20px; padding: 20px"
         >
           <h3 style="text-align: center; margin: 10px;">Thank you!</h3>
-          <h5 style="text-align: center; margin: 10px;">
-            We'll mail you at
-            <span style="color: black; text-decoration: underline ;">{{
-              this.email
-            }}</span>
-          </h5>
-
           <div class="flex flex-center q-mb-lg">
             <q-img
               src="../assets/thank-you.gif"
@@ -80,7 +73,7 @@
 
 <script>
 import axios from "axios";
-import config from '../api.config.js'
+import config from "../api.config.js";
 
 export default {
   data() {

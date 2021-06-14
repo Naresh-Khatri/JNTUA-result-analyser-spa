@@ -305,7 +305,7 @@ export default {
           });
       }
     },
-    async drawChart() {
+    drawChart() {
       this.datacollection = {
         labels: this.subjectNames,
         datasets: this.datasets

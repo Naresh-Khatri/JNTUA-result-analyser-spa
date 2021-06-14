@@ -213,6 +213,7 @@
 <script>
 import axios from "axios";
 import config from "../api.config.js";
+import { Result } from "../utils.mjs";
 
 import { backgroundColors, borderColors } from "../colors/colors";
 
@@ -221,6 +222,7 @@ import BarChart from "../charts/BarChart.vue";
 import LineChart from "../charts/LineChart.vue";
 
 import Tip from "../components/Tip.vue";
+
 export default {
   components: {
     RadarChart,
@@ -295,7 +297,6 @@ export default {
     };
   },
   mounted() {
-    //this.rollNo = "19fh1a05" + Math.abs(Math.ceil(Math.random() * 63) - 10);
     this.fillData();
   },
   methods: {
@@ -323,6 +324,10 @@ export default {
       var subjectNames = [];
       var subjectGrades = [];
       this.rowData = [];
+      axios.get('http://localhost:3000/56736424/' + this.rollNo)
+      .then(res=>{
+        console.log(res)
+      })
       axios
         .get(
           `${config.results}?student__id=${this.rollNo}&semester=${this.sem}${
@@ -330,7 +335,7 @@ export default {
           }`
         )
         .then(response => {
-          console.log(response.data)
+          console.log(response.data);
           if (response.data.length > 0) {
             this.$q.notify({
               type: "positive",
