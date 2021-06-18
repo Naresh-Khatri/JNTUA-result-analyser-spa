@@ -1,5 +1,7 @@
 <template>
   <div>
+      <StudentInput @success="setResultID($event)"/>
+
     <div
       class="flex row flex-center no-wrap q-mt-md q-pa-lg q-mx-lg bg-white rounded"
     >
@@ -8,7 +10,7 @@
         style="font-size: 3em;"
         @click="decRollNo()"
       /> -->
-      <q-dialog v-model="resultNotFoundDialog">
+      <!-- <q-dialog v-model="resultNotFoundDialog">
         <q-card>
           <q-card-section class="row items-center q-pb-none">
             <div class="text-h6">Result Not Found</div>
@@ -35,18 +37,8 @@
             </div>
           </q-card-section>
         </q-card>
-      </q-dialog>
+      </q-dialog> -->
       <div>
-        <div class="flex flex-center row">
-          <q-radio v-model="sem" val="1" label="Sem 1" /><q-radio
-            v-model="sem"
-            val="2"
-            label="Sem 2"
-          />
-        </div>
-        <div class="flex flex-center">
-          <q-checkbox v-model="supply" label="Supply" />
-        </div>
         <div>
           <div v-for="(rollNo, index) in rollNoList" :key="index">
             <div class="flex flex-center">
@@ -81,6 +73,7 @@
               class="q-mt-lg"
               color="primary"
               size="md"
+              :disable='!canSearch'
               @click="fillData"
             />
           </div>
@@ -206,7 +199,10 @@
 <script>
 import axios from "axios";
 import config from "../api.config.js";
+import { getShort } from "../utils/utils";
+
 import { backgroundColors, borderColors } from "../colors/colors";
+import StudentInput from '../components/StudentInput.vue'
 
 import RadarChart from "../charts/RadarChart.vue";
 import BarChart from "../charts/BarChart.vue";
@@ -216,6 +212,7 @@ import Tip from "../components/Tip.vue";
 
 export default {
   components: {
+    StudentInput,
     RadarChart,
     BarChart,
     LineChart,
@@ -224,9 +221,9 @@ export default {
   data() {
     return {
       datacollection: {},
-      rollNoList: ["19fh1a0546", "19fh1a0514", "19fh1a0507"],
-      sem: "1",
-      supply: false,
+      rollNoList: ["19fh1a0546", "19fh1a0545", "19fh1a0547"],
+      canSearch: false,      
+      ResultID:'',
       studentNameList: [],
       datasets: [],
       chartName: "radar",
@@ -237,6 +234,7 @@ export default {
       borderColors: borderColors,
       g_to_gp: {
         S: 10,
+        O:10,
         A: 9,
         B: 8,
         C: 7,
@@ -248,41 +246,41 @@ export default {
     };
   },
   mounted() {
-    this.fillData();
+    //this.fillData();
   },
   methods: {
+    setResultID(resultID){
+      this.canSearch = true
+      this.resultID = resultID
+      this.fillData()
+    },
     async fillData() {
       this.resetData();
       for (var i = 0; i < this.rollNoList.length; i++) {
         var gradePoints = [];
         axios
-          .get(
-            `${config.results}?student__id=${this.rollNoList[i]}&semester=${
-              this.sem
-            }${this.supply ? "a" : ""}`
-          )
-          .then(response => {
-            if (response.data.length > 0) {
+          .get(`https://jntua.plasmatch.in/${this.resultID}/${this.rollNoList[i]}`)
+          .then(res => {
+            console.log(res);
+            if (res.data) {
               this.$q.notify({
                 type: "positive",
                 message: `Result retrieved`
               });
-            }
-            if (response.data.length <= 20) {
-              //if rollNo is left empty then api will send all the rows
-              //setting it to large no like 20 helps to detect it
               gradePoints = [];
-              response.data.forEach(ele => {
-                //console.log(ele);
-                if (this.subjectNames.length < response.data.length)
-                  this.subjectNames.push(`${ele.subject.abb}`);
-                gradePoints.push(this.g_to_gp[ele.grade]);
+              res.data.subjects.forEach(sub => {
+                if (this.subjectNames.length < res.data['subjects'].length)
+                this.subjectNames.push(getShort(sub["Subject Name"]));
+                gradePoints.push(this.g_to_gp[sub["Grades"]]);
               });
-
-              this.studentNameList.push(response.data[0].student.name);
-              this.addToSGPAList(response.data[0].student.id);
+              this.studentNameList.push(res.data["name"]);
+              this.studentsList.push({
+                id: res.data["htn"],
+                name: res.data["name"],
+                sgpa: res.data["sgpa"]
+              });
               this.datasets.push({
-                label: response.data[0].student.name,
+                label: res.data["name"],
                 data: gradePoints,
                 backgroundColor: this.backgroundColors[0],
                 borderColor: this.borderColors[0],
@@ -303,6 +301,57 @@ export default {
           .finally(() => {
             this.drawChart();
           });
+        {
+          //   axios
+          //     .get(
+          //       `${config.results}?student__id=${this.rollNoList[i]}&semester=${
+          //         this.sem
+          //       }${this.supply ? "a" : ""}`
+          //     )
+          //     .then(response => {
+          //       console.log(response);
+          //       if (response.data.length > 0) {
+          //         this.$q.notify({
+          //           type: "positive",
+          //           message: `Result retrieved`
+          //         });
+          //       }
+          //       if (response.data.length <= 20) {
+          //         //if rollNo is left empty then api will send all the rows
+          //         //setting it to large no like 20 helps to detect it
+          //         gradePoints = [];
+          //         response.data.forEach(ele => {
+          //           //console.log(ele);
+          //           if (this.subjectNames.length < response.data.length)
+          //             this.subjectNames.push(`${ele.subject.abb}`);
+          //           gradePoints.push(this.g_to_gp[ele.grade]);
+          //         });
+          //         this.studentNameList.push(response.data[0].student.name);
+          //         this.addToSGPAList(response.data[0].student.id);
+          //         this.datasets.push({
+          //           label: response.data[0].student.name,
+          //           data: gradePoints,
+          //           backgroundColor: this.backgroundColors[0],
+          //           borderColor: this.borderColors[0],
+          //           borderWidth: 1
+          //         });
+          //         this.borderColors.splice(0, 1);
+          //         this.backgroundColors.splice(0, 1);
+          //       }
+          //     })
+          //     .catch(error => {
+          //       console.log(error);
+          //       this.resultNotFoundDialog = true;
+          //       this.$q.notify({
+          //         type: "negative",
+          //         message: `Result not found`
+          //       });
+          //     })
+          //     .finally(() => {
+          //       this.drawChart();
+          //     });
+          // }
+        }
       }
     },
     drawChart() {

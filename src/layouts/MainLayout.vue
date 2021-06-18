@@ -100,7 +100,7 @@
       </div>
     </q-drawer>
 
-    <q-page-container class="bg-grey-4">
+    <q-page-container class="bg-grey-4" style="min-height:1000px">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -116,8 +116,12 @@ export default {
   }
 };
 </script>
-<style lang="sass">
-.bg-primary
-  color: white
-  background: #F2C037
+<style>
+/* @import "tailwindcss/base"; */
+/* @import "tailwindcss/components"; */
+/* @import "tailwindcss/utilities"; */
+.bg-primary {
+  color: white;
+  background: #f2c037;
+}
 </style>

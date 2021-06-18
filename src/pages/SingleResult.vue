@@ -1,68 +1,83 @@
 <template>
   <div>
-    <div
-      class="flex row flex-center space-between 
-      justify-between no-wrap q-pa-lg bg-white 
-      rounded q-ma-md"
-    >
-      <q-dialog v-model="resultNotFoundDialog">
-        <q-card>
-          <q-card-section class="row items-center q-pb-none">
-            <div class="text-h6">Result Not Found</div>
-            <q-space />
-            <q-btn icon="close" flat round dense v-close-popup />
-          </q-card-section>
+    <!-- <q-dialog v-model="resultNotFoundDialog">
+      <q-card>
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6">Result Not Found</div>
+          <q-space />
+          <q-btn icon="close" flat round dense v-close-popup />
+        </q-card-section>
 
-          <q-card-section>
-            If you think your hall ticket number is correct then go to feedback
-            section and provide us the hall ticket number range of your batch
-            like this and we'll update our database
-            <q-space />
-            <div class="flex flex-center " style="flex-direction:column">
-              <div class="row">
-                <q-chip label="19fh1a0501" /> - <q-chip label="19fh1a0562" />
-              </div>
-              <q-btn
-                label="Feedback"
-                class="q-ma-md"
-                color="primary"
-                size="md"
-                to="feedback"
-              />
+        <q-card-section>
+          If you think your hall ticket number is correct then go to feedback
+          section and provide us the hall ticket number range of your batch like
+          this and we'll update our database
+          <q-space />
+          <div class="flex flex-center " style="flex-direction:column">
+            <div class="row">
+              <q-chip label="19fh1a0501" /> - <q-chip label="19fh1a0562" />
             </div>
-          </q-card-section>
-        </q-card>
-      </q-dialog>
-      <q-icon
-        name="arrow_back_ios_new"
-        style="font-size: 3em;"
-        v-show="datacollection.datasets"
-        @click="decRollNo()"
-      />
-      <div>
-        <div>
-          <q-input filled label="Roll Number" v-model="rollNo" />
-          <div>
-            <q-radio v-model="sem" val="1" label="Sem 1" /><q-radio
-              v-model="sem"
-              val="2"
-              label="Sem 2"
+            <q-btn
+              label="Feedback"
+              class="q-ma-md"
+              color="primary"
+              size="md"
+              to="feedback"
             />
           </div>
-          <div class="flex flex-center">
-            <q-checkbox v-model="supply" label="Supply" />
+        </q-card-section>
+      </q-card>
+    </q-dialog> -->
+    <StudentInput @success="setResultID($event)" />
+    <div class="flex column justify-center q-pa-lg bg-white rounded q-ma-md">
+      <div class="flex row justify-between items-center">
+        <q-icon
+          name="arrow_back_ios_new"
+          style="font-size: 3em;"
+          :disabled="!datacollection.datasets"
+          @click="decRollNo()"
+        />
+        <q-input filled label="Roll Number" v-model="rollNo" />
+
+        <!-- <div>
+          <div>
+            <div>
+              <q-radio v-model="sem" val="1" label="Sem 1" /><q-radio
+                v-model="sem"
+                val="2"
+                label="Sem 2"
+              />
+            </div>
+            <div class="flex flex-center">
+              <q-checkbox v-model="supply" label="Supply" />
+            </div>
+            <div class="flex flex-center">
+              <q-btn
+                label="Search"
+                color="primary"
+                size="md"
+                @click="fillData"
+              />
+            </div>
           </div>
-          <div class="flex flex-center">
-            <q-btn label="Search" color="primary" size="md" @click="fillData" />
-          </div>
-        </div>
+        </div> -->
+        <q-icon
+          name="arrow_forward_ios"
+          style="font-size: 3em;"
+          :disabled="!datacollection.datasets"
+          @click="incRollNo()"
+        />
       </div>
-      <q-icon
-        name="arrow_forward_ios"
-        style="font-size: 3em;"
-        v-show="datacollection.datasets"
-        @click="incRollNo()"
-      />
+      <div class="flex justify-center">
+        <q-btn
+          style="width:fit-content"
+          class="q-mt-sm"
+          label="Submit"
+          color="primary"
+          :disable="!canSearch"
+          @click="submit()"
+        />
+      </div>
     </div>
     <div v-if="datacollection.datasets">
       <div class="flex flex-center ">
@@ -213,14 +228,14 @@
 <script>
 import axios from "axios";
 import config from "../api.config.js";
-import { Result } from "../utils.mjs";
-
+import { getShort } from "../utils/utils";
 import { backgroundColors, borderColors } from "../colors/colors";
 
 import RadarChart from "../charts/RadarChart.vue";
 import BarChart from "../charts/BarChart.vue";
 import LineChart from "../charts/LineChart.vue";
 
+import StudentInput from "../components/StudentInput.vue";
 import Tip from "../components/Tip.vue";
 
 export default {
@@ -228,12 +243,15 @@ export default {
     RadarChart,
     BarChart,
     LineChart,
-    Tip
+    Tip,
+    StudentInput
   },
   data() {
     return {
       datacollection: {},
-      rollNo: "19fh1a0546",
+      canSearch: false,
+      rollNo: "19ER1R0045",
+      resultID: "",
       sem: "1",
       studentName: "",
       chartName: "radar",
@@ -286,6 +304,7 @@ export default {
       },
       g_to_gp: {
         S: 10,
+        O:10,
         A: 9,
         B: 8,
         C: 7,
@@ -297,14 +316,21 @@ export default {
     };
   },
   mounted() {
-    this.fillData();
+    //this.fillData();
   },
   methods: {
+    setResultID(resultID) {
+      this.resultID = resultID;
+      this.canSearch = true;
+    },
+    submit() {
+      this.fillData();
+    },
     incRollNo() {
       var prefix = "";
-      for (var i = 0; i < 7; i++) prefix += this.rollNo[i];
+      for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
       var num = "";
-      for (var i = 7; i < this.rollNo.length; i++) num += this.rollNo[i];
+      for (var i = 8; i < this.rollNo.length; i++) num += this.rollNo[i];
       num = parseInt(num);
       num++;
       this.rollNo = prefix + num;
@@ -312,9 +338,9 @@ export default {
     },
     decRollNo() {
       var prefix = "";
-      for (var i = 0; i < 7; i++) prefix += this.rollNo[i];
+      for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
       var num = "";
-      for (var i = 7; i < this.rollNo.length; i++) num += this.rollNo[i];
+      for (var i = 8; i < this.rollNo.length; i++) num += this.rollNo[i];
       num = parseInt(num);
       num--;
       this.rollNo = prefix + num;
@@ -324,38 +350,31 @@ export default {
       var subjectNames = [];
       var subjectGrades = [];
       this.rowData = [];
-      axios.get('http://localhost:3000/56736424/' + this.rollNo)
-      .then(res=>{
-        console.log(res)
-      })
       axios
-        .get(
-          `${config.results}?student__id=${this.rollNo}&semester=${this.sem}${
-            this.supply ? "a" : ""
-          }`
-        )
-        .then(response => {
-          console.log(response.data);
-          if (response.data.length > 0) {
+        .get(`https://jntua.plasmatch.in/${this.resultID}/${this.rollNo}`)
+        .then(res => {
+          console.log(res);
+          if (res.data) {
             this.$q.notify({
               type: "positive",
               message: `Result retrieved`
             });
-          }
-          response.data.forEach(ele => {
-            //console.log(ele);
-            this.rowData.push({
-              subject_name: ele.subject.abb,
-              status: ele.passed ? "Pass" : "Failed",
-              points: this.g_to_gp[ele.grade],
-              grade: ele.grade,
-              credit: ele.subject.credit
+            res.data.subjects.forEach(sub => {
+              this.rowData.push({
+                subject_name: getShort(sub["Subject Name"]),
+                status: sub["Result Status"] == "P" ? "Pass" : "Failed",
+                points: this.g_to_gp[sub["Grades"]],
+                grade: sub["Grades"],
+                credit: sub["Credits"]
+              });
+              subjectNames.push(
+                `${getShort(sub["Subject Name"])} (${sub["Grades"]})`
+              );
+              subjectGrades.push(this.g_to_gp[sub["Grades"]]);
             });
-            subjectNames.push(`${ele.subject.abb} (${ele.grade})`);
-            subjectGrades.push(this.g_to_gp[ele.grade]);
-          });
-          this.studentName = response.data[0].student.name;
-          this.getsgpa();
+            this.studentName = res.data["name"];
+            this.studentSGPA = Number.parseFloat(res.data.sgpa);
+          }
         })
         .catch(error => {
           console.log(error);
@@ -382,18 +401,6 @@ export default {
               }
             ]
           };
-        });
-    },
-    getsgpa() {
-      axios
-        .get(
-          `${config.semestergpa}?student__id=${this.rollNo}&semester=${this.sem}`
-        )
-        .then(response => {
-          {
-            console.log(response);
-            this.studentSGPA = response.data[0].sgpa;
-          }
         });
     }
   }
