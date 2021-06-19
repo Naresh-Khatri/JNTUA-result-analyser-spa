@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="container">
     <div
       v-if="loading"
       style="position: fixed;width: 100vw;height: 100vh;
@@ -12,67 +12,63 @@
         enter-active-class="animated fadeIn"
         leave-active-class="animated fadeOut"
       >
-        <q-img
-          style="position: absolute;top: 50%;left: 50%;
-          font-size: 50px;color: white;transform: translate(-50%,-50%);"
-          src="../assets/loading-head.gif"
-        >
+        <q-img class="loading-img" src="../assets/loading-head.gif">
           <div class="absolute-bottom-right text-subtitle2 flex flex-center">
             This might take a minute
           </div>
         </q-img>
       </transition>
     </div>
-
-    <StudentInput @success="setResultID($event)" />
-    <div class="flex column bg-white rounded q-pa-lg q-ma-lg">
-      <q-input
-        class="q-mb-md"
-        filled
-        v-model="rollPrefix"
-        bottom-slots
-        :rules="[
-          val =>
-            val.length == 8 ||
-            'Enter first 8 charaters of your full roll no.'
-        ]"
-        label="Roll no prefix"
-      >
-        <template v-slot:hint>
-          Example: 19fh1a05
-        </template></q-input
-      >
-      <div class="q-pa-md">
-        <q-range
-          v-model="range"
-          :min="1"
-          :max="99"
-          label
-          drag-range
-          label-always
-        />
-        <q-badge color="secondary" class="q-mb-lg text-subtitle2">
-          Selected : {{ rollPrefix + rollWithPrefix(range.min) }} -
-          {{ rollPrefix + rollWithPrefix(range.max) }}
-        </q-badge>
+    <div class="wrapper">
+      <StudentInput class="result-input" @success="setResultID($event)" />
+      <div class="roll-input flex column bg-white rounded q-pa-lg">
+        <q-input
+          class="q-mb-md"
+          filled
+          v-model="rollPrefix"
+          bottom-slots
+          :rules="[
+            val =>
+              val.length == 8 || 'Enter first 8 charaters of your full roll no.'
+          ]"
+          label="Roll no prefix"
+        >
+          <template v-slot:hint>
+            Example: 19fh1a05
+          </template></q-input
+        >
+        <div class="q-pa-md">
+          <q-range
+            v-model="range"
+            :min="1"
+            :max="99"
+            label
+            drag-range
+            label-always
+          />
+          <q-badge color="secondary" class="q-mb-lg text-subtitle2">
+            Selected : {{ rollPrefix + rollWithPrefix(range.min) }} -
+            {{ rollPrefix + rollWithPrefix(range.max) }}
+          </q-badge>
+        </div>
+        <div class="flex justify-center">
+          <q-btn
+            style="width:fit-content"
+            class="q-mt-sm"
+            label="Submit"
+            color="primary"
+            :disable="!canSearch"
+            @click="submit()"
+          />
+        </div>
       </div>
-      <div class="flex justify-center">
-        <q-btn
-          style="width:fit-content"
-          class="q-mt-sm"
-          label="Submit"
-          color="primary"
-          :disable="rollPrefix.length != 8"
-          @click="submit()"
-        />
-      </div>
-    </div>
-    <Tip
-      title="Info"
-      desc="This graph contains all the student with their SPGAs,
+      <div class="data-container" v-if="Object.keys(datacollection).length">
+        <Tip
+          title="Info"
+          desc="This graph contains all the student with their SPGAs,
                             Tap on any point to know more"
-    />
-    <!-- <div class="flex flex-center q-mt-lg">
+        />
+        <!-- <div class="flex flex-center q-mt-lg">
       <q-btn-group
         ><q-btn
           label="Sem 1"
@@ -91,29 +87,41 @@
       </q-btn-group>
     </div> -->
 
-    <div style="overflow-x: auto;">
-      <LineChart
-        style="height:70vh; width:1600px"
-        :chart-data="datacollection"
-        :options="{
-          responsive: true,
-          maintainAspectRatio: false,
-          layout: {
-            padding: 40
-          },
-          scales: {
-            yAxes: [
-              {
-                ticks: {
-                  beginAtZero: true,
-                  min: 0,
-                  max: 10
-                }
+        <div style="overflow-x: auto;">
+          <LineChart
+            style="height:650px; width:1300px"
+            :chart-data="datacollection"
+            :options="{
+              responsive: true,
+              maintainAspectRatio: false,
+              layout: {
+                padding: 40
+              },
+              scales: {
+                yAxes: [
+                  {
+                    ticks: {
+                      beginAtZero: true,
+                      min: 0,
+                      max: 10
+                    }
+                  }
+                ]
               }
-            ]
-          }
-        }"
-      />
+            }"
+          />
+        </div>
+        <Tip
+          title="Important"
+          desc="Students who are failed even in 1 subject wont be plotted!"
+        />
+      </div>
+      <div
+        v-else
+        class="data-container flex flex-center q-ma-xl text-h4 text-center text-grey"
+      >
+        Looks so empty here :/
+      </div>
     </div>
   </div>
 </template>
@@ -136,14 +144,14 @@ export default {
     return {
       canSearch: false,
       rollPrefix: "19fh1a05",
+      resultID: "",
       loading: false,
       range: {
         min: 1,
         max: 50
       },
       datacollection: {},
-      sem: 1,
-      resultID: ""
+      sem: 1
     };
   },
   mounted() {
@@ -155,7 +163,7 @@ export default {
       else return roll;
     },
     setResultID(resultID) {
-      this.canSearch;
+      this.canSearch = true;
       this.resultID = resultID;
     },
     // changeSem(sem) {
@@ -169,9 +177,7 @@ export default {
 
       axios
         .get(
-          `https://jntua.plasmatch.in/semResults/${this.resultID}/${
-            this.rollPrefix
-          }/${this.range.min}/${this.range.max}`
+          `https://jntua.plasmatch.in/semResults/${this.resultID}/${this.rollPrefix}/${this.range.min}/${this.range.max}`
         )
         .then(res => {
           this.loading = false;
@@ -182,6 +188,7 @@ export default {
           res.data.forEach(ele => {
             studentNames.push(ele["name"]);
             studentSGPAs.push(ele["sgpa"]);
+            // console.log(ele.sgpa, ele.name, ele.htn);
           });
         })
         .finally(() => {
@@ -227,4 +234,68 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+@media screen and (min-width: 768px) {
+  .wrapper {
+    display: grid;
+    gap: 25px;
+    margin-top: 50px;
+    width: 60%;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "result-input roll-input"
+      "data-container data-container";
+  }
+  .sgpa-container {
+    grid-area: sgpa-container;
+    align-self: center;
+  }
+  .roll-input {
+    grid-area: roll-input;
+  }
+  .result-input {
+    grid-area: result-input;
+  }
+  .data-container {
+    grid-area: data-container;
+  }
+  .container {
+    display: grid;
+    justify-items: center;
+  }
+  .loading-img {
+    width: 500px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .result-input {
+    margin: 20px 10px;
+  }
+  .roll-input {
+    margin: 20px 10px;
+  }
+  .sgpa-container {
+    margin: 20px 10px;
+  }
+  .data-container {
+    margin: 20px 10px;
+  }
+  .loading-img{
+  width: 80%;
+
+  }
+}
+.loading-img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 50px;
+  color: white;
+  border-radius: 25px;
+}
+.rounded {
+  border-radius: 20px;
+}
+</style>

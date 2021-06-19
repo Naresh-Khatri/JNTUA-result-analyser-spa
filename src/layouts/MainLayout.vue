@@ -5,6 +5,7 @@
         <q-toolbar>
           <q-btn dense flat round icon="menu" @click="left = !left" />
           <q-space />
+          <!-- <q-btn flat round icon="search" class="q-mr-xs" @click="toggleTheme()" /> -->
           <q-btn flat round disabled dense icon="search" class="q-mr-xs" />
           <q-btn flat round disabled dense icon="group_add" />
         </q-toolbar>
@@ -113,6 +114,12 @@ export default {
       left: false,
       link: "single-result"
     };
+  },
+  methods:{
+    toggleTheme(){
+      this.$q.dark.toggle()
+      console.log(this.$q.dark.isActive)
+    }
   }
 };
 </script>

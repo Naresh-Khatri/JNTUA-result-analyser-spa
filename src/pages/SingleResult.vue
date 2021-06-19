@@ -1,6 +1,7 @@
 <template>
-  <div>
-    <!-- <q-dialog v-model="resultNotFoundDialog">
+  <div class="container">
+    <div class="wrapper">
+      <!-- <q-dialog v-model="resultNotFoundDialog">
       <q-card>
         <q-card-section class="row items-center q-pb-none">
           <div class="text-h6">Result Not Found</div>
@@ -28,18 +29,18 @@
         </q-card-section>
       </q-card>
     </q-dialog> -->
-    <StudentInput @success="setResultID($event)" />
-    <div class="flex column justify-center q-pa-lg bg-white rounded q-ma-md">
-      <div class="flex row justify-between items-center">
-        <q-icon
-          name="arrow_back_ios_new"
-          style="font-size: 3em;"
-          :disabled="!datacollection.datasets"
-          @click="decRollNo()"
-        />
-        <q-input filled label="Roll Number" v-model="rollNo" />
+      <StudentInput class="result-input" @success="setResultID($event)" />
+      <div class="roll-input q-pa-lg bg-white rounded">
+        <div class="flex no-wrap row justify-evenly items-center">
+          <q-icon
+            name="arrow_back_ios_new"
+            style="font-size: 3em;"
+            :disabled="!datacollection.datasets"
+            @click="decRollNo()"
+          />
+          <q-input filled label="Roll Number" v-model="rollNo" />
 
-        <!-- <div>
+          <!-- <div>
           <div>
             <div>
               <q-radio v-model="sem" val="1" label="Sem 1" /><q-radio
@@ -61,27 +62,30 @@
             </div>
           </div>
         </div> -->
-        <q-icon
-          name="arrow_forward_ios"
-          style="font-size: 3em;"
-          :disabled="!datacollection.datasets"
-          @click="incRollNo()"
-        />
+          <q-icon
+            name="arrow_forward_ios"
+            style="font-size: 3em;"
+            :disabled="!datacollection.datasets"
+            @click="incRollNo()"
+          />
+        </div>
+        <div class="flex justify-center">
+          <q-btn
+            style="width:fit-content"
+            class="q-mt-sm"
+            label="Submit"
+            color="primary"
+            :disable="!canSearch"
+            @click="submit()"
+          />
+        </div>
       </div>
       <div class="flex justify-center">
-        <q-btn
-          style="width:fit-content"
-          class="q-mt-sm"
-          label="Submit"
-          color="primary"
-          :disable="!canSearch"
-          @click="submit()"
-        />
-      </div>
-    </div>
-    <div v-if="datacollection.datasets">
-      <div class="flex flex-center ">
-        <q-card class="q-px-lg q-mx-lg q-mt-md rounded" flat>
+        <q-card
+          class="sgpa-container q-px-lg rounded"
+          v-if="datacollection.datasets"
+          flat
+        >
           <div class="flex flex-center q-px-sm">
             <div class="col">
               <div class=" text-center" style="font-size:1.3rem">
@@ -104,123 +108,130 @@
           </div>
         </q-card>
       </div>
-      <div class="q-pa-md">
+      <div class="data-container" v-if="datacollection.datasets">
+        <div>
+          <Tip
+            title="Tip 1"
+            desc="Click on the column name to sort the rows accordingly"
+          />
+
+          <q-table
+            title="Result Table"
+            class="q-pt-md"
+            dense
+            :data="rowData"
+            :columns="columns"
+            :hide-bottom="true"
+            :pagination="pagination"
+            row-key="name"
+          >
+            <template v-slot:body="props">
+              <q-tr :props="props">
+                <q-td key="subject_name" :props="props">
+                  {{ props.row.subject_name }}
+                </q-td>
+                <q-td key="status" :props="props">
+                  <q-chip
+                    dense
+                    size="md"
+                    :color="
+                      props.row.status == 'Pass' ? 'positive' : 'negative'
+                    "
+                    class="text-white"
+                    >{{ props.row.status }}</q-chip
+                  >
+                </q-td>
+                <q-td dense key="points" :props="props">
+                  {{ props.row.points }}
+                </q-td>
+                <q-td key="grade" :props="props"> {{ props.row.grade }} </q-td>
+                <q-td key="credit" :props="props">{{ props.row.credit }}</q-td>
+              </q-tr>
+            </template>
+          </q-table>
+        </div>
         <Tip
-          title="Tip 1"
-          desc="Click on the column name to sort the rows accordingly"
+          title="Tip 2"
+          desc="Here you can choose from various charts like radar,
+        line and bar. Also you can tap on any point inside chart to know more"
         />
 
-        <q-table
-          title="Result Table "
-          class="q-pt-md"
-          dense
-          :data="rowData"
-          :columns="columns"
-          :hide-bottom="true"
-          :pagination="pagination"
-          row-key="name"
+        <q-tabs
+          v-model="chartName"
+          indicator-color="primary"
+          class="text-primary rounded bg-white q-mb-sm q-mx-lg"
         >
-          <template v-slot:body="props">
-            <q-tr :props="props">
-              <q-td key="subject_name" :props="props">
-                {{ props.row.subject_name }}
-              </q-td>
-              <q-td key="status" :props="props">
-                <q-chip
-                  dense
-                  size="md"
-                  :color="props.row.status == 'Pass' ? 'positive' : 'negative'"
-                  class="text-white"
-                  >{{ props.row.status }}</q-chip
-                >
-              </q-td>
-              <q-td dense key="points" :props="props">
-                {{ props.row.points }}
-              </q-td>
-              <q-td key="grade" :props="props"> {{ props.row.grade }} </q-td>
-              <q-td key="credit" :props="props">{{ props.row.credit }}</q-td>
-            </q-tr>
-          </template>
-        </q-table>
-      </div>
-      <Tip
-        title="Tip 2"
-        desc="Here you can choose from various charts like radar,
-        line and bar. Also you can tap on any point inside chart to know more"
-      />
-
-      <q-tabs
-        v-model="chartName"
-        indicator-color="primary"
-        class="text-primary rounded bg-white q-mb-sm q-mx-lg"
-      >
-        <q-tab name="radar" icon="radar" label="Radar" />
-        <q-tab name="line" icon="show_chart" label="Line" />
-        <q-tab name="bar" icon="bar_chart" label="Bar" />
-      </q-tabs>
-      <q-tab-panels v-model="chartName" animated class="shadow-2 rounded">
-        <q-tab-panel name="radar" class="rounded">
-          <RadarChart
-            :chart-data="datacollection"
-            :options="{
-              responsive: true,
-              maintainAspectRatio: false,
-              scale: {
-                ticks: {
-                  beginAtZero: true,
-                  max: 10
+          <q-tab name="radar" icon="radar" label="Radar" />
+          <q-tab name="line" icon="show_chart" label="Line" />
+          <q-tab name="bar" icon="bar_chart" label="Bar" />
+        </q-tabs>
+        <q-tab-panels v-model="chartName" animated class="shadow-2 rounded">
+          <q-tab-panel name="radar" class="rounded">
+            <RadarChart
+              :chart-data="datacollection"
+              :options="{
+                responsive: true,
+                maintainAspectRatio: false,
+                scale: {
+                  ticks: {
+                    beginAtZero: true,
+                    max: 10
+                  }
                 }
-              }
-            }"
-          />
-        </q-tab-panel>
+              }"
+            />
+          </q-tab-panel>
 
-        <q-tab-panel name="line" class="flex flex-center flex-row">
-          <LineChart
-            style="max-width:500px"
-            :chart-data="datacollection"
-            :options="{
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                yAxes: [
-                  {
-                    ticks: {
-                      beginAtZero: true,
-                      min: 0,
-                      max: 10
+          <q-tab-panel name="line" class="flex flex-center flex-row">
+            <LineChart
+              style="max-width:500px"
+              :chart-data="datacollection"
+              :options="{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  yAxes: [
+                    {
+                      ticks: {
+                        beginAtZero: true,
+                        min: 0,
+                        max: 10
+                      }
                     }
-                  }
-                ]
-              }
-            }"
-          />
-        </q-tab-panel>
+                  ]
+                }
+              }"
+            />
+          </q-tab-panel>
 
-        <q-tab-panel name="bar">
-          <BarChart
-            :chart-data="datacollection"
-            :options="{
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                yAxes: [
-                  {
-                    ticks: {
-                      beginAtZero: true,
-                      min: 0,
-                      max: 10
+          <q-tab-panel name="bar">
+            <BarChart
+              :chart-data="datacollection"
+              :options="{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  yAxes: [
+                    {
+                      ticks: {
+                        beginAtZero: true,
+                        min: 0,
+                        max: 10
+                      }
                     }
-                  }
-                ]
-              }
-            }"
-          />
-        </q-tab-panel>
-      </q-tab-panels>
-    </div>
-    <div v-else class="flex flex-center q-ma-xl text-h4 text-center text-grey">
-      Looks so empty here :/
+                  ]
+                }
+              }"
+            />
+          </q-tab-panel>
+        </q-tab-panels>
+      </div>
+      <div
+        v-else
+        class="data-container flex flex-center q-ma-xl text-h4 text-center text-grey"
+      >
+        Looks so empty here :/
+      </div>
     </div>
   </div>
 </template>
@@ -250,7 +261,7 @@ export default {
     return {
       datacollection: {},
       canSearch: false,
-      rollNo: "19ER1R0045",
+      rollNo: "19fh1a0546",
       resultID: "",
       sem: "1",
       studentName: "",
@@ -304,19 +315,20 @@ export default {
       },
       g_to_gp: {
         S: 10,
-        O:10,
+        O: 10,
         A: 9,
         B: 8,
         C: 7,
         D: 6,
         E: 5,
         F: 0,
-        AB: 0
+        AB: 0,
+        Y:0
       }
     };
   },
   mounted() {
-    //this.fillData();
+    // this.fillData();
   },
   methods: {
     setResultID(resultID) {
@@ -353,7 +365,7 @@ export default {
       axios
         .get(`https://jntua.plasmatch.in/${this.resultID}/${this.rollNo}`)
         .then(res => {
-          console.log(res);
+          // console.log(res);
           if (res.data) {
             this.$q.notify({
               type: "positive",
@@ -407,6 +419,53 @@ export default {
 };
 </script>
 <style scoped>
+@media screen and (min-width: 1000px) {
+  .wrapper {
+    display: grid;
+    gap: 25px;
+    margin-top: 50px;
+    width:60%;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    grid-template-areas:
+      "result-input roll-input"
+      "result-input sgpa-container"
+      "data-container data-container";
+  }
+  .sgpa-container {
+    grid-area: sgpa-container;
+    align-self: center;
+    width: 100%;
+  }
+  .roll-input {
+    grid-area: roll-input;
+  }
+  .result-input {
+    grid-area: result-input;
+  }
+  .data-container {
+    grid-area: data-container;
+  }
+  .container {
+    display: grid;
+    justify-items: center;
+  }
+}
+@media screen and (max-width: 1000px) {
+  .result-input {
+    margin: 20px 10px;
+  }
+  .roll-input {
+    margin: 20px 10px;
+  }
+  .sgpa-container {
+    margin: 20px 10px;
+    width: 70%;
+  }
+  .data-container {
+    margin: 20px 10px;
+  }
+}
 .rounded {
   border-radius: 20px;
 }

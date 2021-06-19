@@ -1,10 +1,50 @@
 <template>
-  <div>
-      <StudentInput @success="setResultID($event)"/>
+  <div class="container">
+    <div class="wrapper">
+      <StudentInput class="result-input" @success="setResultID($event)" />
 
-    <div
-      class="flex row flex-center no-wrap q-mt-md q-pa-lg q-mx-lg bg-white rounded"
-    >
+      <div class="roll-input q-pa-lg bg-white rounded">
+        <div v-for="(rollNo, index) in rollNoList" :key="index">
+          <div class="flex flex-center">
+            <q-input filled label="Roll Number" v-model="rollNoList[index]">
+              <template v-slot:append>
+                <q-btn
+                  round
+                  dense
+                  flat
+                  icon="remove_circle"
+                  color="negative"
+                  v-show="rollNoList.length > 1"
+                  @click="rollNoList.splice(index, 1)"
+                />
+              </template>
+            </q-input>
+          </div>
+        </div>
+        <div class="flex flex-center">
+          <q-btn
+            icon="add"
+            round
+            class="q-mt-sm"
+            color="primary"
+            size="md"
+            @click="rollNoList.push('')"
+          />
+        </div>
+        <div class="flex flex-center">
+          <q-btn
+            label="Search"
+            class="q-mt-lg"
+            color="primary"
+            size="md"
+            :disable="!canSearch"
+            @click="fillData"
+          />
+        </div>
+      </div>
+      <!-- <div
+        class="flex row flex-center no-wrap q-mt-md q-pa-lg q-mx-lg bg-white rounded"
+      > -->
       <!-- <q-icon
         name="arrow_back_ios_new"
         style="font-size: 3em;"
@@ -38,160 +78,123 @@
           </q-card-section>
         </q-card>
       </q-dialog> -->
-      <div>
-        <div>
-          <div v-for="(rollNo, index) in rollNoList" :key="index">
-            <div class="flex flex-center">
-              <q-input filled label="Roll Number" v-model="rollNoList[index]">
-                <template v-slot:append>
-                  <q-btn
-                    round
-                    dense
-                    flat
-                    icon="remove_circle"
-                    color="negative"
-                    v-show="rollNoList.length > 1"
-                    @click="rollNoList.splice(index, 1)"
-                  />
-                </template>
-              </q-input>
-            </div>
-          </div>
-          <div class="flex flex-center">
-            <q-btn
-              icon="add"
-              round
-              class="q-mt-sm"
-              color="primary"
-              size="md"
-              @click="rollNoList.push('')"
-            />
-          </div>
-          <div class="flex flex-center">
-            <q-btn
-              label="Search"
-              class="q-mt-lg"
-              color="primary"
-              size="md"
-              :disable='!canSearch'
-              @click="fillData"
-            />
-          </div>
-        </div>
-      </div>
-    </div>
-    <div v-if="datasets.length">
-      <div class="flex flex-center">
-        <q-card
-          class="q-pa-sm q-ma-md rounded"
-          flat
-          style="display:flex; flex-wrap:wrap; justify-content:center"
-        >
-          <div v-for="(student, index) in studentsList" :key="index">
-            <div class="text-center">
-              <q-knob
-                readonly
-                :value="student.sgpa"
-                show-value
-                size="90px"
-                label="dsf"
-                :thickness="0.22"
-                :max="10"
-                color="green"
-                track-color="grey-3"
-                class="text-primary q-ma-lg"
-                style="margin-bottom:4px;"
-              />
-              <div
-                class="text-grey"
-                style="max-width:150px;font-size:1.1em; word-break: break-word;"
-              >
-                {{ student.name }}
+      <!-- </div> -->
+      <div class="data-container" v-if="datasets.length">
+        <div class="flex flex-center">
+          <q-card
+            class="q-pa-sm q-ma-md rounded"
+            flat
+            style="display:flex; flex-wrap:wrap; justify-content:center"
+          >
+            <div v-for="(student, index) in studentsList" :key="index">
+              <div class="text-center">
+                <q-knob
+                  readonly
+                  :value="student.sgpa"
+                  show-value
+                  size="90px"
+                  label="dsf"
+                  :thickness="0.22"
+                  :max="10"
+                  color="green"
+                  track-color="grey-3"
+                  class="text-primary q-ma-lg"
+                  style="margin-bottom:4px;"
+                />
+                <div
+                  class="text-grey"
+                  style="max-width:150px;font-size:1.1em; word-break: break-word;"
+                >
+                  {{ student.name }}
+                </div>
               </div>
             </div>
-          </div>
-        </q-card>
-      </div>
-      <Tip
-        title="Tip"
-        desc="You can click on any student's name label to remove them from the chart"
-      />
-      <q-tabs
-        v-model="chartName"
-        indicator-color="primary"
-        class="text-primary rounded bg-white q-mb-sm q-mx-lg"
-      >
-        <q-tab name="radar" icon="radar" label="Radar" />
-        <q-tab name="line" icon="show_chart" label="Line" />
-        <q-tab name="bar" icon="bar_chart" label="Bar" />
-      </q-tabs>
-      <q-tab-panels
-        v-model="chartName"
-        animated
-        class="q-mx-sm shadow-2 rounded"
-      >
-        <q-tab-panel name="radar">
-          <RadarChart
-            :chart-data="datacollection"
-            :options="{
-              responsive: true,
-              maintainAspectRatio: false,
-              scale: {
-                ticks: {
-                  beginAtZero: true,
-                  max: 10
+          </q-card>
+        </div>
+        <Tip
+          title="Tip"
+          desc="You can click on any student's name label to remove them from the chart"
+        />
+        <q-tabs
+          v-model="chartName"
+          indicator-color="primary"
+          class="text-primary rounded bg-white q-mb-sm q-mx-lg"
+        >
+          <q-tab name="radar" icon="radar" label="Radar" />
+          <q-tab name="line" icon="show_chart" label="Line" />
+          <q-tab name="bar" icon="bar_chart" label="Bar" />
+        </q-tabs>
+        <q-tab-panels
+          v-model="chartName"
+          animated
+          class="q-mx-sm shadow-2 rounded"
+        >
+          <q-tab-panel name="radar">
+            <RadarChart
+              :chart-data="datacollection"
+              :options="{
+                responsive: true,
+                maintainAspectRatio: false,
+                scale: {
+                  ticks: {
+                    beginAtZero: true,
+                    max: 10
+                  }
                 }
-              }
-            }"
-          />
-        </q-tab-panel>
+              }"
+            />
+          </q-tab-panel>
 
-        <q-tab-panel name="line" class="flex flex-center flex-row">
-          <LineChart
-            style="max-width:500px"
-            :chart-data="datacollection"
-            :options="{
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                yAxes: [
-                  {
-                    ticks: {
-                      beginAtZero: true,
-                      min: 0,
-                      max: 10
+          <q-tab-panel name="line" class="flex flex-center flex-row">
+            <LineChart
+              style="max-width:500px"
+              :chart-data="datacollection"
+              :options="{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  yAxes: [
+                    {
+                      ticks: {
+                        beginAtZero: true,
+                        min: 0,
+                        max: 10
+                      }
                     }
-                  }
-                ]
-              }
-            }"
-          />
-        </q-tab-panel>
+                  ]
+                }
+              }"
+            />
+          </q-tab-panel>
 
-        <q-tab-panel name="bar">
-          <BarChart
-            :chart-data="datacollection"
-            :options="{
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                yAxes: [
-                  {
-                    ticks: {
-                      beginAtZero: true,
-                      min: 0,
-                      max: 10
+          <q-tab-panel name="bar">
+            <BarChart
+              :chart-data="datacollection"
+              :options="{
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  yAxes: [
+                    {
+                      ticks: {
+                        beginAtZero: true,
+                        min: 0,
+                        max: 10
+                      }
                     }
-                  }
-                ]
-              }
-            }"
-          />
-        </q-tab-panel>
-      </q-tab-panels>
-    </div>
-    <div v-else class="flex flex-center q-ma-xl text-h4 text-center text-grey">
-      Looks so empty here :/
+                  ]
+                }
+              }"
+            />
+          </q-tab-panel>
+        </q-tab-panels>
+      </div>
+      <div
+        v-else
+        class="data-container flex flex-center q-ma-xl text-h4 text-center text-grey"
+      >
+        Looks so empty here :/
+      </div>
     </div>
   </div>
 </template>
@@ -202,7 +205,7 @@ import config from "../api.config.js";
 import { getShort } from "../utils/utils";
 
 import { backgroundColors, borderColors } from "../colors/colors";
-import StudentInput from '../components/StudentInput.vue'
+import StudentInput from "../components/StudentInput.vue";
 
 import RadarChart from "../charts/RadarChart.vue";
 import BarChart from "../charts/BarChart.vue";
@@ -221,9 +224,9 @@ export default {
   data() {
     return {
       datacollection: {},
-      rollNoList: ["19fh1a0546", "19fh1a0545", "19fh1a0547"],
-      canSearch: false,      
-      ResultID:'',
+      rollNoList: [],
+      canSearch: false,
+      ResultID: "",
       studentNameList: [],
       datasets: [],
       chartName: "radar",
@@ -234,32 +237,48 @@ export default {
       borderColors: borderColors,
       g_to_gp: {
         S: 10,
-        O:10,
+        O: 10,
         A: 9,
         B: 8,
         C: 7,
         D: 6,
         E: 5,
         F: 0,
-        AB: 0
+        AB: 0,
+        Y:0
       }
     };
   },
   mounted() {
     //this.fillData();
+    this.generateRandRolls();
   },
   methods: {
-    setResultID(resultID){
-      this.canSearch = true
-      this.resultID = resultID
-      this.fillData()
+    generateRandRolls() {
+      for (let i = 0; i < 3; i++) {
+        this.rollNoList.push("19fh1a05" + this.getRandom(60));
+      }
+    },
+    getRandom(max) {
+      let num = Math.ceil(Math.random() * max);
+      let numStr = "";
+      if (num < 10) numStr = "0" + num;
+      else numStr = num;
+      return numStr;
+    },
+    setResultID(resultID) {
+      this.canSearch = true;
+      this.resultID = resultID;
+      this.fillData();
     },
     async fillData() {
       this.resetData();
       for (var i = 0; i < this.rollNoList.length; i++) {
         var gradePoints = [];
         axios
-          .get(`https://jntua.plasmatch.in/${this.resultID}/${this.rollNoList[i]}`)
+          .get(
+            `https://jntua.plasmatch.in/${this.resultID}/${this.rollNoList[i]}`
+          )
           .then(res => {
             console.log(res);
             if (res.data) {
@@ -269,8 +288,8 @@ export default {
               });
               gradePoints = [];
               res.data.subjects.forEach(sub => {
-                if (this.subjectNames.length < res.data['subjects'].length)
-                this.subjectNames.push(getShort(sub["Subject Name"]));
+                if (this.subjectNames.length < res.data["subjects"].length)
+                  this.subjectNames.push(getShort(sub["Subject Name"]));
                 gradePoints.push(this.g_to_gp[sub["Grades"]]);
               });
               this.studentNameList.push(res.data["name"]);
@@ -406,6 +425,50 @@ export default {
 };
 </script>
 <style>
+@media screen and (min-width: 768px) {
+  .wrapper {
+    display: grid;
+    gap: 25px;
+    margin-top: 50px;
+    width: 70%;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas:
+      "result-input roll-input"
+      "data-container data-container";
+  }
+  .sgpa-container {
+    grid-area: sgpa-container;
+    align-self: center;
+  }
+  .roll-input {
+    grid-area: roll-input;
+  }
+  .result-input {
+    grid-area: result-input;
+  }
+  .data-container {
+    grid-area: data-container;
+  }
+  .container {
+    display: grid;
+    justify-items: center;
+  }
+}
+@media screen and (max-width: 768px) {
+  .result-input {
+    margin: 20px 10px;
+  }
+  .roll-input {
+    margin: 20px 10px;
+  }
+  .sgpa-container {
+    margin: 20px 10px;
+  }
+  .data-container {
+    margin: 20px 10px;
+  }
+}
 .rounded {
   border-radius: 20px;
 }
