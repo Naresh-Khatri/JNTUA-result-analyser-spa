@@ -4,7 +4,8 @@
       <div v-if="sent" class="centerr">
         <div
           value="df  "
-          style="height: 100%; background: white;border-radius: 20px; padding: 20px"
+          style="height: 100%;border-radius: 20px; padding: 20px"
+          :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
         >
           <h3 style="text-align: center; margin: 10px;">Thank you!</h3>
           <div class="flex flex-center q-mb-lg">
@@ -28,17 +29,19 @@
         >
           <h3 style="text-align: center; margin: 10px;">Send Us a Message!</h3>
           <q-input
-            outlined
+            filled
+            :color="$q.dark.isActive ? 'white' : 'primary'"
             class="q-mx-lg q-my-sm q-mt-xl"
             v-model="name"
-            label="Name(Optional)"
+            label="Name (Optional)"
             type="text"
           />
           <q-input
-            outlined
             class="q-mx-lg"
+            filled
+            :color="$q.dark.isActive ? 'white' : 'primary'"
             v-model="email"
-            label="Email(Optional)"
+            label="Email (Optional)"
             type="email"
             :rules="[
               val =>
@@ -55,7 +58,7 @@
               v-model="message"
               filled
               type="textarea"
-              style="background-color: white"
+              :color="$q.dark.isActive ? 'white' : 'primary'"
               label="Message"
             />
           </div>
@@ -63,6 +66,7 @@
             color="primary"
             label="Submit"
             style="margin-left:40%;"
+            :disable="message.length < minCharInMsg"
             @click="onSubmit"
           />
         </q-stepper>
@@ -73,7 +77,6 @@
 
 <script>
 import axios from "axios";
-import config from "../api.config.js";
 
 export default {
   data() {
@@ -82,24 +85,22 @@ export default {
       email: "",
       message: "",
       sent: false,
-      ok: ""
+      ok: "",
+      minCharInMsg: 4
     };
   },
   methods: {
     onSubmit() {
-      var payload = {
-        name: this.name,
-        email: this.email,
-        message: this.message
-      };
-
-      console.log(payload);
+      if (this.message.length < this.minCharInMsg) return
+        var payload = {
+          name: this.name,
+          email: this.email,
+          text: this.message
+        };
       axios
-        // .post("https://apiv1.plasmatch.in/SendMessage/", payload)
-        .post(config.feedbacks, payload)
-
+        .post("https://jntua.plasmatch.in/feedback", payload)
         .then(response => {
-          if (response.status === 201) {
+          if (response.status === 200) {
             this.$q.notify({
               type: "positive",
               message: "Message Sent!",

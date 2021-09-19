@@ -30,15 +30,23 @@
       </q-card>
     </q-dialog> -->
       <StudentInput class="result-input" @success="setResultID($event)" />
-      <div class="roll-input q-pa-lg bg-white rounded">
+      <div
+        class="roll-input q-pa-lg rounded"
+        :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+      >
         <div class="flex no-wrap row justify-evenly items-center">
           <q-icon
             name="arrow_back_ios_new"
             style="font-size: 3em;"
             :disabled="!datacollection.datasets"
-            @click="decRollNo()"
+            @click="changeRoll(-1)"
           />
-          <q-input filled label="Roll Number" v-model="rollNo" />
+          <q-input
+            filled
+            label="Roll Number"
+            :color="$q.dark.isActive ? 'white' : 'primary'"
+            v-model="rollNo"
+          />
 
           <!-- <div>
           <div>
@@ -66,7 +74,7 @@
             name="arrow_forward_ios"
             style="font-size: 3em;"
             :disabled="!datacollection.datasets"
-            @click="incRollNo()"
+            @click="changeRoll(1)"
           />
         </div>
         <div class="flex justify-center">
@@ -102,13 +110,25 @@
                 :max="10"
                 color="green"
                 track-color="grey-3"
-                class="text-primary q-ma-md"
+                class=" q-ma-md"
               />
             </div>
           </div>
         </q-card>
+        <transition v-if="datacollection.datasets">
+          <div style="display:flex; justify-content:center">
+            <q-btn
+              text-color="white"
+              label="Share"
+              style="background:#25D366"
+              @click="share"
+            >
+              <img width="50px" src="../assets/whatsapp.svg" />
+            </q-btn>
+          </div>
+        </transition>
       </div>
-      <div class="data-container" v-if="datacollection.datasets">
+      <div class="data-container q-mb-xl" v-if="datacollection.datasets">
         <div>
           <Tip
             title="Tip 1"
@@ -159,78 +179,63 @@
         <q-tabs
           v-model="chartName"
           indicator-color="primary"
-          class="text-primary rounded bg-white q-mb-sm q-mx-lg"
+          class="text-primary rounded q-mb-sm q-mx-lg"
+          :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
         >
-          <q-tab name="radar" icon="radar" label="Radar" />
-          <q-tab name="line" icon="show_chart" label="Line" />
-          <q-tab name="bar" icon="bar_chart" label="Bar" />
+          <q-tab
+            name="radar"
+            icon="radar"
+            label="Radar"
+            :style="$q.dark.isActive ? 'color:white' : ''"
+          />
+          <q-tab
+            name="line"
+            icon="show_chart"
+            label="Line"
+            :style="$q.dark.isActive ? 'color:white' : ''"
+          />
+          <q-tab
+            name="bar"
+            icon="bar_chart"
+            label="Bar"
+            :style="$q.dark.isActive ? 'color:white' : ''"
+          />
         </q-tabs>
-        <q-tab-panels v-model="chartName" animated class="shadow-2 rounded">
+        <q-tab-panels
+          v-model="chartName"
+          animated
+          class="q-mb-xl shadow-2 rounded"
+        >
           <q-tab-panel name="radar" class="rounded">
-            <RadarChart
-              :chart-data="datacollection"
-              :options="{
-                responsive: true,
-                maintainAspectRatio: false,
-                scale: {
-                  ticks: {
-                    beginAtZero: true,
-                    max: 10
-                  }
-                }
-              }"
-            />
+            <RadarChart :chart-data="datacollection" :key="$q.dark.isActive" />
           </q-tab-panel>
 
           <q-tab-panel name="line" class="flex flex-center flex-row">
             <LineChart
-              style="max-width:500px"
+              style="min-width:90%"
               :chart-data="datacollection"
-              :options="{
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  yAxes: [
-                    {
-                      ticks: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 10
-                      }
-                    }
-                  ]
-                }
-              }"
+              :key="$q.dark.isActive"
             />
           </q-tab-panel>
 
           <q-tab-panel name="bar">
-            <BarChart
-              :chart-data="datacollection"
-              :options="{
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                  yAxes: [
-                    {
-                      ticks: {
-                        beginAtZero: true,
-                        min: 0,
-                        max: 10
-                      }
-                    }
-                  ]
-                }
-              }"
-            />
+            <BarChart :chart-data="datacollection" :key="$q.dark.isActive" />
           </q-tab-panel>
         </q-tab-panels>
       </div>
       <div
         v-else
-        class="data-container flex flex-center q-ma-xl text-h4 text-center text-grey"
+        class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl"
       >
-        Looks so empty here :/
+        <q-intersection>
+          <q-img
+            width="400px"
+            src="../assets/sad-emoji.gif"
+            style="filter: drop-shadow(0px 0px 4px yellow);"
+          />
+        </q-intersection>
+
+        Looks so empty here
       </div>
     </div>
   </div>
@@ -323,38 +328,76 @@ export default {
         E: 5,
         F: 0,
         AB: 0,
-        Y:0
+        Y: 0
       }
     };
   },
   mounted() {
+    // this.resultID = "56736469";
+    // this.canSearch = true;
     // this.fillData();
+    this.checkQueries();
   },
   methods: {
     setResultID(resultID) {
       this.resultID = resultID;
       this.canSearch = true;
     },
+    checkQueries() {
+      // console.log(this.$route.query);
+      if (!Object.keys(this.$route.query).includes("resultID")) return;
+      // console.log(window.location);
+      this.rollNoList = this.$route.query.htn;
+      this.resultID = this.$route.query.resultID;
+      console.log(this.rollNoList, this.resultID);
+      this.canSearch = true;
+      this.fillData();
+    },
     submit() {
       this.fillData();
     },
-    incRollNo() {
-      var prefix = "";
-      for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
-      var num = "";
-      for (var i = 8; i < this.rollNo.length; i++) num += this.rollNo[i];
-      num = parseInt(num);
-      num++;
-      this.rollNo = prefix + num;
-      this.fillData();
+    share() {
+      if (navigator.share) {
+        navigator.share({
+          title: "Hey I compared our results on this cool webApp!",
+          url: `${window.location.origin}/#/?resultID=${
+            this.resultID
+          }&rollList=${this.rollNo}`
+        })
+          .then(() => {
+            this.sendSharedInfoToDB();
+            console.log("Thanks for sharing!");
+            this.$q.notify({
+              type: "positive",
+              message: `Thanks for sharing this page! 😀😁`
+            });
+          })
+          .catch(console.error);
+      } else {
+        // fallback
+      }
     },
-    decRollNo() {
+    sendSharedInfoToDB() {
+      axios.post("https://jntua.plasmatch.in/shared", {
+        type:'single',
+        htns: [this.rollNo],
+        resultID: this.resultID
+      });
+    },
+    changeRoll(val) {
+      if (!this.datacollection.datasets) {
+        this.$q.notify({
+          message: "Please select exam first!",
+          type: "info"
+        });
+        return;
+      }
       var prefix = "";
       for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
       var num = "";
       for (var i = 8; i < this.rollNo.length; i++) num += this.rollNo[i];
       num = parseInt(num);
-      num--;
+      num += val;
       this.rollNo = prefix + num;
       this.fillData();
     },
@@ -387,6 +430,10 @@ export default {
             this.studentName = res.data["name"];
             this.studentSGPA = Number.parseFloat(res.data.sgpa);
           }
+        })
+        .then(() => {
+          //scroll bottom
+          window.scrollTo(0, document.body.scrollHeight + 100);
         })
         .catch(error => {
           console.log(error);
@@ -424,7 +471,7 @@ export default {
     display: grid;
     gap: 25px;
     margin-top: 50px;
-    width:60%;
+    width: 60%;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
     grid-template-areas:

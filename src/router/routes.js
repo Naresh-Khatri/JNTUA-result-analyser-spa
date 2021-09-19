@@ -6,9 +6,9 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/SingleResult.vue') },
       { path: '/single-result', component: () => import('src/pages/SingleResult.vue') },
-      { path: '/multi-result', component: () => import('src/pages/MultiResult.vue') },
+      { path: '/compare-result', component: () => import('src/pages/CompareResult.vue') },
       { path: '/feedback', component: () => import('src/pages/FeedbackPage.vue') },
-      { path: '/sem-result', component: () => import('pages/SemResult.vue') },
+      { path: '/batch-result', component: () => import('src/pages/BatchResult.vue') },
     ]
   },
 

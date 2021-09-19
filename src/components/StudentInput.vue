@@ -1,24 +1,27 @@
 <template>
-  <div class="flex column bg-white rounded q-pa-lg ">
+  <div class="flex column rounded q-pa-lg " :class="$q.dark.isActive?'bg-dark':'bg-white'">
     <div class="flex flex-col justify-center">
-      <q-btn
+      <!-- <q-btn
         style="width:fit-content"
         class="q-mb-sm"
         label="Reset"
         color="primary"
         @click="reset()"
-      />
+      /> -->
     </div>
     <q-select
+    :color="$q.dark.isActive?'white':'primary'"
       filled
       v-model="selectedReg"
       :options="regsOpts"
       outlined
       @input="selectedFn('reg', selectedReg)"
-      label="Regulation"
+      label="Regulation/Curriculum"
       clearable
     />
     <q-select
+    :color="$q.dark.isActive?'white':'primary'"
+
       filled
       v-model="selectedCourse"
       :options="coursesOpts"
@@ -29,6 +32,7 @@
       :disable="!selectedReg"
     />
     <q-select
+    :color="$q.dark.isActive?'white':'primary'"
       filled
       v-model="selectedYear"
       :options="yearOpts"
@@ -39,6 +43,7 @@
       :disable="!selectedCourse"
     />
     <q-select
+    :color="$q.dark.isActive?'white':'primary'"
       filled
       v-model="selectedSem"
       :options="semOpts"
@@ -49,6 +54,7 @@
       :disable="!selectedYear"
     />
     <q-select
+    :color="$q.dark.isActive?'white':'primary'"
       filled
       v-model="selectedTitle"
       :options="titleOpts"
@@ -84,11 +90,26 @@ export default {
   },
   mounted() {
     this.init();
+    // //testing to add feedback request dialog
+    //   $q.dialog({
+    //     title: 'Confirm',
+    //     message: 'Would you like to turn on the wifi?',
+    //     cancel: true,
+    //     persistent: true
+    //   }).onOk(() => {
+    //     // console.log('>>>> OK')
+    //   }).onOk(() => {
+    //     // console.log('>>>> second OK catcher')
+    //   }).onCancel(() => {
+    //     // console.log('>>>> Cancel')
+    //   }).onDismiss(() => {
+    //     // console.log('I am triggered on both OK and Cancel')
+    //   })
   },
   methods: {
     init() {
       axios.get("https://jntua.plasmatch.in/releasedResults").then(res => {
-        console.log(res.data);
+        // console.log(res.data);
         this.resultObj = res.data;
         this.regsOpts = Object.keys(res.data);
       });

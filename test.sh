@@ -11,6 +11,6 @@ git status
 git add .
 
 git status
-git commit -m 'Add responsiveness to all pages'
+git commit -m 'Add share analytics and scroll bottom'
 #git pull origin gh-pages --allow-unrelated-histories
 git push origin gh-pages --force

@@ -1,16 +1,41 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header class=" bg-white text-black " style="height:100px">
+    <q-header
+      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+      style="height:100px"
+    >
       <div class="bg-primary text-white">
         <q-toolbar>
           <q-btn dense flat round icon="menu" @click="left = !left" />
           <q-space />
-          <!-- <q-btn flat round icon="search" class="q-mr-xs" @click="toggleTheme()" /> -->
-          <q-btn flat round disabled dense icon="search" class="q-mr-xs" />
-          <q-btn flat round disabled dense icon="group_add" />
+
+          <transition name="fade" mode="out-in">
+            <q-btn
+              flat
+              v-if="!$q.dark.isActive"
+              round
+              key="1"
+              icon="dark_mode"
+              class="q-mr-xs"
+              size="lg"
+              @click="toggleTheme()"
+            />
+            <q-btn
+              flat
+              round
+              key="2"
+              v-else
+              icon="light_mode"
+              class="q-mr-xs"
+              size="lg"
+              @click="toggleTheme()"
+            />
+          </transition>
+          <!-- <q-btn flat round disabled dense icon="search" class="q-mr-xs" />
+          <q-btn flat round disabled dense icon="group_add" /> -->
         </q-toolbar>
-        <q-toolbar inset>
-          <q-toolbar-title
+        <q-toolbar inset style="padding:0px">
+          <q-toolbar-title class="text-center"
             ><strong>JNTUA</strong> Results analyser</q-toolbar-title
           >
         </q-toolbar>
@@ -33,37 +58,37 @@
               <q-icon name="person_outline" />
             </q-item-section>
 
-            <q-item-section>Single result</q-item-section>
+            <q-item-section>Single</q-item-section>
           </q-item>
 
           <q-item
             clickable
             v-ripple
-            :active="link === 'multi-result'"
-            @click="link = 'multi-result'"
+            :active="link === 'compare-result'"
+            @click="link = 'compare-result'"
             active-class="bg-primary"
-            to="/multi-result"
+            to="/compare-result"
           >
             <q-item-section avatar>
               <q-icon name="person_add_alt" />
             </q-item-section>
 
-            <q-item-section>Multi result</q-item-section>
+            <q-item-section>Compare</q-item-section>
           </q-item>
 
           <q-item
             clickable
             v-ripple
-            :active="link === 'sem-result'"
-            @click="link = 'sem-result'"
+            :active="link === 'batch-result'"
+            @click="link = 'batch-result'"
             active-class="bg-primary"
-            to="/sem-result"
+            to="/batch-result"
           >
             <q-item-section avatar>
               <q-icon name="school" />
             </q-item-section>
 
-            <q-item-section>Sem Result</q-item-section>
+            <q-item-section>Batch</q-item-section>
           </q-item>
 
           <q-separator spaced />
@@ -101,7 +126,10 @@
       </div>
     </q-drawer>
 
-    <q-page-container class="bg-grey-4" style="min-height:1000px">
+    <q-page-container
+      :class="$q.dark.isActive ? 'dark' : 'bg-grey-4'"
+      style="min-height:1000px; transition: background-color .3s"
+    >
       <router-view />
     </q-page-container>
   </q-layout>
@@ -115,10 +143,31 @@ export default {
       link: "single-result"
     };
   },
-  methods:{
-    toggleTheme(){
-      this.$q.dark.toggle()
-      console.log(this.$q.dark.isActive)
+  mounted() {
+    this.$q.loadingBar.setDefaults({
+      color: "white",
+      size: "15px"
+    });
+    this.$q.addressbarColor.set("#ff4d01");
+    this.$q.dark.toggle();
+
+    //patch logs
+    console.log("yes");
+    this.$q.dialog({
+      title: "New Feature! 👩‍🔧",
+      html: true,
+      message: `<li style='font-size:1.2em'>
+      Now you can share any result with your friends😎🤟</li>
+        <br>
+                  If you want this app to get better then head over to 
+                  the feedback section on top left💁‍♀️
+                  `
+    });
+    localStorage.setItem("logDisplayed", true);
+  },
+  methods: {
+    toggleTheme() {
+      this.$q.dark.toggle();
     }
   }
 };
@@ -127,8 +176,24 @@ export default {
 /* @import "tailwindcss/base"; */
 /* @import "tailwindcss/components"; */
 /* @import "tailwindcss/utilities"; */
+.body--light {
+  background: #e0e0e0;
+  transition: 0.3s;
+}
 .bg-primary {
   color: white;
   background: #f2c037;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: all 0.2s;
+}
+.fade-enter {
+  opacity: 0;
+  transform: rotate(-90deg);
+}
+.fade-leave-to {
+  opacity: 0;
+  transform: rotate(90deg);
 }
 </style>

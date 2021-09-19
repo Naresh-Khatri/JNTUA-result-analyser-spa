@@ -18,13 +18,14 @@ export default {
 
 <style scoped>
 .container {
+  display: block;
   border-radius: 4px;
   margin: 16px 0;
   padding: 16px 24px;
   font-size: 1em;
   border-width: 0 5px;
   border-style: solid;
-  background-color: #c1f4cd;
+  background-color: rgba(193, 244, 205, 0.562);
   border-color: #21ba45;
   letter-spacing: 0.5px;
 }

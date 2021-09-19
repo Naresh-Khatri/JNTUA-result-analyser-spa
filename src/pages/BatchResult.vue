@@ -21,7 +21,10 @@
     </div>
     <div class="wrapper">
       <StudentInput class="result-input" @success="setResultID($event)" />
-      <div class="roll-input flex column bg-white rounded q-pa-lg">
+      <div
+        class="roll-input flex column rounded q-pa-lg"
+        :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+      >
         <q-input
           class="q-mb-md"
           filled
@@ -53,63 +56,80 @@
         </div>
         <div class="flex justify-center">
           <q-btn
-            style="width:fit-content"
-            class="q-mt-sm"
-            label="Submit"
+            style="width:150px"
             color="primary"
+            :loading="loading"
             :disable="!canSearch"
             @click="submit()"
-          />
+          >
+            Submit
+            <template v-slot:loading>
+              <q-spinner-gears class="on-left" />
+              Fetching...
+            </template>
+          </q-btn>
         </div>
       </div>
-      <div class="data-container" v-if="Object.keys(datacollection).length">
+      <div class="data-container" v-if="Object.keys(datacollection).length > 0">
         <Tip
           title="Info"
           desc="This graph contains all the student with their SPGAs,
                             Tap on any point to know more"
         />
         <!-- <div class="flex flex-center q-mt-lg">
-      <q-btn-group
-        ><q-btn
-          label="Sem 1"
-          color="primary"
-          size="lg"
-          :disable="sem == 1"
-          @click="changeSem(1)"
-        />
-        <q-btn
-          label="Sem 2"
-          color="primary"
-          size="lg"
-          :disable="sem == 2"
-          @click="changeSem(2)"
-        />
-      </q-btn-group>
+          <q-btn-group
+            ><q-btn
+              label="Sem 1"
+              color="primary"
+              size="lg"
+              :disable="sem == 1"
+              @click="changeSem(1)"
+            />
+            <q-btn
+              label="Sem 2"
+              color="primary"
+              size="lg"
+              :disable="sem == 2"
+              @click="changeSem(2)"
+            />
+          </q-btn-group>
     </div> -->
 
-        <div style="overflow-x: auto;">
-          <LineChart
-            style="height:650px; width:1300px"
-            :chart-data="datacollection"
-            :options="{
-              responsive: true,
-              maintainAspectRatio: false,
-              layout: {
-                padding: 40
-              },
-              scales: {
-                yAxes: [
-                  {
-                    ticks: {
-                      beginAtZero: true,
-                      min: 0,
-                      max: 10
-                    }
-                  }
-                ]
-              }
+        <transition>
+          <div style="display:flex; justify-content:center">
+            <q-btn
+              class="text-white"
+              label="Share"
+              style="background:#25D366"
+              @click="share"
+            >
+              <img width="50px" src="../assets/whatsapp.svg" />
+            </q-btn>
+          </div>
+        </transition>
+        <div
+          style="overflow-x: auto;padding:20px; border-radius:25px;margin:20px 0px"
+          :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+        >
+          <q-scroll-area
+            horizontal
+            style="height:550px;"
+            :thumb-style="{
+              bottom: '4px',
+              borderRadius: '5px',
+              background: '#b0b8b4ff',
+              width: '10px',
+              opacity: 1
             }"
-          />
+            :style="!$q.screen.lt.md ? 'height:700px' : ''"
+          >
+            <LineChart
+              style="height:550px; width:1300px"
+              :style="!$q.screen.lt.md ? 'height:700px' : ''"
+              :chart-data="datacollection"
+              :key="$q.dark.isActive"
+            />
+          </q-scroll-area>
         </div>
         <Tip
           title="Important"
@@ -118,9 +138,17 @@
       </div>
       <div
         v-else
-        class="data-container flex flex-center q-ma-xl text-h4 text-center text-grey"
+        class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl"
       >
-        Looks so empty here :/
+        <q-intersection>
+          <!-- <q-img
+            width="400px"
+            src="../assets/sad-emoji.gif"
+            style="filter: drop-shadow(0px 0px 6px yellow);"
+          /> -->
+        </q-intersection>
+
+        Looks so empty here
       </div>
     </div>
   </div>
@@ -155,7 +183,10 @@ export default {
     };
   },
   mounted() {
+    // this.resultID = "56736469";
+    // this.canSearch = true;
     //this.fillData();
+    this.checkQueries();
   },
   methods: {
     rollWithPrefix(roll) {
@@ -170,6 +201,49 @@ export default {
     //   this.sem = sem;
     //   this.fillData();
     // },
+    checkQueries() {
+      if (!Object.keys(this.$route.query).includes("resultID")) return;
+
+      // console.log(Object.keys(this.$route.query).includes("resultID"));
+      console.log(this.$route.query);
+      this.resultID = this.$route.query.resultID;
+      this.range.rollPrefix = this.$route.query.prefix;
+      this.range.min = this.$route.query.min;
+      this.range.max = this.$route.query.max;
+
+      console.log(window.location);
+      this.submit();
+    },
+    share() {
+      if (navigator.share) {
+        navigator
+          .share({
+            title: "Hey I saw our entire batch result on this cool webApp!",
+            url: `${window.location.href}?resultID=${this.resultID}&prefix=${this.rollPrefix}&min=${this.range.min}&max=${this.range.max}`
+          })
+          .then(() => {
+            this.sendSharedInfoToDB();
+            console.log("Thanks for sharing!");
+            this.$q.notify({
+              type: "positive",
+              message: `Thanks for sharing this page! 😀😁`
+            });
+          })
+          .catch(console.error);
+      } else {
+        // fallback
+      }
+    },
+    sendSharedInfoToDB() {
+      axios.post("https://jntua.plasmatch.in/shared", {
+        type: "batch",
+        htns: [
+          this.rollPrefix + this.rollWithPrefix(this.range.min),
+          this.rollPrefix + this.rollWithPrefix(this.range.max)
+        ],
+        resultID: this.resultID
+      });
+    },
     submit() {
       this.loading = true;
       var studentNames = [];
@@ -191,14 +265,18 @@ export default {
             // console.log(ele.sgpa, ele.name, ele.htn);
           });
         })
+        .then(() => {
+          //scroll bottom
+          window.scrollTo(0, document.body.scrollHeight + 100);
+        })
         .finally(() => {
           this.datacollection = {
             labels: studentNames,
             datasets: [
               {
                 data: studentSGPAs,
-                backgroundColor: "#b0b8b4ff",
-                borderColor: "#184a45ff"
+                backgroundColor: "#ff4d0155",
+                borderColor: "#ff4d01"
               }
             ]
           };
@@ -235,7 +313,7 @@ export default {
 </script>
 
 <style scoped>
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 1024px) {
   .wrapper {
     display: grid;
     gap: 25px;
@@ -268,7 +346,7 @@ export default {
     width: 500px;
   }
 }
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1024px) {
   .result-input {
     margin: 20px 10px;
   }
@@ -281,9 +359,8 @@ export default {
   .data-container {
     margin: 20px 10px;
   }
-  .loading-img{
-  width: 80%;
-
+  .loading-img {
+    width: 80%;
   }
 }
 .loading-img {
