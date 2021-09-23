@@ -33,7 +33,7 @@
             :color="$q.dark.isActive ? 'white' : 'primary'"
             class="q-mx-lg q-my-sm q-mt-xl"
             v-model="name"
-            label="Name (Optional)"
+            label="Name"
             type="text"
           />
           <q-input

@@ -378,7 +378,7 @@ export default {
       }
     },
     sendSharedInfoToDB() {
-      axios.post("https://jntua.plasmatch.in/shared", {
+      axios.post("https://jntua.plasmatch.in/share", {
         type:'single',
         htns: [this.rollNo],
         resultID: this.resultID
@@ -406,7 +406,7 @@ export default {
       var subjectGrades = [];
       this.rowData = [];
       axios
-        .get(`https://jntua.plasmatch.in/${this.resultID}/${this.rollNo}`)
+        .get(`https://jntua.plasmatch.in/singleResult/${this.resultID}/${this.rollNo}`)
         .then(res => {
           // console.log(res);
           if (res.data) {

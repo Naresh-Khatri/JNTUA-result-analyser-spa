@@ -307,7 +307,7 @@ export default {
       }
     },
     sendSharedInfoToDB() {
-      axios.post("https://jntua.plasmatch.in/shared", {
+      axios.post("https://jntua.plasmatch.in/share", {
         type:'compare',
         htns: this.rollNoList,
         resultID: this.resultID
@@ -319,7 +319,7 @@ export default {
         var gradePoints = [];
         axios
           .get(
-            `https://jntua.plasmatch.in/${this.resultID}/${this.rollNoList[i]}`
+            `https://jntua.plasmatch.in/singleResult/${this.resultID}/${this.rollNoList[i]}`
           )
           .then(res => {
             // console.log(res);

@@ -11,6 +11,6 @@ git status
 git add .
 
 git status
-git commit -m 'Add share analytics and scroll bottom'
+git commit -m 'Fix loading gif position when batch search is in progress'
 #git pull origin gh-pages --allow-unrelated-histories
 git push origin gh-pages --force

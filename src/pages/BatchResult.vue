@@ -235,7 +235,7 @@ export default {
       }
     },
     sendSharedInfoToDB() {
-      axios.post("https://jntua.plasmatch.in/shared", {
+      axios.post("https://jntua.plasmatch.in/share", {
         type: "batch",
         htns: [
           this.rollPrefix + this.rollWithPrefix(this.range.min),
