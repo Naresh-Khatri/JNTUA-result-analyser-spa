@@ -12,6 +12,7 @@ export default {
         maintainAspectRatio: false,
         scale: {
           ticks: {
+            min:0,
             backdropColor: "rgba(255,255,255,0)"
           },
           gridLines: {

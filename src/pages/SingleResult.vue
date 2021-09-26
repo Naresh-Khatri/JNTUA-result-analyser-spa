@@ -416,7 +416,7 @@ export default {
             });
             res.data.subjects.forEach(sub => {
               this.rowData.push({
-                subject_name: getShort(sub["Subject Name"]),
+                subject_name: getShort(sub["Subject Name"]),  
                 status: sub["Result Status"] == "P" ? "Pass" : "Failed",
                 points: this.g_to_gp[sub["Grades"]],
                 grade: sub["Grades"],
