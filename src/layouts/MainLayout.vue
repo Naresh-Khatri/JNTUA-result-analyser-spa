@@ -96,6 +96,20 @@
           <q-item
             clickable
             v-ripple
+            :active="link === 'stats'"
+            @click="link = 'stats'"
+            active-class="bg-primary"
+            to="/stats"
+          >
+            <q-item-section avatar>
+              <q-icon name="leaderboard" />
+            </q-item-section>
+
+            <q-item-section>Stats</q-item-section>
+          </q-item>
+          <q-item
+            clickable
+            v-ripple
             :active="link === 'feedback'"
             @click="link = 'feedback'"
             active-class="bg-primary"
@@ -154,14 +168,16 @@ export default {
     //patch logs
     console.log("yes");
     this.$q.dialog({
-      title: "New Feature! 👩‍🔧",
+      title: "New Features! 👩‍🔧",
       html: true,
       message: `<li style='font-size:1.2em'>
+      🆕 Added 🏆statstics for every college</li>
+      <li style='font-size:1.2em'>
       Now you can share any result with your friends😎🤟</li>
         <br>
-                  If you want this app to get better then head over to 
-                  the feedback section on top left💁‍♀️
-                  `
+        If you want this app to get better then head over to 
+        the feedback section on top 🙋‍♀️
+        `
     });
     localStorage.setItem("logDisplayed", true);
   },

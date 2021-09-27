@@ -11,6 +11,6 @@ git status
 git add .
 
 git status
-git commit -m 'Fix loading gif position when batch search is in progress'
+git commit -m 'Set radar min tick to 0'
 #git pull origin gh-pages --allow-unrelated-histories
 git push origin gh-pages --force
