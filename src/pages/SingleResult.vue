@@ -358,12 +358,11 @@ export default {
     },
     share() {
       if (navigator.share) {
-        navigator.share({
-          title: "Hey I compared our results on this cool webApp!",
-          url: `${window.location.origin}/#/?resultID=${
-            this.resultID
-          }&rollList=${this.rollNo}`
-        })
+        navigator
+          .share({
+            title: "Hey I compared our results on this cool webApp!",
+            url: `${window.location.origin}/#/?resultID=${this.resultID}&rollList=${this.rollNo}`
+          })
           .then(() => {
             this.sendSharedInfoToDB();
             console.log("Thanks for sharing!");
@@ -379,7 +378,7 @@ export default {
     },
     sendSharedInfoToDB() {
       axios.post("https://jntua.plasmatch.in/share", {
-        type:'single',
+        type: "single",
         htns: [this.rollNo],
         resultID: this.resultID
       });
@@ -392,13 +391,69 @@ export default {
         });
         return;
       }
-      var prefix = "";
-      for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
-      var num = "";
-      for (var i = 8; i < this.rollNo.length; i++) num += this.rollNo[i];
-      num = parseInt(num);
-      num += val;
-      this.rollNo = prefix + num;
+      let chars = [
+        "a",
+        "b",
+        "c",
+        "d",
+        "e",
+        "f",
+        "g",
+        "h",
+        "i",
+        "j",
+        "k",
+        "l",
+        "m",
+        "n",
+        "o",
+        "p"
+      ];
+      //check if roll > 99 by checking whether 2nd from last elem is char
+      if (!chars.includes(this.rollNo[this.rollNo.length - 2])) {
+        console.log("of");
+
+        var prefix = "";
+        for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
+
+        var num = "";
+        for (var i = 8; i < this.rollNo.length; i++) num += this.rollNo[i];
+        num = parseInt(num);
+        num += val;
+        //check bounds
+        if (num < 1) {
+          this.$q.notify({
+            message: "Bound reached",
+            type: "info"
+          });
+          return;
+        }
+        //change roll to ao 
+        if (num >= 100) {
+          this.rollNo = prefix + "a0";
+          return;
+        }
+        // add a 0 in front if num <10
+        this.rollNo = prefix + (num < 10 ? `0${num}` : num);
+      } else {
+        var prefix = "";
+        for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
+        //TODO
+        let char = this.rollNo[8];
+        let num = parseInt(this.rollNo[9]);
+
+        num += val;
+        if (char.toLowerCase() == "a" && num < 0) {
+          char = "9";
+          num = 9;
+        }
+        if (num >= 10) char = chars[chars.indexOf(char) + 1];
+        else if (num < 0) {
+          num = 9;
+          char = chars[chars.indexOf(char) - 1];
+        }
+        this.rollNo = prefix + char + Math.abs(num % 10);
+      }
       this.fillData();
     },
     fillData() {
@@ -406,7 +461,9 @@ export default {
       var subjectGrades = [];
       this.rowData = [];
       axios
-        .get(`https://jntua.plasmatch.in/singleResult/${this.resultID}/${this.rollNo}`)
+        .get(
+          `https://jntua.plasmatch.in/singleResult/${this.resultID}/${this.rollNo}`
+        )
         .then(res => {
           // console.log(res);
           if (res.data) {
@@ -416,7 +473,7 @@ export default {
             });
             res.data.subjects.forEach(sub => {
               this.rowData.push({
-                subject_name: getShort(sub["Subject Name"]),  
+                subject_name: getShort(sub["Subject Name"]),
                 status: sub["Result Status"] == "P" ? "Pass" : "Failed",
                 points: this.g_to_gp[sub["Grades"]],
                 grade: sub["Grades"],
