@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <q-page class="card">
     <div class="q-pa-md">
       <div v-if="sent" class="centerr">
         <div
@@ -72,7 +72,7 @@
         </q-stepper>
       </div>
     </div>
-  </div>
+  </q-page>
 </template>
 
 <script>
@@ -127,17 +127,11 @@ export default {
 };
 </script>
 <style>
-#map {
-  min-height: 500px;
-  max-height: 500px;
-  min-width: 300px;
-  max-width: 700px;
-}
 .card {
   max-width: 800px;
+  margin-top:50px;
   margin-left: auto;
   margin-right: auto;
-  margin-top: 100px;
   border-radius: 5px;
 }
 .centerr {

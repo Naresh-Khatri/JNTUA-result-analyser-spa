@@ -1,16 +1,20 @@
 <template>
-  <div class="flex column rounded q-pa-lg " :class="$q.dark.isActive?'bg-dark':'bg-white'">
-    <div class="flex flex-col justify-center">
-      <!-- <q-btn
+  <div
+    class="flex column rounded q-pa-lg "
+    :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+  >
+    <!--<div class="flex flex-col justify-center">
+         <q-btn
         style="width:fit-content"
         class="q-mb-sm"
         label="Reset"
         color="primary"
         @click="reset()"
-      /> -->
-    </div>
+      />
+    </div>-->
+    <!-- <div class="text-h6">Sected your batch</div> -->
     <q-select
-    :color="$q.dark.isActive?'white':'primary'"
+      :color="$q.dark.isActive ? 'white' : 'primary'"
       filled
       v-model="selectedReg"
       :options="regsOpts"
@@ -20,8 +24,7 @@
       clearable
     />
     <q-select
-    :color="$q.dark.isActive?'white':'primary'"
-
+      :color="$q.dark.isActive ? 'white' : 'primary'"
       filled
       v-model="selectedCourse"
       :options="coursesOpts"
@@ -32,7 +35,7 @@
       :disable="!selectedReg"
     />
     <q-select
-    :color="$q.dark.isActive?'white':'primary'"
+      :color="$q.dark.isActive ? 'white' : 'primary'"
       filled
       v-model="selectedYear"
       :options="yearOpts"
@@ -43,7 +46,7 @@
       :disable="!selectedCourse"
     />
     <q-select
-    :color="$q.dark.isActive?'white':'primary'"
+      :color="$q.dark.isActive ? 'white' : 'primary'"
       filled
       v-model="selectedSem"
       :options="semOpts"
@@ -54,7 +57,7 @@
       :disable="!selectedYear"
     />
     <q-select
-    :color="$q.dark.isActive?'white':'primary'"
+      :color="$q.dark.isActive ? 'white' : 'primary'"
       filled
       v-model="selectedTitle"
       :options="titleOpts"

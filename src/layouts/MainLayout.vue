@@ -142,7 +142,7 @@
 
     <q-page-container
       :class="$q.dark.isActive ? 'dark' : 'bg-grey-4'"
-      style="min-height:1000px; transition: background-color .3s"
+      style="transition: background-color .3s"
     >
       <router-view />
     </q-page-container>

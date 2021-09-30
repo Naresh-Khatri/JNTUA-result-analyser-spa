@@ -34,6 +34,8 @@
         class="roll-input q-pa-lg rounded"
         :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
       >
+
+      <!-- Roll number input with forward and backward buttons -->
         <div class="flex no-wrap row justify-evenly items-center">
           <q-icon
             name="arrow_back_ios_new"
@@ -47,29 +49,6 @@
             :color="$q.dark.isActive ? 'white' : 'primary'"
             v-model="rollNo"
           />
-
-          <!-- <div>
-          <div>
-            <div>
-              <q-radio v-model="sem" val="1" label="Sem 1" /><q-radio
-                v-model="sem"
-                val="2"
-                label="Sem 2"
-              />
-            </div>
-            <div class="flex flex-center">
-              <q-checkbox v-model="supply" label="Supply" />
-            </div>
-            <div class="flex flex-center">
-              <q-btn
-                label="Search"
-                color="primary"
-                size="md"
-                @click="fillData"
-              />
-            </div>
-          </div>
-        </div> -->
           <q-icon
             name="arrow_forward_ios"
             style="font-size: 3em;"
@@ -77,6 +56,7 @@
             @click="changeRoll(1)"
           />
         </div>
+        <!-- Submit button -->
         <div class="flex justify-center">
           <q-btn
             style="width:fit-content"
@@ -407,7 +387,17 @@ export default {
         "m",
         "n",
         "o",
-        "p"
+        "p",
+        "q",
+        "r",
+        "s",
+        "t",
+        "u",
+        "v",
+        "w",
+        "x",
+        "y",
+        "z"
       ];
       //check if roll > 99 by checking whether 2nd from last elem is char
       if (!chars.includes(this.rollNo[this.rollNo.length - 2])) {
@@ -428,7 +418,7 @@ export default {
           });
           return;
         }
-        //change roll to ao 
+        //change roll to a0
         if (num >= 100) {
           this.rollNo = prefix + "a0";
           return;

@@ -141,11 +141,11 @@
         class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl"
       >
         <q-intersection>
-          <!-- <q-img
+          <q-img
             width="400px"
             src="../assets/sad-emoji.gif"
             style="filter: drop-shadow(0px 0px 6px yellow);"
-          /> -->
+          />
         </q-intersection>
 
         Looks so empty here

@@ -11,6 +11,6 @@ git status
 git add .
 
 git status
-git commit -m 'Add new route stats to view insights'
+git commit -m 'minor UI improvements'
 #git pull origin gh-pages --allow-unrelated-histories
 git push origin gh-pages --force
