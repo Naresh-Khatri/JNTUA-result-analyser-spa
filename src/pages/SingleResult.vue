@@ -223,7 +223,7 @@
 
 <script>
 import axios from "axios";
-import config from "../api.config.js";
+import apiRoutes from "../apiRoutes"
 import { getShort } from "../utils/utils";
 import { backgroundColors, borderColors } from "../colors/colors";
 
@@ -357,7 +357,7 @@ export default {
       }
     },
     sendSharedInfoToDB() {
-      axios.post("https://jntua.plasmatch.in/share", {
+      axios.post(apiRoutes.share, {
         type: "single",
         htns: [this.rollNo],
         resultID: this.resultID
@@ -452,7 +452,7 @@ export default {
       this.rowData = [];
       axios
         .get(
-          `https://jntua.plasmatch.in/singleResult/${this.resultID}/${this.rollNo}`
+          `${apiRoutes.singleResult}/${this.resultID}/${this.rollNo}`
         )
         .then(res => {
           // console.log(res);

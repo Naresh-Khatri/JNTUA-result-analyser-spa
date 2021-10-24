@@ -158,9 +158,9 @@
 import axios from "axios";
 
 import LineChart from "../charts/LineChart.vue";
-import config from "../api.config.js";
 import Tip from "../components/Tip.vue";
 import StudentInput from "../components/StudentInput.vue";
+import apiRoutes from 'src/apiRoutes';
 
 export default {
   components: {
@@ -185,7 +185,6 @@ export default {
   mounted() {
     // this.resultID = "56736469";
     // this.canSearch = true;
-    //this.fillData();
     this.checkQueries();
   },
   methods: {
@@ -197,10 +196,6 @@ export default {
       this.canSearch = true;
       this.resultID = resultID;
     },
-    // changeSem(sem) {
-    //   this.sem = sem;
-    //   this.fillData();
-    // },
     checkQueries() {
       if (!Object.keys(this.$route.query).includes("resultID")) return;
 
@@ -235,7 +230,7 @@ export default {
       }
     },
     sendSharedInfoToDB() {
-      axios.post("https://jntua.plasmatch.in/share", {
+      axios.post(apiRoutes.share, {
         type: "batch",
         htns: [
           this.rollPrefix + this.rollWithPrefix(this.range.min),
@@ -251,7 +246,7 @@ export default {
 
       axios
         .get(
-          `https://jntua.plasmatch.in/semResults/${this.resultID}/${this.rollPrefix}/${this.range.min}/${this.range.max}`
+          `${apiRoutes.semResults}/${this.resultID}/${this.rollPrefix}/${this.range.min}/${this.range.max}`
         )
         .then(res => {
           this.loading = false;
@@ -282,32 +277,6 @@ export default {
           };
         });
     },
-    fillData() {
-      var studentNames = [];
-      var studentSGPAs = [];
-
-      axios
-        .get(`${config.semestergpa}?ordering=-sgpa&semester=${this.sem}`)
-        .then(response => {
-          console.log(response.data);
-          response.data.forEach(ele => {
-            studentNames.push(ele.student.name);
-            studentSGPAs.push(ele.sgpa);
-          });
-        })
-        .finally(() => {
-          this.datacollection = {
-            labels: studentNames,
-            datasets: [
-              {
-                data: studentSGPAs,
-                backgroundColor: "#b0b8b4ff",
-                borderColor: "#184a45ff"
-              }
-            ]
-          };
-        });
-    }
   }
 };
 </script>

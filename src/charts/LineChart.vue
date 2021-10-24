@@ -16,7 +16,7 @@ export default {
               ticks: {
                 beginAtZero: true,
                 min: 0,
-                max: 10
+                // max: 10
               },   gridLines: {
                 color: this.$q.dark.isActive ? "#444" : "#eee"
               }

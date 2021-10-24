@@ -1,30 +1,67 @@
 <template>
-  <q-page padding :key="dataCollection.labels.length">
+  <q-page padding :key="pieDataCollection.labels.length">
     <!-- content -->
     <!-- <LineChart
       style="min-width:90%"
-      :chart-data="dataCollection"
+      :chart-data="pieDataCollection"
       :key="$q.dark.isActive"
     /> -->
-    <div class="text-center text-h6 q-mt-md">
-      College code (Searches count)
-    </div>
-    <PieChart
-      style="height:600px"
-      :chart-data="dataCollection"
-      :key="$q.dark.isActive"
-    />
-    <div class="text-h4 q-mt-lg">
-      🏆Leaderboards
+    <div
+      class="flex column rounded q-pa-md q-my-md"
+      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+      style="border-radius:20px"
+    >
+      <div class="text-h5">Unique searches per day</div>
+      <q-scroll-area
+        ref="scrollArea"
+        horizontal
+        style="height:400px;"
+        :thumb-style="{
+          bottom: '4px',
+          borderRadius: '5px',
+          background: '#b0b8b4ff',
+          width: '10px',
+          opacity: 1
+        }"
+        :style="!$q.screen.lt.md ? 'height:700px' : ''"
+      >
+        <LineChart
+          style="width:1300px"
+          :chart-data="lineDataCollection"
+          :key="$q.dark.isActive"
+        />
+      </q-scroll-area>
     </div>
     <div
-      v-for="(college, index) in topColleges"
-      :key="index"
-      class="text-h6 q-ma-md"
+      class="q-my-md q-py-md"
+      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+      style="border-radius:20px"
     >
-      #{{ index + 1 }}. {{ college.collegeCode }} - {{ college.collegeName }}({{
-        college.district
-      }})
+      <div class="text-center text-h6 q-mt-md">
+        College code (Searches count)
+      </div>
+      <PieChart
+        style="height:600px"
+        :chart-data="pieDataCollection"
+        :key="$q.dark.isActive"
+      />
+    </div>
+    <div
+      class="q-my-md q-py-md"
+      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+      style="border-radius:20px"
+    >
+      <div class="text-h4 q-mt-lg q-ml-lg">
+        🏆Leaderboards
+      </div>
+      <div
+        v-for="(college, index) in topColleges"
+        :key="index"
+        class="text-body1 q-ma-md"
+      >
+        #{{ index + 1 }}. {{ college.collegeCode }} -
+        {{ college.collegeName }}({{ college.district }})
+      </div>
     </div>
   </q-page>
 </template>
@@ -32,21 +69,37 @@
 <script>
 // import data from './data.json'
 import PieChart from "../charts/PieChart.vue";
+import LineChart from "../charts/LineChart.vue";
 import axios from "axios";
+
+import apiRoutes from "../apiRoutes";
 
 import { backgroundColors, borderColors } from "../colors/colors";
 
 export default {
   // name: 'PageName',
   components: {
-    PieChart
+    PieChart,
+    LineChart
   },
   data() {
     return {
-      dataCollection: {
+      pieDataCollection: {
         labels: [],
         datasets: [
           {
+            data: [],
+            backgroundColor: [],
+            borderColor: [],
+            borderWidth: 1
+          }
+        ]
+      },
+      lineDataCollection: {
+        labels: [],
+        datasets: [
+          {
+            label: "Search Count",
             data: [],
             backgroundColor: [],
             borderColor: [],
@@ -59,36 +112,57 @@ export default {
   },
 
   mounted() {
-    // this.dataCollection.data = data.
+    // this.pieDataCollection.data = data.
     // console.log(data)
     axios
-      .get("https://jntua.plasmatch.in/stats/public")
-      // .get("http://localhost:3000/stats/public")
+      .get(apiRoutes.stats)
       .then(res => {
-        // console.log(res);
+        console.log(res);
+        setTimeout(() => {
+          this.$refs.scrollArea.setScrollPosition(1000, 800);
+        }, 500);
         this.topColleges = res.data.topColleges;
         let counter = 0;
         let arr = Object.entries(res.data.colleges);
         arr.sort(([a, b], [c, d]) => d - b);
         // console.log(arr);
         arr.map(item => {
-          this.dataCollection.labels.push(`${item[0]} (${item[1]})`);
-          this.dataCollection.datasets[0].data.push(item[1]);
-          this.dataCollection.datasets[0].backgroundColor.push(
+          this.pieDataCollection.labels.push(`${item[0]} (${item[1]})`);
+          this.pieDataCollection.datasets[0].data.push(item[1]);
+          this.pieDataCollection.datasets[0].backgroundColor.push(
             backgroundColors[counter % 7]
           );
-          this.dataCollection.datasets[0].borderColor.push(
+          this.pieDataCollection.datasets[0].borderColor.push(
             borderColors[counter % 7]
           );
           counter++;
         });
-
-        // this.dataCollection.
+        arr = Object.entries(res.data.searchDates);
+        this.lineDataCollection.datasets[0].backgroundColor.push(
+          backgroundColors[counter % 7]
+        );
+        this.lineDataCollection.datasets[0].borderColor.push(
+          borderColors[counter % 7]
+        );
+        arr.map(item => {
+          this.lineDataCollection.labels.push(item[0]);
+          this.lineDataCollection.datasets[0].data.push(item[1]);
+          counter++;
+        });
+        // this.$refs.dateChart.scrollLeft += 300;
+        // setTimeout(() => {
+        //   document.querySelector(
+        //     ".dateChart"
+        //   ).scrollLeft -= document.querySelector(".dateChart").scrollWidth;
+        // }, 1000);
+        // console.log(document.querySelector(".dateChart").scrollWidth);
+        // this.pieDataCollection.
       })
       .catch(err => {
         console.log(err);
       });
-    // console.log(this.dataCollection);
-  }
+    // console.log(this.pieDataCollection);
+  },
+  methods: {}
 };
 </script>

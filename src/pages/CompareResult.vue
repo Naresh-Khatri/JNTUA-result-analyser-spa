@@ -198,7 +198,6 @@
 
 <script>
 import axios from "axios";
-import config from "../api.config.js";
 import { getShort } from "../utils/utils";
 
 import { backgroundColors, borderColors } from "../colors/colors";
@@ -209,6 +208,7 @@ import BarChart from "../charts/BarChart.vue";
 import LineChart from "../charts/LineChart.vue";
 
 import Tip from "../components/Tip.vue";
+import apiRoutes from 'src/apiRoutes.js';
 
 export default {
   components: {
@@ -307,7 +307,7 @@ export default {
       }
     },
     sendSharedInfoToDB() {
-      axios.post("https://jntua.plasmatch.in/share", {
+      axios.post(apiRoutes.share, {
         type:'compare',
         htns: this.rollNoList,
         resultID: this.resultID
@@ -319,7 +319,7 @@ export default {
         var gradePoints = [];
         axios
           .get(
-            `https://jntua.plasmatch.in/singleResult/${this.resultID}/${this.rollNoList[i]}`
+            `${apiRoutes.singleResult}/${this.resultID}/${this.rollNoList[i]}`
           )
           .then(res => {
             // console.log(res);
@@ -371,55 +371,7 @@ export default {
             this.drawChart();
           });
         {
-          //   axios
-          //     .get(
-          //       `${config.results}?student__id=${this.rollNoList[i]}&semester=${
-          //         this.sem
-          //       }${this.supply ? "a" : ""}`
-          //     )
-          //     .then(response => {
-          //       console.log(response);
-          //       if (response.data.length > 0) {
-          //         this.$q.notify({
-          //           type: "positive",
-          //           message: `Result retrieved`
-          //         });
-          //       }
-          //       if (response.data.length <= 20) {
-          //         //if rollNo is left empty then api will send all the rows
-          //         //setting it to large no like 20 helps to detect it
-          //         gradePoints = [];
-          //         response.data.forEach(ele => {
-          //           //console.log(ele);
-          //           if (this.subjectNames.length < response.data.length)
-          //             this.subjectNames.push(`${ele.subject.abb}`);
-          //           gradePoints.push(this.g_to_gp[ele.grade]);
-          //         });
-          //         this.studentNameList.push(response.data[0].student.name);
-          //         this.addToSGPAList(response.data[0].student.id);
-          //         this.datasets.push({
-          //           label: response.data[0].student.name,
-          //           data: gradePoints,
-          //           backgroundColor: this.backgroundColors[0],
-          //           borderColor: this.borderColors[0],
-          //           borderWidth: 1
-          //         });
-          //         this.borderColors.splice(0, 1);
-          //         this.backgroundColors.splice(0, 1);
-          //       }
-          //     })
-          //     .catch(error => {
-          //       console.log(error);
-          //       this.resultNotFoundDialog = true;
-          //       this.$q.notify({
-          //         type: "negative",
-          //         message: `Result not found`
-          //       });
-          //     })
-          //     .finally(() => {
-          //       this.drawChart();
-          //     });
-          // }
+         
         }
       }
     },
@@ -457,20 +409,6 @@ export default {
       ];
       this.studentsList = [];
     },
-    addToSGPAList(rollNo) {
-      axios
-        .get(`${config.semestergpa}?student__id=${rollNo}&semester=${this.sem}`)
-        .then(async response => {
-          {
-            this.studentsList.push(
-              Object.assign(response.data[0].student, {
-                sgpa: response.data[0].sgpa
-              })
-            );
-          }
-        });
-    },
-    removeEmptyRoll() {}
   }
 };
 </script>

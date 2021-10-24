@@ -77,6 +77,7 @@
 
 <script>
 import axios from "axios";
+import apiRoutes from "../apiRoutes"
 
 export default {
   data() {
@@ -98,7 +99,7 @@ export default {
           text: this.message
         };
       axios
-        .post("https://jntua.plasmatch.in/feedback", payload)
+        .post(apiRoutes.feedback, payload)
         .then(response => {
           if (response.status === 200) {
             this.$q.notify({
