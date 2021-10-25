@@ -127,6 +127,7 @@
               style="height:550px; width:1300px"
               :style="!$q.screen.lt.md ? 'height:700px' : ''"
               :chart-data="datacollection"
+              :yMax="10"
               :key="$q.dark.isActive"
             />
           </q-scroll-area>

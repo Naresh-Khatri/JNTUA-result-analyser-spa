@@ -27,6 +27,8 @@ export default {
   border-style: solid;
   background-color: rgba(193, 244, 205, 0.562);
   border-color: #21ba45;
+   /* background-color: rgba(255, 77, 1, 0.116);
+  border-color: #ff4d01; */
   letter-spacing: 0.5px;
 }
 p {

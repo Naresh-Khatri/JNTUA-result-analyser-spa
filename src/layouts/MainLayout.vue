@@ -165,7 +165,7 @@ export default {
     this.$q.addressbarColor.set("#ff4d01");
     this.$q.dark.toggle();
 
-    if (!process.env.NODE_ENV)
+    if (process.env.NODE_ENV)
       //patch logs
       this.$q.dialog({
         title: "New Features! 👩‍🔧",

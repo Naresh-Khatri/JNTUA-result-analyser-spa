@@ -11,6 +11,6 @@ git status
 git add .
 
 git status
-git commit -m 'minor UI improvements'
+git commit -m 'new stuff'
 #git pull origin gh-pages --allow-unrelated-histories
 git push origin gh-pages --force

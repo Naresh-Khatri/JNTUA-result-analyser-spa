@@ -119,7 +119,7 @@ export default {
       .then(res => {
         console.log(res);
         setTimeout(() => {
-          this.$refs.scrollArea.setScrollPosition(1000, 800);
+          this.$refs.scrollArea.setScrollPosition(1000, 1000);
         }, 500);
         this.topColleges = res.data.topColleges;
         let counter = 0;

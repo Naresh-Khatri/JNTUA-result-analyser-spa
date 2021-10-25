@@ -3,7 +3,7 @@
     <div class="wrapper">
       <StudentInput
         class="result-input"
-        :resultID="resultID"
+        :receivedResID="resultID"
         @success="setResultID($event)"
       />
 
@@ -54,43 +54,6 @@
           />
         </div>
       </div>
-      <!-- <div
-        class="flex row flex-center no-wrap q-mt-md q-pa-lg q-mx-lg bg-white rounded"
-      > -->
-      <!-- <q-icon
-        name="arrow_back_ios_new"
-        style="font-size: 3em;"
-        @click="decRollNo()"
-      /> -->
-      <!-- <q-dialog v-model="resultNotFoundDialog">
-        <q-card>
-          <q-card-section class="row items-center q-pb-none">
-            <div class="text-h6">Result Not Found</div>
-            <q-space />
-            <q-btn icon="close" flat round dense v-close-popup />
-          </q-card-section>
-
-          <q-card-section>
-            If you think your hall ticket number is correct then go to feedback
-            section and provide us the hall ticket number range of your batch
-            like this and we'll update our database
-            <q-space />
-            <div class="flex flex-center " style="flex-direction:column">
-              <div class="row">
-                <q-chip label="19fh1a0501" /> - <q-chip label="19fh1a0562" />
-              </div>
-              <q-btn
-                label="Feedback"
-                class="q-ma-md"
-                color="primary"
-                size="md"
-                to="feedback"
-              />
-            </div>
-          </q-card-section>
-        </q-card>
-      </q-dialog> -->
-      <!-- </div> -->
       <div class="data-container q-mb-xl" v-if="datasets.length">
         <div class="flex flex-center">
           <q-card
@@ -251,6 +214,7 @@ export default {
     // this.setResultID("56736469");
     //this.fillData();
     this.checkQueries();
+    console.log(window.location.href.split("#")[0] + "#/")
   },
   methods: {
     checkQueries() {
@@ -289,7 +253,7 @@ export default {
         navigator
           .share({
             title: "Hey I compared our results on this cool webApp!",
-            url: `${window.location.href}?resultID=${
+            url: `${window.location.href.split("#")[0] + "#/"}?resultID=${
               this.resultID
             }&rollList=${this.rollNoList.toString()}`
           })

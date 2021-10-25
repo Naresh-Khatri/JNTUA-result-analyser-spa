@@ -3,15 +3,6 @@
     class="flex column rounded q-pa-lg "
     :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
   >
-    <!--<div class="flex flex-col justify-center">
-         <q-btn
-        style="width:fit-content"
-        class="q-mb-sm"
-        label="Reset"
-        color="primary"
-        @click="reset()"
-      />
-    </div>-->
     <!-- <div class="text-h6">Sected your batch</div> -->
     <div style="display:flex; flex-direction:row-reverse">
       <q-btn
@@ -82,6 +73,7 @@
 import axios from "axios";
 import apiRoutes from "../apiRoutes";
 export default {
+  props: ["receivedResID"],
   data() {
     return {
       selectedReg: "",
@@ -89,6 +81,7 @@ export default {
       selectedYear: "",
       selectedSem: "",
       selectedTitle: "",
+      selectedResultID: "",
       uniques: {},
       resultsList: [],
       resultObj: {},
@@ -102,23 +95,36 @@ export default {
   },
   mounted() {
     this.init();
-    // //testing to add feedback request dialog
-    //   $q.dialog({
-    //     title: 'Confirm',
-    //     message: 'Would you like to turn on the wifi?',
-    //     cancel: true,
-    //     persistent: true
-    //   }).onOk(() => {
-    //     // console.log('>>>> OK')
-    //   }).onOk(() => {
-    //     // console.log('>>>> second OK catcher')
-    //   }).onCancel(() => {
-    //     // console.log('>>>> Cancel')
-    //   }).onDismiss(() => {
-    //     // console.log('I am triggered on both OK and Cancel')
-    //   })
   },
   methods: {
+    setQueries() {
+      setTimeout(() => {
+        // console.log(this.receivedResID);
+        axios
+          .get(apiRoutes.resIDDetails + "/" + this.receivedResID)
+          .then(async res => {
+            // console.log(res.data);
+            this.selectedReg = res.data.reg;
+            await this.sleep(150);
+            this.selectedFn("reg", res.data.reg);
+            this.selectedCourse = res.data.course;
+            await this.sleep(150);
+            this.selectedFn("course", res.data.course);
+            this.selectedYear = res.data.year;
+            await this.sleep(150);
+            this.selectedFn("year", res.data.year);
+            this.selectedSem = res.data.sem;
+            await this.sleep(150);
+            this.selectedFn("sem", res.data.sem);
+            this.selectedTitle = res.data.title;
+            await this.sleep(150);
+            this.selectedFn("title", {
+              label: res.data.title,
+              resultID: this.receivedResID
+            });
+          }, 200);
+      });
+    },
     init() {
       axios
         .get(apiRoutes.releasedResults)
@@ -129,7 +135,8 @@ export default {
         })
         .then(() => {
           setTimeout(() => {
-            this.loadStorage();
+            if (this.receivedResID) this.setQueries();
+            else this.loadStorage();
           }, 100);
         });
     },
@@ -158,20 +165,11 @@ export default {
       } else if (option == "sem") {
         this.selectedTitle = "";
         // localStorage.setItem("title", "");
-      } else {
-        this.selectedCourse = "";
-        this.selectedYear = "";
-        this.selectedSem = "";
-        this.selectedTitle = "";
-        // localStorage.setItem("course", "");
-        // localStorage.setItem("year", "");
-        // localStorage.setItem("sem", "");
-        // localStorage.setItem("title", "");
       }
     },
     selectedFn(option, value) {
       //listen to when reset
-      if (value == null) return this.reset(option);
+      // if (value == null) return this.reset(option);
       // console.log(option, value);
       this.save(option, value);
       this.reset(option);
@@ -193,15 +191,17 @@ export default {
         this.resultObj[this.selectedReg][this.selectedCourse][
           this.selectedYear
         ][this.selectedSem].forEach(ele => {
-          opts.push({ label: ele.title, value: ele.resultID });
+          opts.push({ label: ele.title, resultID: ele.resultID });
         });
         console.log(opts);
         this.titleOpts = opts;
       } else if (option == "title") {
-        console.log(value);
-        this.selectedTitle = value;
-
-        this.emitResultID();
+        // console.log(value);
+        this.selectedTitle = value.label;
+        this.selectedResultID = value.resultID;
+        //dont emit if parent already has resID
+        // if (!this.receivedResID)
+         this.emitResultID();
       }
     },
     clearStorage() {
@@ -230,7 +230,7 @@ export default {
       // console.log(localStorage.getItem("course"));
       // console.log(localStorage.getItem("year"));
       // console.log(localStorage.getItem("sem"));
-      // console.log(localStorage.getItem("title"));
+      // console.log(JSON.parse(localStorage.getItem("title")));
       if (localStorage.getItem("reg")) {
         this.selectedReg = localStorage.getItem("reg");
         await this.sleep(150);
@@ -253,15 +253,15 @@ export default {
       }
       // if (localStorage.getItem("title")) {
       //   await this.sleep(500);
-      //   console.log(localStorage.getItem("title"))
-      //   // this.selectedTitle = localStorage.getItem("title");
+      //   console.log(localStorage.getItem("title"));
+      //   this.selectedTitle = localStorage.getItem("title").label;
       //   this.selectedFn("title", localStorage.getItem("title"));
       // }
     },
     emitResultID() {
       // localStorage.setItem('lastUniques', JSON.stringify(this.uniques))
-      console.log(this.selectedTitle);
-      this.$emit("success", this.selectedTitle.value);
+      // console.log(this.selectedTitle);
+      this.$emit("success", this.selectedResultID);
     }
   }
 };
