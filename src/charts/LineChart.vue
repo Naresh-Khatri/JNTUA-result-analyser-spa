@@ -11,6 +11,10 @@ export default {
       options: {
         responsive: true,
         maintainAspectRatio: false,
+        tooltips: {
+          mode: "index",
+          intersect: false  //show tooltip according to x hover
+        },
         scales: {
           yAxes: [
             {
@@ -36,8 +40,7 @@ export default {
   },
   mounted() {
     //set the y max if provided
-    if(this.yMax)
-    this.options.scales.yAxes[0].ticks.max = this.yMax;
+    if (this.yMax) this.options.scales.yAxes[0].ticks.max = this.yMax;
     // this.chartData is created in the mixin.
     // If you want to pass options please create a local options object
     Chart.defaults.global.defaultFontColor = this.$q.dark.isActive

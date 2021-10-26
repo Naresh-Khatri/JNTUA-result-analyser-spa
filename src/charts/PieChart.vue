@@ -9,9 +9,15 @@ export default {
     return {
       options: {
         responsive: true,
+        plugins: {
+          legend: {
+            labels: {
+              usePointStyle: true
+            }
+          }
+        },
         maintainAspectRatio: false,
-        scales: {
-        }
+        scales: {}
       }
     };
   },

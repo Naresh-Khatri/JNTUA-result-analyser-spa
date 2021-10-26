@@ -23,7 +23,7 @@
           width: '10px',
           opacity: 1
         }"
-        :style="!$q.screen.lt.md ? 'height:700px' : ''"
+        :style="!$q.screen.lt.md ? 'height:400px' : ''"
       >
         <LineChart
           style="width:1300px"
