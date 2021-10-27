@@ -37,8 +37,37 @@
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
       style="border-radius:20px"
     >
-      <div class="text-center text-h6 q-mt-md">
+      <div class="text-center text-h6 q-ma-md">
         College code (Searches count)
+        <!-- <div class="row q-col-gutter-none">
+          <q-chip
+            v-for="(d, i) in pieDataCollection.labels"
+            :key="i"
+            dense
+            class="col-2"
+            :style="
+              `background: ${backgroundColors[i % 7]};border: 2px solid ${
+                borderColors[i % 7]
+              }; opacity:.7`
+            "
+            style="font-size:11px; font-weight:400;display:flex; justify-content:center; align-items:center;height:20px;padding:5px"
+            :label="d"
+          >
+            <span>
+              <div
+                :style="
+                  `background: ${backgroundColors[i % 7]};border: 2px solid ${
+                    borderColors[i % 7]
+                  }; opacity:.7`
+                "
+                style="width:10px; height:10px "
+              ></div>
+            </span>
+            <span style="font-size:11px; font-weight:300">
+              {{ d }}
+            </span>
+          </q-chip> 
+        </div> -->
       </div>
       <PieChart
         style="height:600px"
@@ -84,6 +113,8 @@ export default {
   },
   data() {
     return {
+      backgroundColors: backgroundColors,
+      borderColors: borderColors,
       pieDataCollection: {
         labels: [],
         datasets: [
@@ -114,6 +145,9 @@ export default {
   mounted() {
     // this.pieDataCollection.data = data.
     // console.log(data)
+    setTimeout(() => {
+      console.log(this.pieDataCollection);
+    }, 1000);
     axios
       .get(apiRoutes.stats)
       .then(res => {

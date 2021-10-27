@@ -13,14 +13,16 @@ export default {
         maintainAspectRatio: false,
         tooltips: {
           mode: "index",
-          intersect: false  //show tooltip according to x hover
+          intersect: false //show tooltip according to x hover
         },
         scales: {
+         
+
           yAxes: [
             {
               ticks: {
                 beginAtZero: true,
-                min: 0
+                min: 0,
               },
               gridLines: {
                 color: this.$q.dark.isActive ? "#444" : "#eee"

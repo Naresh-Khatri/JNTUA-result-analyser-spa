@@ -79,7 +79,10 @@
                     color="green"
                     track-color="grey-3"
                     class=" q-ma-md"
-                  />
+                  >
+                    <q-avatar size="60px">
+                      </q-avatar
+                  ></q-knob>
                 </div>
               </div>
             </q-card>
@@ -139,8 +142,13 @@
                       :props="props"
                     >
                       <!-- 25 + 50 = 75 -->
-                      <div v-if="!props.row.total" style="font-size:22px;">🤷‍♀️</div>
-                      <div v-else> {{props.row.total}} ({{props.row.externals }} + {{props.row.internals}})</div>
+                      <div v-if="!props.row.total" style="font-size:22px;">
+                        🤷‍♀️
+                      </div>
+                      <div v-else>
+                        {{ props.row.total }} ({{ props.row.externals }} +
+                        {{ props.row.internals }})
+                      </div>
                     </q-td>
                     <q-td dense auto-width key="grade" :props="props">
                       {{ props.row.grade }}
@@ -480,7 +488,7 @@ export default {
               type: "positive",
               message: `Result retrieved`
             });
-            console.log(res.data)
+            console.log(res.data);
             res.data.subjects.forEach(sub => {
               this.rowData.push({
                 subject_name: getShort(sub["Subject Name"]),
