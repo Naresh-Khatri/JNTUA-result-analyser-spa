@@ -150,6 +150,7 @@
 </template>
 
 <script>
+import WelcomDialog from 'src/components/WelcomDialog.vue';
 export default {
   data() {
     return {
@@ -168,23 +169,27 @@ export default {
     if (process.env.NODE_ENV)
       //patch logs
       this.$q.dialog({
-        title: "New Features! 👩‍🔧",
-        html: true,
-        message: `<li style='font-size:1.2em'>
-      🆕 Added 🏆statstics for every college</li>
-      <li style='font-size:1.2em'>
-      Now you can share any result with your friends😎🤟</li>
-        <br>
-        If you want this app to get better then head over to 
-        the feedback section on top 🙋‍♀️
-        `
+      //   title: "New Features! 👩‍🔧",
+      //   html: true,
+      //   message: `<li style='font-size:1.2em'>
+      // 🆕 Added 🏆statstics for every college</li>
+      // <li style='font-size:1.2em'>
+      // Now you can share any result with your friends😎🤟</li>
+      //   <br>
+      //   If you want this app to get better then head over to 
+      //   the feedback section on top 🙋‍♀️
+      //   `
+      component: WelcomDialog,
       });
     localStorage.setItem("logDisplayed", true);
   },
   methods: {
     toggleTheme() {
       this.$q.dark.toggle();
-    }
+    },
+     show() {
+      this.$refs.dialog.show();
+    },
   }
 };
 </script>

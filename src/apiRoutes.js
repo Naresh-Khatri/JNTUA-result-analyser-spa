@@ -1,5 +1,5 @@
 
-let prefix = !process.env.NODE_ENV ? "http://localhost:3000/" : "https://jntua.plasmatch.in/"
+let prefix = process.env.NODE_ENV ? "http://localhost:3000/" : "https://jntua.plasmatch.in/"
 module.exports = {
     stats: prefix + "stats/public",
     releasedResults: prefix + "releasedResults",
