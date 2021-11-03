@@ -14,11 +14,7 @@
     >
       <div style="display:flex; justify-content:center;">
         <div class="wrapper" style="width:100%; max-width:1000px">
-          <StudentInput
-            class="result-input"
-            :receivedResID="resultID"
-            @success="setResultID($event)"
-          />
+          <StudentInput class="result-input" @success="setSelection($event)" />
           <div
             class="roll-input q-pa-lg rounded"
             :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -79,9 +75,6 @@
                     color="green"
                     track-color="grey-3"
                     class=" q-ma-md"
-                  >
-                    <q-avatar size="60px">
-                      </q-avatar
                   ></q-knob>
                 </div>
               </div>
@@ -153,11 +146,13 @@
                     <q-td dense auto-width key="grade" :props="props">
                       {{ props.row.grade }}
                     </q-td>
-                    <q-td dense auto-width key="points" :props="props">
+                    <!-- <q-td dense auto-width key="points" :props="props">
                       {{ props.row.points }}
-                    </q-td>
+                    </q-td> -->
                     <q-td dense auto-width key="credit" :props="props">{{
                       props.row.credit
+                    }}</q-td>  <q-td dense auto-width key="month" :props="props">{{
+                      props.row.month
                     }}</q-td>
                   </q-tr>
                 </template>
@@ -233,7 +228,6 @@
                 style="filter: drop-shadow(0px 0px 4px yellow);"
               />
             </q-intersection>
-
             Looks so empty here
           </div>
         </div>
@@ -245,7 +239,7 @@
 <script>
 import axios from "axios";
 import apiRoutes from "../apiRoutes";
-import { getShort } from "../utils/utils";
+import { getShort, getBestAttempts } from "../utils/utils";
 import { backgroundColors, borderColors } from "../colors/colors";
 
 import RadarChart from "../charts/RadarChart.vue";
@@ -267,8 +261,8 @@ export default {
     return {
       datacollection: {},
       canSearch: false,
-      rollNo: "19fh1a0546",
-      resultID: "",
+      rollNo: "19fh1a0547",
+      // resultID: "",
       sem: "1",
       studentName: "",
       chartName: "radar",
@@ -298,15 +292,8 @@ export default {
         {
           name: "grade",
           align: "center",
-          label: "Grade",
+          label: "Grade(pts)",
           field: "grade",
-          sortable: true
-        },
-        {
-          name: "points",
-          align: "center",
-          label: "Points",
-          field: "points",
           sortable: true
         },
         {
@@ -315,12 +302,17 @@ export default {
           label: "Credits",
           field: "credit",
           sortable: true
+        },
+        {
+          name: "month",
+          align: "center",
+          label: "Month",
+          field: "month",
+          sortable: true
         }
       ],
-      supply: false,
       studentSGPA: 0,
       rowData: [],
-      resultNotFoundDialog: false,
       pagination: {
         sortBy: "name",
         descending: false,
@@ -338,27 +330,28 @@ export default {
         F: 0,
         AB: 0,
         Y: 0
-      }
+      },
+      selectionInput: {}
     };
   },
   mounted() {
     // this.resultID = "56736469";
     // this.canSearch = true;
     // this.fillData();
-    this.checkQueries();
+    // this.checkQueries();
   },
   methods: {
-    setResultID(resultID) {
-      this.resultID = resultID;
+    setSelection(selection) {
+      this.selectionInput = selection;
       this.canSearch = true;
     },
     checkQueries() {
       // console.log(this.$route.query);
-      if (!Object.keys(this.$route.query).includes("resultID")) return;
+      // if (!Object.keys(this.$route.query).includes("resultID")) return;
       // console.log(window.location);
-      this.resultID = this.$route.query.resultID;
+      // this.resultID = this.$route.query.resultID;
       this.rollNo = this.$route.query.roll;
-      console.log(this.rollNo, this.resultID);
+      // console.log(this.rollNo, this.resultID);
       this.canSearch = true;
       this.fillData();
     },
@@ -366,6 +359,7 @@ export default {
       this.fillData();
     },
     share() {
+      return;
       if (navigator.share) {
         navigator
           .share({
@@ -477,33 +471,49 @@ export default {
     },
     fillData() {
       var subjectNames = [];
-      var subjectGrades = [];
+      var subjectGrade = [];
       this.rowData = [];
       axios
-        .get(`${apiRoutes.singleResult}/${this.resultID}/${this.rollNo}`)
+        .get(
+          apiRoutes.singleResultv2 +
+            "/" +
+            this.rollNo +
+            "/" +
+            this.selectionInput.reg +
+            "/" +
+            this.selectionInput.course +
+            "/" +
+            this.selectionInput.year +
+            "/" +
+            this.selectionInput.sem
+        )
         .then(res => {
-          // console.log(res);
           if (res.data) {
             this.$q.notify({
               type: "positive",
               message: `Result retrieved`
             });
             console.log(res.data);
-            res.data.subjects.forEach(sub => {
+            console.log("Best Attempt = ");
+            // console.log(getBestAttempts(res.data.attempts));
+            const bestAttempts = getBestAttempts(res.data.attempts);
+            console.log(bestAttempts);
+
+            bestAttempts.forEach(sub => {
               this.rowData.push({
                 subject_name: getShort(sub["Subject Name"]),
                 status: sub["Result Status"] == "P" ? "✔" : "❌",
-                points: this.g_to_gp[sub["Grades"]],
-                grade: sub["Grades"],
+                grade: sub["Grade"] + " (" + this.g_to_gp[sub["Grade"]] + ")",
                 internals: sub["Internals"],
                 externals: sub["Externals"],
                 total: sub["Total Marks"],
-                credit: sub["Credits"]
+                credit: sub["Credits"],
+                month: sub["month"]
               });
               subjectNames.push(
-                `${getShort(sub["Subject Name"])} (${sub["Grades"]})`
+                `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
               );
-              subjectGrades.push(this.g_to_gp[sub["Grades"]]);
+              subjectGrade.push(this.g_to_gp[sub["Grade"]]);
             });
             this.studentName = res.data["name"];
             this.studentSGPA = Number.parseFloat(res.data.sgpa);
@@ -532,7 +542,7 @@ export default {
             datasets: [
               {
                 label: this.studentName,
-                data: subjectGrades,
+                data: subjectGrade,
                 backgroundColor: backgroundColors[1],
                 borderColor: borderColors[1],
                 borderWidth: 1

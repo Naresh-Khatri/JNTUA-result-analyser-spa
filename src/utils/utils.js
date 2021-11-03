@@ -28,4 +28,26 @@ function getShort(str) {
   }
 }
 
-module.exports = { getShort }
+function getBestAttempts(attempts) {
+  const bestAttempts = attempts[0].subjects
+  console.log(attempts)
+  if (attempts[0].failedCount == 0) {
+    console.log('returning since single attempt')
+    return bestAttempts
+  }
+  for (let i = 1; i < attempts.length; i++) {
+    //continue if empty obj {} found
+    if (!!!Object.keys(attempts[i]).length) continue
+    // console.log(attempts[i].subjects)
+    // console.log(bestAttempts)
+    for (let j = 0; j < attempts[i].subjects.length; j++) {
+      for (let k = 0; k < bestAttempts.length; k++)
+        if (attempts[i].subjects[j]['Subject Name'].toLowerCase() == bestAttempts[k]['Subject Name'].toLowerCase()) {
+          bestAttempts[k] = attempts[i].subjects[j]
+          // console.log(attempts[i].subjects[j], bestAttempts[k])
+        }
+    }
+  }
+  return bestAttempts
+}
+module.exports = { getShort, getBestAttempts }

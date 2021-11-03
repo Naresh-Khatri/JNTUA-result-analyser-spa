@@ -55,7 +55,7 @@
       clearable
       :disable="!selectedYear"
     />
-    <q-select
+    <!-- <q-select
       :color="$q.dark.isActive ? 'white' : 'primary'"
       filled
       v-model="selectedTitle"
@@ -65,7 +65,7 @@
       :disable="!selectedYear"
       clearable
       @input="selectedFn('title', selectedTitle)"
-    />
+    /> -->
   </div>
 </template>
 
@@ -80,7 +80,7 @@ export default {
       selectedCourse: "",
       selectedYear: "",
       selectedSem: "",
-      selectedTitle: "",
+      // selectedTitle: "",
       selectedResultID: "",
       uniques: {},
       resultsList: [],
@@ -89,7 +89,7 @@ export default {
       coursesOpts: [],
       yearOpts: [],
       semOpts: [],
-      titleOpts: [],
+      // titleOpts: [],
       backupResultsList: []
     };
   },
@@ -116,13 +116,13 @@ export default {
             this.selectedSem = res.data.sem;
             await this.sleep(150);
             this.selectedFn("sem", res.data.sem);
-            this.selectedTitle = res.data.title;
-            await this.sleep(150);
-            this.selectedFn("title", {
-              label: res.data.title,
-              resultID: this.receivedResID
-            });
-          }, 200);
+            // this.selectedTitle = res.data.title;
+            // await this.sleep(150);
+            // this.selectedFn("title", {
+            //   label: res.data.title,
+            //   resultID: this.receivedResID
+            // });
+          });
       });
     },
     init() {
@@ -145,7 +145,7 @@ export default {
         this.selectedCourse = "";
         this.selectedYear = "";
         this.selectedSem = "";
-        this.selectedTitle = "";
+        // this.selectedTitle = "";
         // localStorage.setItem("course", "");
         // localStorage.setItem("year", "");
         // localStorage.setItem("sem", "");
@@ -153,17 +153,17 @@ export default {
       } else if (option == "course") {
         this.selectedYear = "";
         this.selectedSem = "";
-        this.selectedTitle = "";
+        // this.selectedTitle = "";
         // localStorage.setItem("year", "");
         // localStorage.setItem("sem", "");
         // localStorage.setItem("title", "");
       } else if (option == "year") {
         this.selectedSem = "";
-        this.selectedTitle = "";
+        // this.selectedTitle = "";
         // localStorage.setItem("sem", "");
         // localStorage.setItem("title", "");
       } else if (option == "sem") {
-        this.selectedTitle = "";
+        // this.selectedTitle = "";
         // localStorage.setItem("title", "");
       }
     },
@@ -186,22 +186,7 @@ export default {
           ]
         );
       else if (option == "sem") {
-        //loop through and create new array for title
-        let opts = [];
-        this.resultObj[this.selectedReg][this.selectedCourse][
-          this.selectedYear
-        ][this.selectedSem].forEach(ele => {
-          opts.push({ label: ele.title, resultID: ele.resultID });
-        });
-        console.log(opts);
-        this.titleOpts = opts;
-      } else if (option == "title") {
-        // console.log(value);
-        this.selectedTitle = value.label;
-        this.selectedResultID = value.resultID;
-        //dont emit if parent already has resID
-        // if (!this.receivedResID)
-         this.emitResultID();
+        this.emitSelection();
       }
     },
     clearStorage() {
@@ -209,12 +194,12 @@ export default {
       localStorage.setItem("course", "");
       localStorage.setItem("year", "");
       localStorage.setItem("sem", "");
-      localStorage.setItem("title", "");
+      // localStorage.setItem("title", "");
       this.selectedReg = "";
       this.selectedCourse = "";
       this.selectedYear = "";
       this.selectedSem = "";
-      this.selectedTitle = "";
+      // this.selectedTitle = "";
     },
     save(option, value) {
       // console.log("saving ", option, " as ", value);
@@ -258,10 +243,15 @@ export default {
       //   this.selectedFn("title", localStorage.getItem("title"));
       // }
     },
-    emitResultID() {
+    emitSelection() {
       // localStorage.setItem('lastUniques', JSON.stringify(this.uniques))
       // console.log(this.selectedTitle);
-      this.$emit("success", this.selectedResultID);
+      this.$emit("success", {
+        reg: this.selectedReg,
+        course: this.selectedCourse,
+        year: this.selectedYear,
+        sem: this.selectedSem
+      });
     }
   }
 };
