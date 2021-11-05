@@ -1,11 +1,7 @@
 <template>
   <div class="container">
     <div class="wrapper">
-      <StudentInput
-        class="result-input"
-        :receivedResID="resultID"
-        @success="setResultID($event)"
-      />
+      <StudentInput class="result-input" @success="setSelection($event)" />
 
       <div
         class="roll-input q-pa-lg rounded"
@@ -88,7 +84,12 @@
         </div>
         <transition>
           <div style="display:flex; justify-content:center">
-            <q-btn class="text-white" label="Share" style="background:#25D366" @click="share">
+            <q-btn
+              class="text-white"
+              label="Share"
+              style="background:#25D366"
+              @click="share"
+            >
               <img width="50px" src="../assets/whatsapp.svg" />
             </q-btn>
           </div>
@@ -161,7 +162,7 @@
 
 <script>
 import axios from "axios";
-import { getShort } from "../utils/utils";
+import { getShort, getBestAttempts } from "../utils/utils";
 
 import { backgroundColors, borderColors } from "../colors/colors";
 import StudentInput from "../components/StudentInput.vue";
@@ -171,7 +172,7 @@ import BarChart from "../charts/BarChart.vue";
 import LineChart from "../charts/LineChart.vue";
 
 import Tip from "../components/Tip.vue";
-import apiRoutes from 'src/apiRoutes.js';
+import apiRoutes from "src/apiRoutes.js";
 
 export default {
   components: {
@@ -186,7 +187,7 @@ export default {
       datacollection: {},
       rollNoList: [],
       canSearch: false,
-      resultID: "",
+      // resultID: "",
       studentNameList: [],
       datasets: [],
       shareText: "",
@@ -207,14 +208,15 @@ export default {
         F: 0,
         AB: 0,
         Y: 0
-      }
+      },
+      selectionInput: {}
     };
   },
   mounted() {
     // this.setResultID("56736469");
     //this.fillData();
     this.checkQueries();
-    console.log(window.location.href.split("#")[0] + "#/")
+    console.log(window.location.href.split("#")[0] + "#/");
   },
   methods: {
     checkQueries() {
@@ -243,12 +245,12 @@ export default {
       else numStr = num;
       return numStr;
     },
-    setResultID(resultID) {
+    setSelection(selection) {
+      this.selectionInput = selection;
       this.canSearch = true;
-      this.resultID = resultID;
-      this.fillData();
     },
     share() {
+      return;
       if (navigator.share) {
         navigator
           .share({
@@ -258,7 +260,7 @@ export default {
             }&rollList=${this.rollNoList.toString()}`
           })
           .then(() => {
-            this.sendSharedInfoToDB()
+            this.sendSharedInfoToDB();
             console.log("Thanks for sharing!");
             this.$q.notify({
               type: "positive",
@@ -272,71 +274,83 @@ export default {
     },
     sendSharedInfoToDB() {
       axios.post(apiRoutes.share, {
-        type:'compare',
+        type: "compare",
         htns: this.rollNoList,
         resultID: this.resultID
       });
     },
     async fillData() {
       this.resetData();
-      for (var i = 0; i < this.rollNoList.length; i++) {
-        var gradePoints = [];
-        axios
-          .get(
-            `${apiRoutes.singleResult}/${this.resultID}/${this.rollNoList[i]}`
+      try {
+        const results = await Promise.all(
+          this.rollNoList.map(roll =>
+            axios.get(
+              apiRoutes.singleResultv2 +
+                "/" +
+                roll +
+                "/" +
+                this.selectionInput.reg +
+                "/" +
+                this.selectionInput.course +
+                "/" +
+                this.selectionInput.year +
+                "/" +
+                this.selectionInput.sem
+            )
           )
-          .then(res => {
-            // console.log(res);
-            if (res.data) {
-              this.$q.notify({
-                type: "positive",
-                message: `Result retrieved`
-              });
-              gradePoints = [];
-              res.data.subjects.forEach(sub => {
-                if (this.subjectNames.length < res.data["subjects"].length)
-                  this.subjectNames.push(getShort(sub["Subject Name"]));
-                gradePoints.push(this.g_to_gp[sub["Grades"]]);
-              });
-              //get last 2 chars of roll
-              let shortRoll = `(${res.data["htn"][res.data["htn"].length - 2]}${
-                res.data["htn"][res.data["htn"].length - 1]
-              })`;
-              this.studentNameList.push(res.data["name"]);
-              this.studentsList.push({
-                id: res.data["htn"],
-                name: res.data["name"] + shortRoll,
-                sgpa: res.data["sgpa"]
-              });
-              this.datasets.push({
-                label: res.data["name"],
-                data: gradePoints,
-                backgroundColor: this.backgroundColors[0],
-                borderColor: this.borderColors[0],
-                borderWidth: 1
-              });
-              this.borderColors.splice(0, 1);
-              this.backgroundColors.splice(0, 1);
-            }
-          })
-          .catch(error => {
-            console.log(error);
-            this.resultNotFoundDialog = true;
+        );
+        var gradePoints = [];
+        results.forEach(res => {
+          // console.log(res.status);
+          if (res.status === 200) {
             this.$q.notify({
-              type: "negative",
-              message: `Result not found`
+              type: "positive",
+              message: `Result retrieved`
             });
-          })
-          .then(() => {
-            //scroll bottom
-            window.scrollTo(0, document.body.scrollHeight + 100);
-          })
-          .finally(() => {
-            this.drawChart();
-          });
-        {
-         
-        }
+            // console.log(res);
+            console.log("Best Attempt = ");
+            // console.log(getBestAttempts(res.data.attempts));
+            gradePoints = [];
+
+            const bestAttempts = getBestAttempts(res.data.attempts);
+            console.log(bestAttempts);
+            bestAttempts.forEach(sub => {
+              if (this.subjectNames.length < bestAttempts.length)
+                this.subjectNames.push(getShort(sub["Subject Name"]));
+              gradePoints.push(this.g_to_gp[sub["Grade"]]);
+            });
+            //get last 2 chars of roll
+            let shortRoll = `(${res.data["htn"][res.data["htn"].length - 2]}${
+              res.data["htn"][res.data["htn"].length - 1]
+            })`;
+            this.studentNameList.push(res.data["name"]);
+            this.studentsList.push({
+              id: res.data["htn"],
+              name: res.data["name"] + shortRoll,
+              sgpa: Number.parseFloat(res.data["sgpa"])
+            });
+            this.datasets.push({
+              label: res.data["name"],
+              data: gradePoints,
+              backgroundColor: this.backgroundColors[0],
+              borderColor: this.borderColors[0],
+              borderWidth: 1
+            });
+            this.borderColors.splice(0, 1);
+            this.backgroundColors.splice(0, 1);
+          }
+        });
+        this.drawChart();
+        window.scrollTo(0, document.body.scrollHeight + 100);
+            
+      } catch (error) {
+        console.log(error);
+        this.resultNotFoundDialog = true;
+        this.$q.notify({
+          type: "negative",
+          message: `Result not found`
+        });
+        //scroll bottom
       }
     },
     drawChart() {
@@ -372,7 +386,7 @@ export default {
         "rgb(201, 203, 207)"
       ];
       this.studentsList = [];
-    },
+    }
   }
 };
 </script>

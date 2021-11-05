@@ -13,6 +13,7 @@ export default {
         scale: {
           ticks: {
             min:0,
+            max:10,
             backdropColor: "rgba(255,255,255,0)"
           },
           gridLines: {

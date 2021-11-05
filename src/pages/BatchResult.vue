@@ -20,7 +20,7 @@
       </transition>
     </div>
     <div class="wrapper">
-      <StudentInput class="result-input" @success="setResultID($event)" />
+      <StudentInput class="result-input" @success="setSelection($event)" />
       <div
         class="roll-input flex column rounded q-pa-lg"
         :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -161,7 +161,7 @@ import axios from "axios";
 import LineChart from "../charts/LineChart.vue";
 import Tip from "../components/Tip.vue";
 import StudentInput from "../components/StudentInput.vue";
-import apiRoutes from 'src/apiRoutes';
+import apiRoutes from "src/apiRoutes";
 
 export default {
   components: {
@@ -177,25 +177,35 @@ export default {
       loading: false,
       range: {
         min: 1,
-        max: 50
+        max: 3
       },
       datacollection: {},
-      sem: 1
+      selectionInput: {}
     };
   },
   mounted() {
     // this.resultID = "56736469";
     // this.canSearch = true;
     this.checkQueries();
+
+    //to show Under Development
+    if(false)
+    this.$q.dialog({
+      title: "Under Development",
+      html:true,
+      persistent: true,
+      message:
+        `This feature is still under development. Please check back later!`
+    });
   },
   methods: {
     rollWithPrefix(roll) {
       if (roll < 10) return `0${roll}`;
       else return roll;
     },
-    setResultID(resultID) {
+    setSelection(selection) {
+      this.selectionInput = selection;
       this.canSearch = true;
-      this.resultID = resultID;
     },
     checkQueries() {
       if (!Object.keys(this.$route.query).includes("resultID")) return;
@@ -247,7 +257,21 @@ export default {
 
       axios
         .get(
-          `${apiRoutes.semResults}/${this.resultID}/${this.rollPrefix}/${this.range.min}/${this.range.max}`
+          apiRoutes.batchResultsv2 +
+            "/" +
+            this.rollPrefix +
+            "/" +
+            this.range.min +
+            "/" +
+            this.range.max +
+            "/" +
+            this.selectionInput.reg +
+            "/" +
+            this.selectionInput.course +
+            "/" +
+            this.selectionInput.year +
+            "/" +
+            this.selectionInput.sem
         )
         .then(res => {
           this.loading = false;
@@ -263,7 +287,7 @@ export default {
         })
         .then(() => {
           //scroll bottom
-          window.scrollTo(0, document.body.scrollHeight + 100);
+          // window.scrollTo(0, document.body.scrollHeight + 100);
         })
         .finally(() => {
           this.datacollection = {
@@ -277,7 +301,7 @@ export default {
             ]
           };
         });
-    },
+    }
   }
 };
 </script>

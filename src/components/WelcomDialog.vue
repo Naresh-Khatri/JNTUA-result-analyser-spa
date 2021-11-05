@@ -5,11 +5,13 @@
         <div class="text-h6">New Features! 👩‍🔧</div>
       </q-card-section>
       <q-card-section class="row items-center">
+
+        Most anticipated feature is here!
         <li style="font-size:1.2em">
-          🆕 Added 🏆statstics for every college
+          View regular + supply result COMBINED!!
         </li>
         <li style="font-size:1.2em">
-          Now you can share any result with your friends😎🤟
+          Join the telegram group and ask for help!
         </li>
         <br />
         If you want this app to get better then head over to the feedback
@@ -21,7 +23,7 @@
           <img style="height:40px" src="../assets/telegram-logo.png" />
           <div class="q-ml-sm">join</div>
         </q-btn>
-        <q-btn flat label="OK" color="primary" />
+        <q-btn flat label="OK" color="primary" @click="confirm = false" />
       </q-card-actions>
     </q-card>
   </q-dialog>
@@ -40,37 +42,37 @@ export default {
     },
     // following method is REQUIRED
     // (don't change its name --> "show")
-    show () {
-      this.$refs.dialog.show()
+    show() {
+      this.$refs.dialog.show();
     },
 
     // following method is REQUIRED
     // (don't change its name --> "hide")
-    hide () {
-      this.$refs.dialog.hide()
+    hide() {
+      this.$refs.dialog.hide();
     },
 
-    onDialogHide () {
+    onDialogHide() {
       // required to be emitted
       // when QDialog emits "hide" event
-      this.$emit('hide')
+      this.$emit("hide");
     },
 
-    onOKClick () {
+    onOKClick() {
       // on OK, it is REQUIRED to
       // emit "ok" event (with optional payload)
       // before hiding the QDialog
-      this.$emit('ok')
+      this.$emit("ok");
       // or with payload: this.$emit('ok', { ... })
 
       // then hiding dialog
-      this.hide()
+      this.hide();
     },
 
-    onCancelClick () {
+    onCancelClick() {
       // we just need to hide dialog
-      this.hide()
+      this.hide();
     }
   }
-}
+};
 </script>
