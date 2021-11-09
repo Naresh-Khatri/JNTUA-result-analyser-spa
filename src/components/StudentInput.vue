@@ -55,17 +55,6 @@
       clearable
       :disable="!selectedYear"
     />
-    <!-- <q-select
-      :color="$q.dark.isActive ? 'white' : 'primary'"
-      filled
-      v-model="selectedTitle"
-      :options="titleOpts"
-      outlined
-      label="Title"
-      :disable="!selectedYear"
-      clearable
-      @input="selectedFn('title', selectedTitle)"
-    /> -->
   </div>
 </template>
 
@@ -73,14 +62,13 @@
 import axios from "axios";
 import apiRoutes from "../apiRoutes";
 export default {
-  props: ["receivedResID"],
+  props: { value: Object },
   data() {
     return {
       selectedReg: "",
       selectedCourse: "",
       selectedYear: "",
       selectedSem: "",
-      // selectedTitle: "",
       selectedResultID: "",
       uniques: {},
       resultsList: [],
@@ -89,17 +77,21 @@ export default {
       coursesOpts: [],
       yearOpts: [],
       semOpts: [],
-      // titleOpts: [],
       backupResultsList: []
     };
   },
   mounted() {
     this.init();
+    console.log(this.value);
+  },
+  watch: {
+    async value(val) {
+      console.log(val);
+    }
   },
   methods: {
     setQueries() {
       setTimeout(() => {
-        // console.log(this.receivedResID);
         axios
           .get(apiRoutes.resIDDetails + "/" + this.receivedResID)
           .then(async res => {
@@ -126,19 +118,27 @@ export default {
       });
     },
     init() {
-      axios
-        .get(apiRoutes.releasedResults)
-        .then(res => {
-          // console.log(res.data);
-          this.resultObj = res.data;
-          this.regsOpts = Object.keys(res.data);
-        })
-        .then(() => {
-          setTimeout(() => {
-            if (this.receivedResID) this.setQueries();
-            else this.loadStorage();
-          }, 100);
-        });
+      axios.get(apiRoutes.releasedResults).then(async res => {
+        // console.log(res.data);
+        this.resultObj = res.data;
+        this.regsOpts = Object.keys(res.data);
+        //check if parent passed selection
+        if (Object.keys(this.value).length > 0) {
+          // console.log("setting params");
+          await this.sleep(150);
+          this.selectedReg = this.value.reg;
+          this.selectedFn("reg", this.value.reg);
+          await this.sleep(150);
+          this.selectedCourse = this.value.course;
+          this.selectedFn("course", this.value.course);
+          await this.sleep(150);
+          this.selectedYear = this.value.year;
+          this.selectedFn("year", this.value.year);
+          await this.sleep(150);
+          this.selectedSem = this.value.sem;
+          this.selectedFn("sem", this.value.sem);
+        } else this.loadStorage();
+      });
     },
     reset(option) {
       if (option == "reg") {
@@ -173,6 +173,8 @@ export default {
       // console.log(option, value);
       this.save(option, value);
       this.reset(option);
+      //if clicked on clear dont select anything and return
+      if (value == null) return;
       if (option == "reg")
         this.coursesOpts = Object.keys(this.resultObj[this.selectedReg]);
       else if (option == "course")
@@ -188,6 +190,7 @@ export default {
       else if (option == "sem") {
         this.emitSelection();
       }
+      this.emitSelection();
     },
     clearStorage() {
       localStorage.setItem("reg", "");
@@ -245,7 +248,6 @@ export default {
     },
     emitSelection() {
       // localStorage.setItem('lastUniques', JSON.stringify(this.uniques))
-      // console.log(this.selectedTitle);
       this.$emit("success", {
         reg: this.selectedReg,
         course: this.selectedCourse,

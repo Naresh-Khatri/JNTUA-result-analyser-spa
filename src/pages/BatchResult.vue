@@ -14,13 +14,17 @@
       >
         <q-img class="loading-img" src="../assets/loading-head.gif">
           <div class="absolute-bottom-right text-subtitle2 flex flex-center">
-            This might take a minute
+            This take a second or two🙋‍♀️
           </div>
         </q-img>
       </transition>
     </div>
     <div class="wrapper">
-      <StudentInput class="result-input" @success="setSelection($event)" />
+      <StudentInput
+        class="result-input"
+        v-model="selection"
+        @success="setSelection($event)"
+      />
       <div
         class="roll-input flex column rounded q-pa-lg"
         :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -173,11 +177,11 @@ export default {
     return {
       canSearch: false,
       rollPrefix: "19fh1a05",
-      resultID: "",
+      selection: {},
       loading: false,
       range: {
         min: 1,
-        max: 3
+        max: 50
       },
       datacollection: {},
       selectionInput: {}
@@ -189,14 +193,13 @@ export default {
     this.checkQueries();
 
     //to show Under Development
-    if(false)
-    this.$q.dialog({
-      title: "Under Development",
-      html:true,
-      persistent: true,
-      message:
-        `This feature is still under development. Please check back later!`
-    });
+    if (false)
+      this.$q.dialog({
+        title: "Under Development",
+        html: true,
+        persistent: true,
+        message: `This feature is still under development. Please check back later!`
+      });
   },
   methods: {
     rollWithPrefix(roll) {
@@ -208,16 +211,18 @@ export default {
       this.canSearch = true;
     },
     checkQueries() {
-      if (!Object.keys(this.$route.query).includes("resultID")) return;
+      if (!Object.keys(this.$route.query).includes("reg")) return;
 
       // console.log(Object.keys(this.$route.query).includes("resultID"));
-      console.log(this.$route.query);
+      this.selectionInput = this.$route.query;
+      this.selection = this.$route.query;
+      // console.log(this.$route.query);
       this.resultID = this.$route.query.resultID;
       this.range.rollPrefix = this.$route.query.prefix;
       this.range.min = this.$route.query.min;
       this.range.max = this.$route.query.max;
 
-      console.log(window.location);
+      // console.log(window.location);
       this.submit();
     },
     share() {
@@ -225,7 +230,23 @@ export default {
         navigator
           .share({
             title: "Hey I saw our entire batch result on this cool webApp!",
-            url: `${window.location.href}?resultID=${this.resultID}&prefix=${this.rollPrefix}&min=${this.range.min}&max=${this.range.max}`
+            url:
+              window.location.origin +
+              window.location.pathname +
+              "#/batch-result?reg=" +
+              this.selectionInput.reg +
+              "&course=" +
+              this.selectionInput.course +
+              "&sem=" +
+              this.selectionInput.sem +
+              "&year=" +
+              this.selectionInput.year +
+              "&roll=" +
+              this.rollPrefix +
+              "&min=" +
+              this.range.min +
+              "&max=" +
+              this.range.max
           })
           .then(() => {
             this.sendSharedInfoToDB();
@@ -276,9 +297,12 @@ export default {
         .then(res => {
           this.loading = false;
           console.log(res);
+          // res.data.map(s => console.log(s.sgpa));
           res.data.sort((a, b) => {
             return b.sgpa - a.sgpa;
           });
+          // res.data.map(s => console.log(s.sgpa));
+
           res.data.forEach(ele => {
             studentNames.push(ele["name"]);
             studentSGPAs.push(ele["sgpa"]);
@@ -287,7 +311,9 @@ export default {
         })
         .then(() => {
           //scroll bottom
-          // window.scrollTo(0, document.body.scrollHeight + 100);
+          setTimeout(() => {
+            window.scrollTo(0, document.body.scrollHeight - 1000);
+          }, 300);
         })
         .finally(() => {
           this.datacollection = {

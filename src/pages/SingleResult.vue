@@ -14,7 +14,11 @@
     >
       <div style="display:flex; justify-content:center;">
         <div class="wrapper" style="width:100%; max-width:1000px">
-          <StudentInput class="result-input" @success="setSelection($event)" />
+          <StudentInput
+            class="result-input"
+            v-model="selection"
+            @success="setSelection($event)"
+          />
           <div
             class="roll-input q-pa-lg rounded"
             :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -151,7 +155,8 @@
                     </q-td> -->
                     <q-td dense auto-width key="credit" :props="props">{{
                       props.row.credit
-                    }}</q-td>  <q-td dense auto-width key="month" :props="props">{{
+                    }}</q-td>
+                    <q-td dense auto-width key="month" :props="props">{{
                       props.row.month
                     }}</q-td>
                   </q-tr>
@@ -262,7 +267,7 @@ export default {
       datacollection: {},
       canSearch: false,
       rollNo: "19fh1a0546",
-      // resultID: "",
+      selection: {},
       sem: "1",
       studentName: "",
       chartName: "radar",
@@ -338,33 +343,50 @@ export default {
     // this.resultID = "56736469";
     // this.canSearch = true;
     // this.fillData();
-    // this.checkQueries();
+    this.checkQueries();
   },
   methods: {
     setSelection(selection) {
+      //dont set selection if params passed
+      // if (Object.keys(this.$route.query).includes("roll")) return;
       this.selectionInput = selection;
-      this.canSearch = true;
+      this.canSearch = !!this.selectionInput.sem;
     },
     checkQueries() {
-      // console.log(this.$route.query);
-      // if (!Object.keys(this.$route.query).includes("resultID")) return;
-      // console.log(window.location);
-      // this.resultID = this.$route.query.resultID;
+      console.log(this.$route.query);
+      if (Object.keys(this.$route.query).length > 0) {
+        this.canSearch = true;
+        this.selectionInput = this.$route.query;
+        this.selection = this.$route.query;
+        this.fillData();
+      }
+      if (!Object.keys(this.$route.query).includes("reg")) return;
+      console.log(window.location);
       this.rollNo = this.$route.query.roll;
       // console.log(this.rollNo, this.resultID);
       this.canSearch = true;
-      this.fillData();
+      // this.fillData();
     },
     submit() {
       this.fillData();
     },
     share() {
-      return;
       if (navigator.share) {
         navigator
           .share({
             title: "Hey I compared our results on this cool webApp!",
-            url: `${window.location.origin}/#/?resultID=${this.resultID}&roll=${this.rollNo}`
+            url:
+              window.location.origin + window.location.pathname+
+              "#/?reg=" +
+              this.selectionInput.reg +
+              "&course=" +
+              this.selectionInput.course +
+              "&sem=" +
+              this.selectionInput.sem +
+              "&year=" +
+              this.selectionInput.year +
+              "&roll=" +
+              this.rollNo
           })
           .then(() => {
             this.sendSharedInfoToDB();
@@ -521,7 +543,7 @@ export default {
         })
         .then(() => {
           //scroll bottom
-          // window.scrollTo(0, document.body.scrollHeight + 100);
+          window.scrollTo(0, document.body.scrollHeight + 100);
           this.$refs.scrollArea.setScrollPosition(375, 200);
         })
         .catch(error => {

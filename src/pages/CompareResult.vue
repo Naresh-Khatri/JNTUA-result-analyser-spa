@@ -1,8 +1,12 @@
 <template>
   <div class="container">
+    <!-- <q-scroll-area ref='scrollArea' style="height:90vh; width:100%"> -->
     <div class="wrapper">
-      <StudentInput class="result-input" @success="setSelection($event)" />
-
+      <StudentInput
+        v-model="selection"
+        class="result-input"
+        @success="setSelection($event)"
+      />
       <div
         class="roll-input q-pa-lg rounded"
         :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -11,8 +15,10 @@
           <div class="flex flex-center">
             <q-input
               filled
+              ref="rollInput"
               label="Roll Number"
               :color="$q.dark.isActive ? 'white' : 'primary'"
+              :rules="[val => validateRollNo(val)]"
               v-model="rollNoList[index]"
             >
               <template v-slot:append>
@@ -23,7 +29,7 @@
                   icon="remove_circle"
                   color="negative"
                   v-show="rollNoList.length > 1"
-                  @click="rollNoList.splice(index, 1)"
+                  @click="removeRollNo(index)"
                 />
               </template>
             </q-input>
@@ -36,7 +42,7 @@
             class="q-mt-sm"
             color="primary"
             size="md"
-            @click="rollNoList.push('')"
+            @click="addRoll"
           />
         </div>
         <div class="flex flex-center">
@@ -157,6 +163,7 @@
         Looks so empty here
       </div>
     </div>
+    <!-- </q-scroll-area> -->
   </div>
 </template>
 
@@ -209,20 +216,21 @@ export default {
         AB: 0,
         Y: 0
       },
-      selectionInput: {}
+      selectionInput: {},
+      selection: {}
     };
   },
   mounted() {
     // this.setResultID("56736469");
     //this.fillData();
     this.checkQueries();
-    console.log(window.location.href.split("#")[0] + "#/");
+    // console.log(window.location.href.split("#")[0] + "#/");
   },
   methods: {
     checkQueries() {
-      console.log(Object.keys(this.$route.query).includes("resultID"));
-      if (!Object.keys(this.$route.query).includes("resultID")) {
-        console.log("empty");
+      console.log(this.$route.query);
+      console.log(Object.keys(this.$route.query).includes("reg"));
+      if (!Object.keys(this.$route.query).includes("reg")) {
         this.generateRandRolls();
         return;
       }
@@ -231,7 +239,34 @@ export default {
       this.resultID = this.$route.query.resultID;
       console.log(this.rollNoList, this.resultID);
       this.canSearch = true;
+      this.selectionInput = this.$route.query;
+      this.selection = this.$route.query;
       this.fillData();
+    },
+    addRoll() {
+      this.rollNoList.push(this.rollNoList[0].slice(0, -2));
+      //setTimeout is used to wait for the input to be rendered
+      setTimeout(() => {
+        this.$refs.rollInput.slice(-1)[0].focus();
+      });
+      console.log("added new roll");
+      this.canSearch = false;
+    },
+    removeRollNo(index) {
+      this.rollNoList.splice(index, 1);
+      this.canSearch = true;
+    },
+    validateRollNo(roll) {
+      if (roll.length != 10) {
+        this.$q.notify({
+          color: "negative",
+          message: "Roll no length should be 10"
+        });
+        this.canSearch = false;
+        return "Roll no length should be 10";
+      }
+      this.canSearch = true;
+      return true;
     },
     generateRandRolls() {
       for (let i = 0; i < 3; i++) {
@@ -250,14 +285,22 @@ export default {
       this.canSearch = true;
     },
     share() {
-      return;
       if (navigator.share) {
         navigator
           .share({
             title: "Hey I compared our results on this cool webApp!",
-            url: `${window.location.href.split("#")[0] + "#/"}?resultID=${
-              this.resultID
-            }&rollList=${this.rollNoList.toString()}`
+            url:
+              window.location.origin + window.location.pathname+
+              "#/compare-result?reg=" +
+              this.selectionInput.reg +
+              "&course=" +
+              this.selectionInput.course +
+              "&sem=" +
+              this.selectionInput.sem +
+              "&year=" +
+              this.selectionInput.year +
+              "&rollList=" +
+              this.rollNoList.toString()
           })
           .then(() => {
             this.sendSharedInfoToDB();
@@ -280,6 +323,7 @@ export default {
       });
     },
     async fillData() {
+      if (!this.canSearch) return;
       this.resetData();
       try {
         const results = await Promise.all(
@@ -341,8 +385,12 @@ export default {
           }
         });
         this.drawChart();
-        window.scrollTo(0, document.body.scrollHeight + 100);
-            
+        setTimeout(() => {
+          // this.$refs.scrollArea.setScrollPosition(750, 500);
+          window.scrollTo(0, 740);
+          console.log('scrolled')
+        }, 700);
+        // console.log(document.body.scrollHeight )
       } catch (error) {
         console.log(error);
         this.resultNotFoundDialog = true;
@@ -438,4 +486,5 @@ export default {
 .rounded {
   border-radius: 20px;
 }
+
 </style>
