@@ -6,6 +6,7 @@ const routes = [
     children: [
       { path: '', component: () => import('pages/SingleResult.vue') },
       { path: '/single-result', component: () => import('src/pages/SingleResult.vue') },
+      { path: '/personal-perf', component: () => import('src/pages/PersonalPerf.vue') },
       { path: '/compare-result', component: () => import('src/pages/CompareResult.vue') },
       { path: '/feedback', component: () => import('src/pages/FeedbackPage.vue') },
       { path: '/batch-result', component: () => import('src/pages/BatchResult.vue') },

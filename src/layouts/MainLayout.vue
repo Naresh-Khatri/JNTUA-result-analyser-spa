@@ -1,9 +1,6 @@
 <template>
   <q-layout view="hHh lpR fFf">
-    <q-header
-      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-      style="height:100px"
-    >
+    <q-header :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'">
       <div class="bg-primary text-white">
         <q-toolbar>
           <q-btn dense flat round icon="menu" @click="left = !left" />
@@ -49,6 +46,20 @@
           <q-item
             clickable
             v-ripple
+            :active="link === 'personal-perf'"
+            @click="link = 'personal-perf'"
+            active-class="bg-primary"
+            to="/personal-perf"
+          >
+            <q-item-section avatar>
+              <q-icon name="person_outline" />
+            </q-item-section>
+
+            <q-item-section>Personal Performance</q-item-section>
+          </q-item>
+          <q-item
+            clickable
+            v-ripple
             :active="link === 'single-result'"
             @click="link = 'single-result'"
             active-class="bg-primary"
@@ -60,7 +71,6 @@
 
             <q-item-section>Single</q-item-section>
           </q-item>
-
           <q-item
             clickable
             v-ripple
