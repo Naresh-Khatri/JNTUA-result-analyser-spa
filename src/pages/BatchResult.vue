@@ -63,7 +63,7 @@
             style="width:150px"
             color="primary"
             :loading="loading"
-            :disable="!canSearch"
+            :disable="!(canSearch && rollPrefix.length == 8)"
             @click="submit()"
           >
             Submit

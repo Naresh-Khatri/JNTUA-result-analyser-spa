@@ -43,7 +43,7 @@
       <!-- drawer content -->
       <div class="q-pa-md">
         <q-list class="rounded-borders text-primary">
-          <q-item
+          <!-- <q-item
             clickable
             v-ripple
             :active="link === 'personal-perf'"
@@ -56,7 +56,7 @@
             </q-item-section>
 
             <q-item-section>Personal Performance</q-item-section>
-          </q-item>
+          </q-item> -->
           <q-item
             clickable
             v-ripple
