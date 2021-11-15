@@ -99,18 +99,53 @@
           </q-btn-group>
     </div> -->
 
-        <transition>
-          <div style="display:flex; justify-content:center">
-            <q-btn
-              class="text-white"
-              label="Share"
-              style="background:#25D366"
-              @click="share"
-            >
-              <img width="50px" src="../assets/whatsapp.svg" />
-            </q-btn>
+        <q-card class="sgpa-container q-pa-md rounded" flat>
+          <div class="flex flex-center q-px-sm">
+            <div class="col">
+              <div class=" text-center" style="font-size:1.3em; font-weight:4000">
+                Toppers 😒
+                <q-separator class="q-my-md" spaced="true"/>
+
+                <i class="fas fa-crown" style="color:gold"> </i>
+                {{ datacollection.labels[0] }}(
+                {{ datacollection.datasets[0].data[0] }}
+                )
+                <br />
+                <i class="fas fa-crown" style="color:silver"> </i>
+                {{ datacollection.labels[1] }}(
+                {{ datacollection.datasets[0].data[1] }}
+                )
+                <br />
+                <i class="fas fa-crown" style="color:brown"> </i>
+                {{ datacollection.labels[2] }}(
+                {{ datacollection.datasets[0].data[2] }}
+                )
+              </div>
+            </div>
+            <!-- <div class="col" style="max-width:150px">
+                  <q-knob
+                    readonly
+                    show-value
+                    size="90px"
+                    :thickness="0.22"
+                    :max="10"
+                    color="green"
+                    track-color="grey-3"
+                    class=" q-ma-md"
+                  ></q-knob>
+                </div> -->
           </div>
-        </transition>
+        </q-card>
+        <div style="display:flex; justify-content:center">
+          <q-btn
+            class="text-white"
+            label="Share"
+            style="background:#25D366"
+            @click="share"
+          >
+            <img width="50px" src="../assets/whatsapp.svg" />
+          </q-btn>
+        </div>
         <div
           style="overflow-x: auto;padding:20px; border-radius:25px;margin:20px 0px"
           :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"

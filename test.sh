@@ -11,6 +11,6 @@ git status
 git add .
 
 git status
-git commit -m 'new stuff'
+git commit -m 'Add roll prefix length validation in batch results'
 #git pull origin gh-pages --allow-unrelated-histories
 git push origin gh-pages --force
