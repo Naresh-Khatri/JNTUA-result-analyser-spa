@@ -48,14 +48,14 @@
           <q-range
             v-model="range"
             :min="1"
-            :max="99"
-            label
+            :max="350"
             drag-range
-            label-always
           />
           <q-badge color="secondary" class="q-mb-lg text-subtitle2">
-            Selected : {{ rollPrefix + rollWithPrefix(range.min) }} -
-            {{ rollPrefix + rollWithPrefix(range.max) }}
+            Selected : {{ rollPrefix }}
+            <span class="text-h5">{{ rollWithPrefix(range.min) }} </span> -
+            {{ rollPrefix }}
+            <span class="text-h5">{{ rollWithPrefix(range.max) }} </span> 
           </q-badge>
         </div>
         <div class="flex justify-center">
@@ -202,6 +202,8 @@ import Tip from "../components/Tip.vue";
 import StudentInput from "../components/StudentInput.vue";
 import apiRoutes from "src/apiRoutes";
 
+import rollsArray from '../utils/rolls'
+
 export default {
   components: {
     StudentInput,
@@ -211,7 +213,7 @@ export default {
   data() {
     return {
       canSearch: false,
-      rollPrefix: "19fh1a05",
+      rollPrefix: "209E1A05",
       selection: {},
       loading: false,
       range: {
@@ -238,8 +240,9 @@ export default {
   },
   methods: {
     rollWithPrefix(roll) {
-      if (roll < 10) return `0${roll}`;
-      else return roll;
+      return rollsArray[roll].toUpperCase()
+      // if (roll < 10) return `0${roll}`;
+      // else return roll;
     },
     setSelection(selection) {
       this.selectionInput = selection;
@@ -339,7 +342,7 @@ export default {
           // res.data.map(s => console.log(s.sgpa));
 
           res.data.forEach(ele => {
-            studentNames.push(ele["name"]);
+            studentNames.push(`${ele["name"]} (${ele["htn"].slice(-2)})`);
             studentSGPAs.push(ele["sgpa"]);
             // console.log(ele.sgpa, ele.name, ele.htn);
           });
