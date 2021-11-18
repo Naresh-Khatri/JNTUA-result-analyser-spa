@@ -107,17 +107,17 @@
                 <q-separator class="q-my-md" spaced="true"/>
 
                 <i class="fas fa-crown" style="color:gold"> </i>
-                {{ datacollection.labels[0].slice(0,-4) }}(
+                {{ datacollection.labels[0].slice(0,-7) }}(
                 {{ datacollection.datasets[0].data[0] }}
                 )
                 <br />
                 <i class="fas fa-crown" style="color:silver"> </i>
-                {{ datacollection.labels[1].slice(0,-4) }}(
+                {{ datacollection.labels[1].slice(0,-7) }}(
                 {{ datacollection.datasets[0].data[1] }}
                 )
                 <br />
                 <i class="fas fa-crown" style="color:brown"> </i>
-                {{ datacollection.labels[2].slice(0,-4) }}(
+                {{ datacollection.labels[2].slice(0,-7) }}(
                 {{ datacollection.datasets[0].data[2] }}
                 )
               </div>
@@ -345,8 +345,8 @@ export default {
           });
           // res.data.map(s => console.log(s.sgpa));
 
-          res.data.forEach(ele => {
-            studentNames.push(`${ele["name"]} (${ele["htn"].slice(-2)})`);
+          res.data.forEach((ele,i) => {
+            studentNames.push(`${ele["name"]} (${ele["htn"].slice(-2)}) #${i}`);
             studentSGPAs.push(ele["sgpa"]);
             // console.log(ele.sgpa, ele.name, ele.htn);
           });
