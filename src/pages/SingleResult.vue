@@ -267,7 +267,7 @@ export default {
     return {
       datacollection: {},
       canSearch: false,
-      rollNo: "19fh1a0547",
+      rollNo: "19fh1a0546",
       selection: {},
       sem: "1",
       studentName: "",
@@ -357,8 +357,10 @@ export default {
       console.log(this.$route.query);
       if (Object.keys(this.$route.query).length > 0) {
         this.canSearch = true;
+        //set local selection and forward to selection component
         this.selectionInput = this.$route.query;
         this.selection = this.$route.query;
+        this.rollNo = this.selection.roll;
         this.fillData();
       }
       if (!Object.keys(this.$route.query).includes("reg")) return;
@@ -375,7 +377,7 @@ export default {
       if (navigator.share) {
         navigator
           .share({
-            title: "Hey I compared our results on this cool webApp!",
+            title: "Hey I analysed my results on this cool website!",
             url:
               window.location.origin + window.location.pathname+
               "#/?reg=" +

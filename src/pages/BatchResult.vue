@@ -107,17 +107,17 @@
                 <q-separator class="q-my-md" spaced="true"/>
 
                 <i class="fas fa-crown" style="color:gold"> </i>
-                {{ datacollection.labels[0] }}(
+                {{ datacollection.labels[0].slice(0,-4) }}(
                 {{ datacollection.datasets[0].data[0] }}
                 )
                 <br />
                 <i class="fas fa-crown" style="color:silver"> </i>
-                {{ datacollection.labels[1] }}(
+                {{ datacollection.labels[1].slice(0,-4) }}(
                 {{ datacollection.datasets[0].data[1] }}
                 )
                 <br />
                 <i class="fas fa-crown" style="color:brown"> </i>
-                {{ datacollection.labels[2] }}(
+                {{ datacollection.labels[2].slice(0,-4) }}(
                 {{ datacollection.datasets[0].data[2] }}
                 )
               </div>
@@ -254,6 +254,10 @@ export default {
       // console.log(Object.keys(this.$route.query).includes("resultID"));
       this.selectionInput = this.$route.query;
       this.selection = this.$route.query;
+      console.log(this.selection)
+      this.rollPrefix = this.selection.roll
+      this.range.min = this.selection.min
+      this.range.max = this.selection.max
       // console.log(this.$route.query);
       this.resultID = this.$route.query.resultID;
       this.range.rollPrefix = this.$route.query.prefix;
