@@ -45,17 +45,12 @@
           </template></q-input
         >
         <div class="q-pa-md">
-          <q-range
-            v-model="range"
-            :min="1"
-            :max="350"
-            drag-range
-          />
+          <q-range v-model="range" :min="1" :max="350" drag-range />
           <q-badge color="secondary" class="q-mb-lg text-subtitle2">
             Selected : {{ rollPrefix }}
             <span class="text-h5">{{ rollWithPrefix(range.min) }} </span> -
             {{ rollPrefix }}
-            <span class="text-h5">{{ rollWithPrefix(range.max) }} </span> 
+            <span class="text-h5">{{ rollWithPrefix(range.max) }} </span>
           </q-badge>
         </div>
         <div class="flex justify-center">
@@ -102,22 +97,25 @@
         <q-card class="sgpa-container q-pa-md rounded" flat>
           <div class="flex flex-center q-px-sm">
             <div class="col">
-              <div class=" text-center" style="font-size:1.3em; font-weight:4000">
+              <div
+                class=" text-center"
+                style="font-size:1.3em; font-weight:4000"
+              >
                 Toppers 😒
-                <q-separator class="q-my-md" spaced="true"/>
+                <q-separator class="q-my-md" spaced="true" />
 
                 <i class="fas fa-crown" style="color:gold"> </i>
-                {{ datacollection.labels[0].slice(0,-7) }}(
+                {{ datacollection.labels[0].slice(0, -7) }}(
                 {{ datacollection.datasets[0].data[0] }}
                 )
                 <br />
                 <i class="fas fa-crown" style="color:silver"> </i>
-                {{ datacollection.labels[1].slice(0,-7) }}(
+                {{ datacollection.labels[1].slice(0, -7) }}(
                 {{ datacollection.datasets[0].data[1] }}
                 )
                 <br />
                 <i class="fas fa-crown" style="color:brown"> </i>
-                {{ datacollection.labels[2].slice(0,-7) }}(
+                {{ datacollection.labels[2].slice(0, -7) }}(
                 {{ datacollection.datasets[0].data[2] }}
                 )
               </div>
@@ -162,9 +160,20 @@
             }"
             :style="!$q.screen.lt.md ? 'height:700px' : ''"
           >
+            <div>
+              <q-btn
+                icon="zoom_out"
+                @click="chartWidth -= 100"
+                :disable="chartWidth < 1300"
+              />
+              <q-btn
+                icon="zoom_in"
+                @click="chartWidth += 100"
+                :disable="chartWidth > 5000"
+              />
+            </div>
             <LineChart
-              style="height:550px; width:1300px"
-              :style="!$q.screen.lt.md ? 'height:700px' : ''"
+              :style="'height:500px; width:' + chartWidth + 'px'"
               :chart-data="datacollection"
               :yMax="10"
               :key="$q.dark.isActive"
@@ -202,7 +211,7 @@ import Tip from "../components/Tip.vue";
 import StudentInput from "../components/StudentInput.vue";
 import apiRoutes from "src/apiRoutes";
 
-import rollsArray from '../utils/rolls'
+import rollsArray from "../utils/rolls";
 
 export default {
   components: {
@@ -213,6 +222,7 @@ export default {
   data() {
     return {
       canSearch: false,
+      chartWidth: 1300,
       rollPrefix: "209E1A05",
       selection: {},
       loading: false,
@@ -240,7 +250,7 @@ export default {
   },
   methods: {
     rollWithPrefix(roll) {
-      return rollsArray[roll].toUpperCase()
+      return rollsArray[roll].toUpperCase();
       // if (roll < 10) return `0${roll}`;
       // else return roll;
     },
@@ -254,10 +264,10 @@ export default {
       // console.log(Object.keys(this.$route.query).includes("resultID"));
       this.selectionInput = this.$route.query;
       this.selection = this.$route.query;
-      console.log(this.selection)
-      this.rollPrefix = this.selection.roll
-      this.range.min = this.selection.min
-      this.range.max = this.selection.max
+      console.log(this.selection);
+      this.rollPrefix = this.selection.roll;
+      this.range.min = this.selection.min;
+      this.range.max = this.selection.max;
       // console.log(this.$route.query);
       this.resultID = this.$route.query.resultID;
       this.range.rollPrefix = this.$route.query.prefix;
@@ -344,12 +354,25 @@ export default {
             return b.sgpa - a.sgpa;
           });
           // res.data.map(s => console.log(s.sgpa));
-
-          res.data.forEach((ele,i) => {
-            studentNames.push(`${ele["name"]} (${ele["htn"].slice(-2)}) #${i}`);
-            studentSGPAs.push(ele["sgpa"]);
-            // console.log(ele.sgpa, ele.name, ele.htn);
-          });
+          const studentsArray = res.data;
+          let rank = 1;
+          for (let i = 0; i < studentsArray.length; i++) {
+            //only add rank if not failed
+            studentNames.push(
+              `${studentsArray[i]["name"]} (${studentsArray[i]["htn"].slice(
+                -2
+              )}) #${studentsArray[i].sgpa > 0 ? rank : "na"}`
+            );
+            studentSGPAs.push(studentsArray[i].sgpa);
+            if (studentsArray[i + 1])
+              if (studentsArray[i].sgpa != studentsArray[i + 1].sgpa) rank++;
+          }
+          // res.data.forEach((ele,i) => {
+          //   studentNames.push(`${ele["name"]} (${ele["htn"].slice(-2)}) #${i+1}`);
+          //   studentSGPAs.push(ele["sgpa"]);
+          //   if()
+          //   // console.log(ele.sgpa, ele.name, ele.htn);
+          // });
         })
         .then(() => {
           //scroll bottom

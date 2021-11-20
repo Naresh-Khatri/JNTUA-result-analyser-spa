@@ -6,7 +6,7 @@
       :chart-data="pieDataCollection"
       :key="$q.dark.isActive"
     /> -->
-    <div
+    <!-- <div
       class="flex column rounded q-pa-md q-my-md"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
       style="border-radius:20px"
@@ -31,7 +31,60 @@
           :key="$q.dark.isActive"
         />
       </q-scroll-area>
+    </div> -->
+
+    <div class="flex flex-center">
+      <div
+        class="q-my-md q-py-md row"
+        :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+        style="border-radius:20px; width: 60%"
+      >
+        <div class="col-8">
+          <transition
+            appear
+            enter-active-class="animated fadeIn"
+            leave-active-class="animated fadeOut"
+          >
+            <div class="text-h4 text-center">
+              {{ totalSearches }}
+            </div>
+          </transition>
+        </div>
+        <div class="col-4">
+          <span class="row text-caption">total</span>
+          <span class="row text-caption">searches</span>
+        </div>
+      </div>
     </div>
+    <div
+      class="q-my-md q-py-md"
+      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+      style="border-radius:20px"
+      v-if="topColleges.length"
+    >
+      <div class="text-h4 q-mt-lg q-ml-lg">
+        🏆Leaderboards
+      </div>
+      <div class="text-body1 q-ma-md">
+        <i class="fas fa-crown" style="color:gold"> </i>
+        {{ topColleges[0].collegeCode }} - {{ topColleges[0].collegeName }}({{
+          topColleges[0].district
+        }})
+      </div>
+      <div class="text-body1 q-ma-md">
+        <i class="fas fa-crown" style="color:silver"> </i>
+        {{ topColleges[1].collegeCode }} - {{ topColleges[1].collegeName }}({{
+          topColleges[1].district
+        }})
+      </div>
+      <div class="text-body1 q-ma-md">
+        <i class="fas fa-crown" style="color:brown"> </i>
+        {{ topColleges[2].collegeCode }} - {{ topColleges[2].collegeName }}({{
+          topColleges[2].district
+        }})
+      </div>
+    </div>
+
     <div
       class="q-my-md q-py-md"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -74,22 +127,8 @@
         :chart-data="pieDataCollection"
         :key="$q.dark.isActive"
       />
-    </div>
-    <div
-      class="q-my-md q-py-md"
-      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-      style="border-radius:20px"
-    >
-      <div class="text-h4 q-mt-lg q-ml-lg">
-        🏆Leaderboards
-      </div>
-      <div
-        v-for="(college, index) in topColleges"
-        :key="index"
-        class="text-body1 q-ma-md"
-      >
-        #{{ index + 1 }}. {{ college.collegeCode }} -
-        {{ college.collegeName }}({{ college.district }})
+      <div class="q-pa-md text-right">
+        *Note: Only top 30 colleges are shown
       </div>
     </div>
   </q-page>
@@ -98,7 +137,7 @@
 <script>
 // import data from './data.json'
 import PieChart from "../charts/PieChart.vue";
-import LineChart from "../charts/LineChart.vue";
+// import LineChart from "../charts/LineChart.vue";
 import axios from "axios";
 
 import apiRoutes from "../apiRoutes";
@@ -108,8 +147,8 @@ import { backgroundColors, borderColors } from "../colors/colors";
 export default {
   // name: 'PageName',
   components: {
-    PieChart,
-    LineChart
+    PieChart
+    // LineChart
   },
   data() {
     return {
@@ -138,31 +177,39 @@ export default {
           }
         ]
       },
-      topColleges: []
+      topColleges: [],
+      totalSearches: 0,
+      timeout: null,
+      updateTime: 1000
     };
   },
 
   mounted() {
     // this.pieDataCollection.data = data.
     // console.log(data)
+    this.updateSearchCount();
     setTimeout(() => {
       console.log(this.pieDataCollection);
     }, 1000);
     axios
       .get(apiRoutes.stats)
       .then(res => {
-        console.log(res);
-        setTimeout(() => {
-          this.$refs.scrollArea.setScrollPosition(1000, 1000);
-        }, 500);
+        // console.log(res);
+        // setTimeout(() => {
+        //   this.$refs.scrollArea.setScrollPosition(1000, 1000);
+        // }, 500);
         this.topColleges = res.data.topColleges;
+        this.totalSearches = res.data.totalSearches;
         let counter = 0;
-        let arr = Object.entries(res.data.colleges);
-        arr.sort(([a, b], [c, d]) => d - b);
+        // let arr = Object.entries(res.data.colleges);
+        // arr.sort(([a, b], [c, d]) => d - b);
         // console.log(arr);
-        arr.map(item => {
-          this.pieDataCollection.labels.push(`${item[0]} (${item[1]})`);
-          this.pieDataCollection.datasets[0].data.push(item[1]);
+        res.data.searches.map((item, index) => {
+          if (index >= 30) return;
+          this.pieDataCollection.labels.push(
+            `${item["_id"]} (${item["total"]})`
+          );
+          this.pieDataCollection.datasets[0].data.push(item["total"]);
           this.pieDataCollection.datasets[0].backgroundColor.push(
             backgroundColors[counter % 7]
           );
@@ -171,18 +218,18 @@ export default {
           );
           counter++;
         });
-        arr = Object.entries(res.data.searchDates);
+        // arr = Object.entries(res.data.searchDates);
         this.lineDataCollection.datasets[0].backgroundColor.push(
           backgroundColors[counter % 7]
         );
         this.lineDataCollection.datasets[0].borderColor.push(
           borderColors[counter % 7]
         );
-        arr.map(item => {
-          this.lineDataCollection.labels.push(item[0]);
-          this.lineDataCollection.datasets[0].data.push(item[1]);
-          counter++;
-        });
+        // arr.map(item => {
+        //   this.lineDataCollection.labels.push(item[0]);
+        //   this.lineDataCollection.datasets[0].data.push(item[1]);
+        //   counter++;
+        // });
         // this.$refs.dateChart.scrollLeft += 300;
         // setTimeout(() => {
         //   document.querySelector(
@@ -197,6 +244,14 @@ export default {
       });
     // console.log(this.pieDataCollection);
   },
-  methods: {}
+  methods: {
+    updateSearchCount() {
+      setTimeout(() => {
+        this.updateTime = Math.random() * 7000;
+        this.totalSearches++;
+        this.updateSearchCount();
+      }, this.updateTime);
+    }
+  }
 };
 </script>
