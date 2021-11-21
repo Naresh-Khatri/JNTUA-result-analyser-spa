@@ -172,7 +172,7 @@
             <q-tabs
               v-model="chartName"
               indicator-color="primary"
-              class="text-primary rounded q-mb-sm q-mx-lg"
+              class="text-primary rounded q-mt-md q-mb-sm q-mx-lg"
               :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
             >
               <q-tab
@@ -337,7 +337,8 @@ export default {
         AB: 0,
         Y: 0
       },
-      selectionInput: {}
+      selectionInput: {},
+      totalAttempts: 0,
     };
   },
   mounted() {
@@ -524,6 +525,12 @@ export default {
             const bestAttempts = getBestAttempts(res.data.attempts);
             console.log(bestAttempts);
 
+            //calc total attempts
+            this.totalAttempts = 0
+            res.data.attempts.forEach(attempt => {
+              if(Object.keys(attempt).length > 0) this.totalAttempts++
+            });
+            console.log('attempts count',this.totalAttempts);
             bestAttempts.forEach(sub => {
               this.rowData.push({
                 subject_name: getShort(sub["Subject Name"]),

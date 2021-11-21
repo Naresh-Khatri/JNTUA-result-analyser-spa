@@ -1,18 +1,47 @@
 <template>
-  <div class="q-mx-lg">
-    <div class="container">
-      <q-icon name="info"/>
-      <p class="text-bold" style="font-weight:700; margin:0; display:inline;">
-        {{ title }}
-      </p>
-      <p>{{ desc }}</p>
-    </div>
+  <div>
+    <transition
+      appear
+      enter-active-class="animated fadeIn"
+      leave-active-class="animated fadeOut"
+    >
+      <div v-if="!disabled" class="q-mx-lg">
+        <div class="container">
+          <q-icon name="info" />
+          <p
+            class="text-bold"
+            style="font-weight:700; margin:0; display:inline;"
+          >
+            {{ title }}
+          </p>
+          <span class="float-right"
+            ><q-btn icon="close" round @click="disable" size="sm" flat />
+          </span>
+          <div>
+            <p>{{ desc }}</p>
+          </div>
+        </div>
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
 export default {
-  props: ["title", "desc"]
+  props: ["title", "desc"],
+  data() {
+    return {
+      disabled: false
+    };
+  },
+  mounted() {
+    // this.$q.tipsDisabled = false;
+  },
+  methods: {
+    disable() {
+      this.disabled = true;
+    }
+  }
 };
 </script>
 
@@ -27,7 +56,7 @@ export default {
   border-style: solid;
   background-color: rgba(193, 244, 205, 0.562);
   border-color: #21ba45;
-   /* background-color: rgba(255, 77, 1, 0.116);
+  /* background-color: rgba(255, 77, 1, 0.116);
   border-color: #ff4d01; */
   letter-spacing: 0.5px;
 }

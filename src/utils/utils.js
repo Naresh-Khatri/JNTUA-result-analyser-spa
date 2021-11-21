@@ -37,8 +37,6 @@ function getBestAttempts(attempts) {
       break
     }
   }
-  console.log(attempts)
-  console.log('bestattempts', bestAttempts)
   if (attempts[0].failedCount == 0) {
     console.log('returning since single attempt')
     return bestAttempts
