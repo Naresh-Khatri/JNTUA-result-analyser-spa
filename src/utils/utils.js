@@ -29,8 +29,16 @@ function getShort(str) {
 }
 
 function getBestAttempts(attempts) {
-  const bestAttempts = attempts[0].subjects
+  let bestAttempts = []
+  //get the first available attempt
+  for (let i = 0; i < attempts.length; i++) {
+    if (Object.keys(attempts[i]).length > 0) {
+      bestAttempts = attempts[i].subjects
+      break
+    }
+  }
   console.log(attempts)
+  console.log('bestattempts', bestAttempts)
   if (attempts[0].failedCount == 0) {
     console.log('returning since single attempt')
     return bestAttempts
