@@ -61,27 +61,32 @@
               class="sgpa-container q-px-lg rounded"
               v-if="datacollection.datasets"
               flat
-            >
-              <div class="flex flex-center q-px-sm">
-                <div class="col">
-                  <div class=" text-center" style="font-size:1.3rem">
-                    {{ studentName }}
+              ><transition
+                appear
+                enter-active-class="animated bounceIn"
+                mode="out-in"
+              >
+                <div class="flex flex-center q-px-sm" :key="studentName">
+                  <div class="col">
+                    <div class=" text-center" style="font-size:1.3rem">
+                      {{ studentName }}
+                    </div>
+                  </div>
+                  <div class="col" style="max-width:150px">
+                    <q-knob
+                      readonly
+                      v-model="studentSGPA"
+                      show-value
+                      size="90px"
+                      :thickness="0.22"
+                      :max="10"
+                      color="green"
+                      track-color="grey-3"
+                      class=" q-ma-md"
+                    ></q-knob>
                   </div>
                 </div>
-                <div class="col" style="max-width:150px">
-                  <q-knob
-                    readonly
-                    v-model="studentSGPA"
-                    show-value
-                    size="90px"
-                    :thickness="0.22"
-                    :max="10"
-                    color="green"
-                    track-color="grey-3"
-                    class=" q-ma-md"
-                  ></q-knob>
-                </div>
-              </div>
+              </transition>
             </q-card>
             <transition v-if="datacollection.datasets">
               <div style="display:flex; justify-content:center">
@@ -163,6 +168,25 @@
                 </template>
               </q-table>
             </div>
+            <!-- sub full forms -->
+            <div class="flex justify-center">
+              <q-card
+                class="sgpa-container q-px-lg rounded"
+                style="width:90%"
+                v-if="datacollection.datasets"
+                flat
+              >
+                <q-expansion-item
+                  v-model="fullFormsExpanded"
+                  label="sub full forms"
+                >
+                  <div v-for="(row,index) in fullFormsArr" :key="index">
+                   <span class="text-h6"> {{ row.shortForm }}</span>: <span class="text-caption">{{row.fullForm}}</span>
+                   <q-separator />
+                  </div>
+                </q-expansion-item></q-card
+              >
+            </div>
             <Tip
               title="Tip 2"
               desc="Here you can choose from various charts like radar,
@@ -220,7 +244,7 @@
                   :key="$q.dark.isActive"
                 />
               </q-tab-panel>
-            sdfdsfsdfasdf
+              sdfdsfsdfasdf
             </q-tab-panels>
           </div>
           <div
@@ -267,7 +291,7 @@ export default {
     return {
       datacollection: {},
       canSearch: false,
-      rollNo: "19fh1a0546",
+      rollNo: "19fh1a0541",
       selection: {},
       sem: "1",
       studentName: "",
@@ -319,6 +343,8 @@ export default {
       ],
       studentSGPA: 0,
       rowData: [],
+      fullFormsExpanded: false,
+      fullFormsArr: [],
       pagination: {
         sortBy: "name",
         descending: false,
@@ -338,7 +364,7 @@ export default {
         Y: 0
       },
       selectionInput: {},
-      totalAttempts: 0,
+      totalAttempts: 0
     };
   },
   mounted() {
@@ -380,7 +406,8 @@ export default {
           .share({
             title: "Hey I analysed my results on this cool website!",
             url:
-              window.location.origin + window.location.pathname+
+              window.location.origin +
+              window.location.pathname +
               "#/?reg=" +
               this.selectionInput.reg +
               "&course=" +
@@ -526,12 +553,18 @@ export default {
             console.log(bestAttempts);
 
             //calc total attempts
-            this.totalAttempts = 0
+            this.totalAttempts = 0;
             res.data.attempts.forEach(attempt => {
-              if(Object.keys(attempt).length > 0) this.totalAttempts++
+              if (Object.keys(attempt).length > 0) this.totalAttempts++;
             });
-            console.log('attempts count',this.totalAttempts);
+            console.log("attempts count", this.totalAttempts);
             bestAttempts.forEach(sub => {
+              //push to full forms array
+              this.fullFormsArr.push({
+                shortForm: getShort(sub["Subject Name"]),
+                fullForm: sub["Subject Name"]
+              });
+              //push to subject names rowData array
               this.rowData.push({
                 subject_name: getShort(sub["Subject Name"]),
                 status: sub["Result Status"] == "P" ? "✔" : "❌",
@@ -553,7 +586,7 @@ export default {
         })
         .then(() => {
           //scroll bottom
-          window.scrollTo(0, document.body.scrollHeight + 100);
+          window.scrollTo(0, document.body.scrollHeight);
           this.$refs.scrollArea.setScrollPosition(375, 200);
         })
         .catch(error => {

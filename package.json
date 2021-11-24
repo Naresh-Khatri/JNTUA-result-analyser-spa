@@ -12,12 +12,12 @@
   "dependencies": {
     "@quasar/cli": "^1.2.1",
     "@quasar/extras": "^1.0.0",
-    "animate.css": "^4.1.1",
     "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "chart.js": "2.9.4",
     "core-js": "^3.6.5",
     "eslint-webpack-plugin": "^2.5.4",
+    "gsap": "^3.8.0",
     "jssoup": "^0.0.12",
     "quasar": "^1.0.0",
     "vue-chartjs": "^3.5.1"

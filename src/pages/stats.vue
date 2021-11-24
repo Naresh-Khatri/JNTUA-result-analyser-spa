@@ -1,37 +1,13 @@
 <template>
   <q-page padding :key="pieDataCollection.labels.length">
     <!-- content -->
+    
     <!-- <LineChart
       style="min-width:90%"
-      :chart-data="pieDataCollection"
+      :chart-data="lineDataCollection"
       :key="$q.dark.isActive"
     /> -->
-    <!-- <div
-      class="flex column rounded q-pa-md q-my-md"
-      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-      style="border-radius:20px"
-    >
-      <div class="text-h5">Unique searches per day</div>
-      <q-scroll-area
-        ref="scrollArea"
-        horizontal
-        style="height:400px;"
-        :thumb-style="{
-          bottom: '4px',
-          borderRadius: '5px',
-          background: '#b0b8b4ff',
-          width: '10px',
-          opacity: 1
-        }"
-        :style="!$q.screen.lt.md ? 'height:400px' : ''"
-      >
-        <LineChart
-          style="width:1300px"
-          :chart-data="lineDataCollection"
-          :key="$q.dark.isActive"
-        />
-      </q-scroll-area>
-    </div> -->
+  
 
     <div class="flex flex-center">
       <div
@@ -40,15 +16,15 @@
         style="border-radius:20px; width: 60%"
       >
         <div class="col-8">
-          <transition
+          <!-- <transition
             appear
             enter-active-class="animated fadeIn"
             leave-active-class="animated fadeOut"
-          >
+          > -->
             <div class="text-h4 text-center">
-              {{ totalSearches }}
+              {{ animatedNumber }}
             </div>
-          </transition>
+          <!-- </transition> -->
         </div>
         <div class="col-4">
           <span class="row text-caption">total</span>
@@ -57,7 +33,7 @@
       </div>
     </div>
     <div
-      class="q-my-md q-py-md"
+      class="q-my-md q-pa-md"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
       style="border-radius:20px"
       v-if="topColleges.length"
@@ -127,17 +103,45 @@
         :chart-data="pieDataCollection"
         :key="$q.dark.isActive"
       />
-      <div class="q-pa-md text-right">
+      <div class="q-pa-md text-right text-grey-6">
         *Note: Only top 30 colleges are shown
       </div>
+
+    </div>
+      <div
+      class="flex column rounded q-pa-md q-my-md"
+      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+      style="border-radius:20px"
+    >
+      <div class="text-h5">searches per day</div>
+      <q-scroll-area
+        ref="scrollArea"
+        horizontal
+        style="height:400px;"
+        :thumb-style="{
+          bottom: '4px',
+          borderRadius: '5px',
+          background: '#b0b8b4ff',
+          width: '10px',
+          opacity: 1
+        }"
+        :style="!$q.screen.lt.md ? 'height:400px' : ''"
+      >
+        <LineChart
+          style="width:1300px"
+          :chart-data="lineDataCollection"
+          :key="$q.dark.isActive"
+        />
+      </q-scroll-area>
     </div>
   </q-page>
 </template>
 
 <script>
 // import data from './data.json'
+import gsap from "gsap";
 import PieChart from "../charts/PieChart.vue";
-// import LineChart from "../charts/LineChart.vue";
+import LineChart from "../charts/LineChart.vue";
 import axios from "axios";
 
 import apiRoutes from "../apiRoutes";
@@ -147,8 +151,8 @@ import { backgroundColors, borderColors } from "../colors/colors";
 export default {
   // name: 'PageName',
   components: {
-    PieChart
-    // LineChart
+    PieChart,
+    LineChart
   },
   data() {
     return {
@@ -179,11 +183,22 @@ export default {
       },
       topColleges: [],
       totalSearches: 0,
+      tweenedNumber: 0,
       timeout: null,
       updateTime: 1000
     };
   },
 
+  computed: {
+    animatedNumber() {
+      return this.tweenedNumber.toFixed(0);
+    }
+  },
+  watch: {
+    totalSearches(val) {
+      gsap.to(this.$data, { duration: 1, tweenedNumber: val });
+    }
+  },
   mounted() {
     // this.pieDataCollection.data = data.
     // console.log(data)
@@ -194,7 +209,7 @@ export default {
     axios
       .get(apiRoutes.stats)
       .then(res => {
-        // console.log(res);
+        console.log(res);
         // setTimeout(() => {
         //   this.$refs.scrollArea.setScrollPosition(1000, 1000);
         // }, 500);
@@ -218,13 +233,19 @@ export default {
           );
           counter++;
         });
-        // arr = Object.entries(res.data.searchDates);
+        // // arr = Object.entries(res.data.searchDates);
+        //set the line chart color to primary
         this.lineDataCollection.datasets[0].backgroundColor.push(
-          backgroundColors[counter % 7]
+          backgroundColors[1]
         );
         this.lineDataCollection.datasets[0].borderColor.push(
-          borderColors[counter % 7]
+          borderColors[1]
         );
+
+        res.data.searchesArr.map((item, index) => {
+          this.lineDataCollection.labels.push(item["date"].slice(5, 10));
+          this.lineDataCollection.datasets[0].data.push(item["searchCount"]);
+        });
         // arr.map(item => {
         //   this.lineDataCollection.labels.push(item[0]);
         //   this.lineDataCollection.datasets[0].data.push(item[1]);

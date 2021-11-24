@@ -11,6 +11,6 @@ git status
 git add .
 
 git status
-git commit -m 'Fix problem where share link takes you to default roll'
+git commit -m 'Add animation on response in singleResult.vue'
 #git pull origin gh-pages --allow-unrelated-histories
 git push origin gh-pages --force
