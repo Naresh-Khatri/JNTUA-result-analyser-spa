@@ -14,7 +14,7 @@
       >
         <q-img class="loading-img" src="../assets/loading-head.gif">
           <div class="absolute-bottom-right text-subtitle2 flex flex-center">
-            This take a second or two🙋‍♀️
+            This takes around 10 second...🙋‍♀️
           </div>
         </q-img>
       </transition>
@@ -39,6 +39,7 @@
               val.length == 8 || 'Enter first 8 charaters of your full roll no.'
           ]"
           label="Roll no prefix"
+          clearable
         >
           <template v-slot:hint>
             Example: 19fh1a05
@@ -69,12 +70,11 @@
           </q-btn>
         </div>
       </div>
-      <div class="data-container" v-if="Object.keys(datacollection).length > 0">
-        <Tip
-          title="Info"
-          desc="This graph contains all the student with their SPGAs,
-                            Tap on any point to know more"
-        />
+      <div
+        class="data-container"
+        v-if="Object.keys(sgpaDataCollection).length > 0"
+      >
+      
         <!-- <div class="flex flex-center q-mt-lg">
           <q-btn-group
             ><q-btn
@@ -105,18 +105,18 @@
                 <q-separator class="q-my-md" spaced="true" />
 
                 <i class="fas fa-crown" style="color:gold"> </i>
-                {{ datacollection.labels[0].slice(0, -7) }}(
-                {{ datacollection.datasets[0].data[0] }}
+                {{ sgpaDataCollection.labels[0].slice(0, -7) }}(
+                {{ sgpaDataCollection.datasets[0].data[0] }}
                 )
                 <br />
                 <i class="fas fa-crown" style="color:silver"> </i>
-                {{ datacollection.labels[1].slice(0, -7) }}(
-                {{ datacollection.datasets[0].data[1] }}
+                {{ sgpaDataCollection.labels[1].slice(0, -7) }}(
+                {{ sgpaDataCollection.datasets[0].data[1] }}
                 )
                 <br />
                 <i class="fas fa-crown" style="color:brown"> </i>
-                {{ datacollection.labels[2].slice(0, -7) }}(
-                {{ datacollection.datasets[0].data[2] }}
+                {{ sgpaDataCollection.labels[2].slice(0, -7) }}(
+                {{ sgpaDataCollection.datasets[0].data[2] }}
                 )
               </div>
             </div>
@@ -144,41 +144,105 @@
             <img width="50px" src="../assets/whatsapp.svg" />
           </q-btn>
         </div>
+          <Tip
+          title="Info"
+          desc="This graph contains all the student with their SPGAs,
+                            Tap on any point to know more"
+        />
         <div
           style="overflow-x: auto;padding:20px; border-radius:25px;margin:20px 0px"
           :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
         >
-          <q-scroll-area
-            horizontal
-            style="height:550px;"
-            :thumb-style="{
-              bottom: '4px',
-              borderRadius: '5px',
-              background: '#b0b8b4ff',
-              width: '10px',
-              opacity: 1
-            }"
-            :style="!$q.screen.lt.md ? 'height:700px' : ''"
+          <q-tabs
+            v-model="sortBy"
+            indicator-color="primary"
+            class="text-primary rounded q-mt-md q-mb-sm q-mx-lg"
+            :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
           >
-            <div>
-              <q-btn
-                icon="zoom_out"
-                @click="chartWidth -= 100"
-                :disable="chartWidth < 1300"
-              />
-              <q-btn
-                icon="zoom_in"
-                @click="chartWidth += 100"
-                :disable="chartWidth > 5000"
-              />
-            </div>
-            <LineChart
-              :style="'height:500px; width:' + chartWidth + 'px'"
-              :chart-data="datacollection"
-              :yMax="10"
-              :key="$q.dark.isActive"
+            <q-tab
+              name="sgpa"
+              icon="show_chart"
+              label="SGPA wise"
+              :style="$q.dark.isActive ? 'color:white' : ''"
             />
-          </q-scroll-area>
+            <q-tab
+              name="sub"
+              icon="book"
+              label="SUB wise"
+              :style="$q.dark.isActive ? 'color:white' : ''"
+            />
+          </q-tabs>
+          <div class="flex justify-end items-center">
+            <q-btn
+              icon="zoom_out"
+              flat
+              round
+              @click="chartWidth -= 100"
+              :disable="chartWidth < 1300"
+            />
+            {{ chartWidthPercentage }}%
+            <q-btn
+              icon="zoom_in"
+              flat
+              round
+              @click="chartWidth += 100"
+              :disable="chartWidth > 5000"
+            />
+          </div>
+          <q-tab-panels
+            v-model="sortBy"
+            animated
+            class="q-mb-xl shadow-2 rounded"
+          >
+            <q-tab-panel name="sgpa" class="rounded">
+              <q-scroll-area
+                horizontal
+                style="height:550px;"
+                :thumb-style="{
+                  bottom: '4px',
+                  borderRadius: '5px',
+                  background: '#b0b8b4ff',
+                  width: '10px',
+                  opacity: 1
+                }"
+                :style="!$q.screen.lt.md ? 'height:700px' : ''"
+              >
+                <LineChart
+                  :style="'height:500px; width:' + chartWidth + 'px'"
+                  :chart-data="sgpaDataCollection"
+                  :yMax="10"
+                  :key="$q.dark.isActive"
+                />
+              </q-scroll-area>
+            </q-tab-panel>
+            <q-tab-panel name="sub" class="rounded">
+              <q-select
+                :options="subjectList"
+                v-model="selectedSubject"
+                @input="changeSort"
+                label="Select sub"
+              />
+              <q-scroll-area
+                horizontal
+                style="height:550px;"
+                :thumb-style="{
+                  bottom: '4px',
+                  borderRadius: '5px',
+                  background: '#b0b8b4ff',
+                  width: '10px',
+                  opacity: 1
+                }"
+                :style="!$q.screen.lt.md ? 'height:700px' : ''"
+              >
+                <LineChart
+                  :style="'height:500px; width:' + chartWidth + 'px'"
+                  :chart-data="subDataCollection"
+                  :yMax="10"
+                  :key="$q.dark.isActive"
+                />
+              </q-scroll-area>
+            </q-tab-panel>
+          </q-tab-panels>
         </div>
         <Tip
           title="Important"
@@ -210,6 +274,7 @@ import LineChart from "../charts/LineChart.vue";
 import Tip from "../components/Tip.vue";
 import StudentInput from "../components/StudentInput.vue";
 import apiRoutes from "src/apiRoutes";
+import { getBestAttempts } from "../utils/utils";
 
 import rollsArray from "../utils/rolls";
 
@@ -223,14 +288,31 @@ export default {
     return {
       canSearch: false,
       chartWidth: 1300,
-      rollPrefix: "209E1A05",
+      rollPrefix: "19fh1a05",
       selection: {},
       loading: false,
+      sortBy: "sgpa",
       range: {
         min: 1,
         max: 50
       },
-      datacollection: {},
+      g_to_gp: {
+        S: 10,
+        O: 10,
+        A: 9,
+        B: 8,
+        C: 7,
+        D: 6,
+        E: 5,
+        F: 0,
+        AB: 0,
+        Y: 0
+      },
+      sgpaDataCollection: {},
+      subDataCollection: {},
+      studentsResultsArr: {},
+      subjectList: [],
+      selectedSubject: "",
       selectionInput: {}
     };
   },
@@ -238,7 +320,6 @@ export default {
     // this.resultID = "56736469";
     // this.canSearch = true;
     this.checkQueries();
-
     //to show Under Development
     if (false)
       this.$q.dialog({
@@ -247,6 +328,11 @@ export default {
         persistent: true,
         message: `This feature is still under development. Please check back later!`
       });
+  },
+  computed: {
+    chartWidthPercentage() {
+      return ((this.chartWidth / 1300) * 100).toFixed();
+    }
   },
   methods: {
     rollWithPrefix(roll) {
@@ -323,6 +409,70 @@ export default {
         resultID: this.resultID
       });
     },
+    changeSort() {
+      let studentsResults = [];
+      this.studentsResultsArr.forEach(student => {
+        studentsResults.push({
+          name: student.name,
+          htn: student.htn,
+          bestAttempt: getBestAttempts(student.attempts)
+        });
+      });
+      //sort studentResults
+      const subIndex = getBestAttempts(
+        this.studentsResultsArr[0].attempts
+      ).findIndex(sub => sub["1"] === this.selectedSubject.value);
+      // console.log(subIndex);
+      studentsResults.sort((a, b) => {
+        return (
+          this.g_to_gp[b.bestAttempt[subIndex].Grade.toUpperCase()] -
+          this.g_to_gp[a.bestAttempt[subIndex].Grade.toUpperCase()]
+        );
+      });
+      let rank = 1;
+      const studentNames = [];
+      const studentSubGrade = [];
+      for (let i = 0; i < studentsResults.length; i++) {
+        // console.log(studentsResults[i]);
+        //only add rank if not failed
+        studentNames.push(
+          `${studentsResults[i]["name"]}(${studentsResults[i]["htn"].slice(
+            -2
+          )}) #${
+            this.g_to_gp[
+              studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
+            ] > 0
+              ? rank
+              : "na"
+          }`
+        );
+        studentSubGrade.push(
+          this.g_to_gp[
+            studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
+          ]
+        );
+        if (studentsResults[i + 1])
+          if (
+            this.g_to_gp[
+              studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
+            ] !=
+            this.g_to_gp[
+              studentsResults[i + 1].bestAttempt[subIndex].Grade.toUpperCase()
+            ]
+          )
+            rank++;
+      }
+      this.subDataCollection = {
+        labels: studentNames,
+        datasets: [
+          {
+            data: studentSubGrade,
+            backgroundColor: "#ff4d0155",
+            borderColor: "#ff4d01"
+          }
+        ]
+      };
+    },
     submit() {
       this.loading = true;
       var studentNames = [];
@@ -346,26 +496,40 @@ export default {
             "/" +
             this.selectionInput.sem
         )
-        .then(res => {
+       .then(res => {
           this.loading = false;
           console.log(res);
           // res.data.map(s => console.log(s.sgpa));
+
+          //get subject list
+          this.subjectList = [];
+          getBestAttempts(res.data[0].attempts).forEach(s => {
+            this.subjectList.push({ value: s["1"], label: s["Subject Name"] });
+          });
+          this.selectedSubject = this.subjectList[0];
+          // console.log(this.subjectList)
           res.data.sort((a, b) => {
             return b.sgpa - a.sgpa;
           });
           // res.data.map(s => console.log(s.sgpa));
-          const studentsArray = res.data;
+          this.studentsResultsArr = res.data;
           let rank = 1;
-          for (let i = 0; i < studentsArray.length; i++) {
+          for (let i = 0; i < this.studentsResultsArr.length; i++) {
             //only add rank if not failed
             studentNames.push(
-              `${studentsArray[i]["name"]} (${studentsArray[i]["htn"].slice(
-                -2
-              )}) #${studentsArray[i].sgpa > 0 ? rank : "na"}`
+              `${this.studentsResultsArr[i]["name"]} (${this.studentsResultsArr[
+                i
+              ]["htn"].slice(-2)}) #${
+                this.studentsResultsArr[i].sgpa > 0 ? rank : "na"
+              }`
             );
-            studentSGPAs.push(studentsArray[i].sgpa);
-            if (studentsArray[i + 1])
-              if (studentsArray[i].sgpa != studentsArray[i + 1].sgpa) rank++;
+            studentSGPAs.push(this.studentsResultsArr[i].sgpa);
+            if (this.studentsResultsArr[i + 1])
+              if (
+                this.studentsResultsArr[i].sgpa !=
+                this.studentsResultsArr[i + 1].sgpa
+              )
+                rank++;
           }
           // res.data.forEach((ele,i) => {
           //   studentNames.push(`${ele["name"]} (${ele["htn"].slice(-2)}) #${i+1}`);
@@ -381,7 +545,8 @@ export default {
           }, 300);
         })
         .finally(() => {
-          this.datacollection = {
+          //create sgpaDataCollection then create subDataCollection
+          this.sgpaDataCollection = {
             labels: studentNames,
             datasets: [
               {
@@ -391,7 +556,9 @@ export default {
               }
             ]
           };
+          this.changeSort()
         });
+      console.log(this.sgpaDataCollection);
     }
   }
 };

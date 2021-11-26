@@ -11,6 +11,7 @@ git status
 git add .
 
 git status
-git commit -m 'Add animation on response in singleResult.vue'
+git commit -m 'Add sub wise result in batch component'
 #git pull origin gh-pages --allow-unrelated-histories
 git push origin gh-pages --force
+

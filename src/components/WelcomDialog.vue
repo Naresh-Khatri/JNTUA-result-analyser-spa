@@ -5,10 +5,8 @@
         <div class="text-h6">New Features! 👩‍🔧</div>
       </q-card-section>
       <q-card-section class="row items-center">
-
-        Most anticipated feature is here!
         <li style="font-size:1.2em">
-          View regular + supply result COMBINED!!
+          Subject wise batch result
         </li>
         <li style="font-size:1.2em">
           Join the telegram group and ask for help!

@@ -8,6 +8,9 @@
         -   attempt to store studentInput in localstorage complete
         -   add new col for marks in result table
         
+4/11    -   started using promise.all()
+6/11    -   after hours of debugging ditched the getStud function
+            that was resolving after getResultFromJNTU
 
 Grades & Grade
 
@@ -15,3 +18,7 @@ Grades & Grade
 result api
 collage community
 dsa prep
+
+25/11/21
+        spent almost 2 hours on sorting result subject wise
+                i was missing return keyword in sort function

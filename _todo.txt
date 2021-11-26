@@ -1,2 +1,7 @@
 correct share feature
 page not responding when 2 new roll added in compare component  - reactive-rule
+
+passed in which attempt
+
+clearable input in batch component
+sort batch result subject wise
