@@ -36,6 +36,9 @@
                 label="Roll Number"
                 :color="$q.dark.isActive ? 'white' : 'primary'"
                 v-model="rollNo"
+                @keydown.enter="submit()"
+                @keydown.up="changeRoll(-1)"
+                @keydown.down="changeRoll(1)"
               />
               <q-icon
                 name="arrow_forward_ios"
@@ -558,6 +561,7 @@ export default {
               if (Object.keys(attempt).length > 0) this.totalAttempts++;
             });
             console.log("attempts count", this.totalAttempts);
+            this.fullFormsArr = []
             bestAttempts.forEach(sub => {
               //push to full forms array
               this.fullFormsArr.push({
@@ -586,8 +590,8 @@ export default {
         })
         .then(() => {
           //scroll bottom
-          window.scrollTo(0, document.body.scrollHeight);
-          this.$refs.scrollArea.setScrollPosition(375, 200);
+          // window.scrollTo(0, document.body.scrollHeight);
+          this.$refs.scrollArea.setScrollPosition(350, 200);
         })
         .catch(error => {
           console.log(error);

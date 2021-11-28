@@ -49,7 +49,6 @@
       filled
       v-model="selectedSem"
       :options="semOpts"
-      outlined
       label="Sem"
       @input="selectedFn('sem', selectedSem)"
       clearable
