@@ -7,7 +7,9 @@
     <div style="display:flex; flex-direction:row-reverse">
       <q-btn
         dense
+        flat
         style="width:130px; "
+        icon="close"
         label="clear all"
         @click="clearStorage"
       />

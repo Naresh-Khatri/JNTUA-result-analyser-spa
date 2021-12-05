@@ -264,24 +264,27 @@
         Looks so empty here
       </div>
     </div>
+    <Footer />
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import apiRoutes from "src/apiRoutes";
 
 import LineChart from "../charts/LineChart.vue";
 import Tip from "../components/Tip.vue";
 import StudentInput from "../components/StudentInput.vue";
-import apiRoutes from "src/apiRoutes";
-import { getBestAttempts } from "../utils/utils";
+import Footer from "../components/Footer.vue";
 
+import { getBestAttempts } from "../utils/utils";
 import rollsArray from "../utils/rolls";
 
 export default {
   components: {
     StudentInput,
     LineChart,
+    Footer,
     Tip
   },
   data() {

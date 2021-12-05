@@ -50,7 +50,7 @@
             <!-- Submit button -->
             <div class="flex justify-center">
               <q-btn
-                style="width:fit-content"
+                :style="submitBtnStyle"
                 class="q-mt-sm"
                 label="Submit"
                 color="primary"
@@ -84,6 +84,7 @@
                       :thickness="0.22"
                       :max="10"
                       color="green"
+                      :style="knobStyle"
                       track-color="grey-3"
                       class=" q-ma-md"
                     ></q-knob>
@@ -183,12 +184,12 @@
                   v-model="fullFormsExpanded"
                   label="sub full forms"
                 >
-                  <div v-for="(row,index) in fullFormsArr" :key="index">
-                   <span class="text-h6"> {{ row.shortForm }}</span>: <span class="text-caption">{{row.fullForm}}</span>
-                   <q-separator />
-                  </div>
-                </q-expansion-item></q-card
-              >
+                  <div v-for="(row, index) in fullFormsArr" :key="index">
+                    <span class="text-h6"> {{ row.shortForm }}</span
+                    >: <span class="text-caption">{{ row.fullForm }}</span>
+                    <q-separator />
+                  </div> </q-expansion-item
+              ></q-card>
             </div>
             <Tip
               title="Tip 2"
@@ -266,6 +267,7 @@
         </div>
       </div>
     </q-scroll-area>
+    <Footer />
   </div>
 </template>
 
@@ -281,14 +283,16 @@ import LineChart from "../charts/LineChart.vue";
 
 import StudentInput from "../components/StudentInput.vue";
 import Tip from "../components/Tip.vue";
+import Footer from "../components/Footer.vue";
 
 export default {
   components: {
     RadarChart,
     BarChart,
     LineChart,
+    StudentInput,
     Tip,
-    StudentInput
+    Footer
   },
   data() {
     return {
@@ -369,6 +373,20 @@ export default {
       selectionInput: {},
       totalAttempts: 0
     };
+  },
+  computed: {
+    submitBtnStyle() {
+      return `${
+        this.canSearch
+          ? "width:fit-content; filter: drop-shadow(0 0 0.5rem #ff4d01)"
+          : ""
+      }`;
+    },
+    knobStyle() {
+      return `filter: drop-shadow(0 0 0.5rem ${
+        this.studentSGPA > 0 ? "green" : "red"
+      });`;
+    }
   },
   mounted() {
     // this.resultID = "56736469";
@@ -561,7 +579,7 @@ export default {
               if (Object.keys(attempt).length > 0) this.totalAttempts++;
             });
             console.log("attempts count", this.totalAttempts);
-            this.fullFormsArr = []
+            this.fullFormsArr = [];
             bestAttempts.forEach(sub => {
               //push to full forms array
               this.fullFormsArr.push({

@@ -42,7 +42,7 @@
     <q-drawer v-model="left" side="left" overlay bordered>
       <!-- drawer content -->
       <div class="q-pa-md">
-        <q-list class="rounded-borders text-primary">
+        <q-list class="rounded-borders text-primary" style="margin-top:200px">
           <!-- <q-item
             clickable
             v-ripple
@@ -161,10 +161,11 @@
 
 <script>
 import WelcomDialog from "src/components/WelcomDialog.vue";
+import RateDialog from "src/components/RateDialog.vue";
 export default {
   data() {
     return {
-      left: false,
+      left: true,
       link: "single-result"
     };
   },
@@ -175,7 +176,10 @@ export default {
     });
     this.$q.addressbarColor.set("#ff4d01");
     this.$q.dark.toggle();
-
+    // this.$q.dialog({
+    //   persistent: true,
+    //   component: RateDialog
+    // });
     if (!window.location.href.includes("8080"))
       //patch logs
       this.$q.dialog({

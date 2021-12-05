@@ -163,6 +163,7 @@
         Looks so empty here
       </div>
     </div>
+    <Footer />
     <!-- </q-scroll-area> -->
   </div>
 </template>
@@ -178,6 +179,7 @@ import RadarChart from "../charts/RadarChart.vue";
 import BarChart from "../charts/BarChart.vue";
 import LineChart from "../charts/LineChart.vue";
 
+import Footer from "../components/Footer.vue";
 import Tip from "../components/Tip.vue";
 import apiRoutes from "src/apiRoutes.js";
 
@@ -187,6 +189,7 @@ export default {
     RadarChart,
     BarChart,
     LineChart,
+    Footer,
     Tip
   },
   data() {
