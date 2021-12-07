@@ -42,7 +42,10 @@
     <q-drawer v-model="left" side="left" overlay bordered>
       <!-- drawer content -->
       <div class="q-pa-md">
-        <q-list class="rounded-borders text-primary" style="margin-top:200px">
+        <q-list
+          class="rounded-borders text-primary"
+          :style="$q.screen.lt.md ? 'margin-top:200px' : ''"
+        >
           <!-- <q-item
             clickable
             v-ripple
@@ -180,7 +183,7 @@ export default {
     //   persistent: true,
     //   component: RateDialog
     // });
-    if (!window.location.href.includes("8080"))
+    if (window.location.href.includes("8080"))
       //patch logs
       this.$q.dialog({
         //   title: "New Features! 👩‍🔧",
@@ -230,5 +233,8 @@ export default {
 .fade-leave-to {
   opacity: 0;
   transform: rotate(90deg);
+}
+.q-drawer__backdrop, .q-dialog__backdrop {
+  backdrop-filter: blur(3px);
 }
 </style>

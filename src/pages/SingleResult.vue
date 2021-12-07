@@ -36,6 +36,11 @@
                 label="Roll Number"
                 :color="$q.dark.isActive ? 'white' : 'primary'"
                 v-model="rollNo"
+                :rules="[
+                  val =>
+                    val.length == 10 ||
+                    'Enter first 8 charaters of your full roll no.'
+                ]"
                 @keydown.enter="submit()"
                 @keydown.up="changeRoll(-1)"
                 @keydown.down="changeRoll(1)"
@@ -173,7 +178,7 @@
               </q-table>
             </div>
             <!-- sub full forms -->
-            <div class="flex justify-center">
+            <div class="flex justify-center q-mt-sm">
               <q-card
                 class="sgpa-container q-px-lg rounded"
                 style="width:90%"
@@ -275,6 +280,7 @@
 import axios from "axios";
 import apiRoutes from "../apiRoutes";
 import { getShort, getBestAttempts } from "../utils/utils";
+import G2GP from "../utils/G2GP";
 import { backgroundColors, borderColors } from "../colors/colors";
 
 import RadarChart from "../charts/RadarChart.vue";
@@ -358,18 +364,7 @@ export default {
         page: 0,
         rowsPerPage: 0
       },
-      g_to_gp: {
-        S: 10,
-        O: 10,
-        A: 9,
-        B: 8,
-        C: 7,
-        D: 6,
-        E: 5,
-        F: 0,
-        AB: 0,
-        Y: 0
-      },
+      G2GP: G2GP,
       selectionInput: {},
       totalAttempts: 0
     };
@@ -590,7 +585,7 @@ export default {
               this.rowData.push({
                 subject_name: getShort(sub["Subject Name"]),
                 status: sub["Result Status"] == "P" ? "✔" : "❌",
-                grade: sub["Grade"] + " (" + this.g_to_gp[sub["Grade"]] + ")",
+                grade: sub["Grade"] + " (" + this.G2GP[sub["Grade"]] + ")",
                 internals: sub["Internals"],
                 externals: sub["Externals"],
                 total: sub["Total Marks"],
@@ -600,7 +595,7 @@ export default {
               subjectNames.push(
                 `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
               );
-              subjectGrade.push(this.g_to_gp[sub["Grade"]]);
+              subjectGrade.push(this.G2GP[sub["Grade"]]);
             });
             this.studentName = res.data["name"];
             this.studentSGPA = Number.parseFloat(res.data.sgpa);

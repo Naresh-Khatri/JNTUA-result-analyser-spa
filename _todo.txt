@@ -1,7 +1,17 @@
-correct share feature
-page not responding when 2 new roll added in compare component  - reactive-rule
+✅correct share feature
+✅page not responding when 2 new roll added in compare component  - reactive-rule
 
 passed in which attempt
 
 clearable input in batch component
-sort batch result subject wise
+✅sort batch result subject wise
+
+suggestion for reload after timeout
+suggestion for feedback on NaN
+
+✅dont let the server crash when jntua is down
+responsive for desktop
+functionality to download batch result in excel
+not found error when timeout
+add some background in ui
+only add one new record in searches collection

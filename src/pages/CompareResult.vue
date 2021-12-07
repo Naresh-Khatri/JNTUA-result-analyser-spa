@@ -171,6 +171,7 @@
 <script>
 import axios from "axios";
 import { getShort, getBestAttempts } from "../utils/utils";
+import G2GP from '../utils/G2GP';
 
 import { backgroundColors, borderColors } from "../colors/colors";
 import StudentInput from "../components/StudentInput.vue";
@@ -207,18 +208,7 @@ export default {
       resultNotFoundDialog: false,
       backgroundColors: backgroundColors,
       borderColors: borderColors,
-      g_to_gp: {
-        S: 10,
-        O: 10,
-        A: 9,
-        B: 8,
-        C: 7,
-        D: 6,
-        E: 5,
-        F: 0,
-        AB: 0,
-        Y: 0
-      },
+      G2GP: G2GP,
       selectionInput: {},
       selection: {}
     };
@@ -364,7 +354,7 @@ export default {
             bestAttempts.forEach(sub => {
               if (this.subjectNames.length < bestAttempts.length)
                 this.subjectNames.push(getShort(sub["Subject Name"]));
-              gradePoints.push(this.g_to_gp[sub["Grade"]]);
+              gradePoints.push(this.G2GP[sub["Grade"]]);
             });
             //get last 2 chars of roll
             let shortRoll = `(${res.data["htn"][res.data["htn"].length - 2]}${

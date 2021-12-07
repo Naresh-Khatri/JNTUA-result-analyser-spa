@@ -3,7 +3,7 @@
     <transition
       appear
       enter-active-class="animated fadeIn"
-      leave-active-class="animated fadeOut"
+      leave-active-class="animated hinge"
     >
       <div v-if="!disabled" class="q-mx-lg">
         <div class="container">
