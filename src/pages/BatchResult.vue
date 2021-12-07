@@ -26,7 +26,7 @@
         @success="setSelection($event)"
       />
       <div
-        class="roll-input flex column rounded q-pa-lg"
+        class="roll-input flex column rounded q-pa-md"
         :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
       >
         <q-input
@@ -74,7 +74,6 @@
         class="data-container"
         v-if="Object.keys(sgpaDataCollection).length > 0"
       >
-      
         <!-- <div class="flex flex-center q-mt-lg">
           <q-btn-group
             ><q-btn
@@ -144,7 +143,7 @@
             <img width="50px" src="../assets/whatsapp.svg" />
           </q-btn>
         </div>
-          <Tip
+        <Tip
           title="Info"
           desc="This graph contains all the student with their SPGAs,
                             Tap on any point to know more"
@@ -156,7 +155,7 @@
           <q-tabs
             v-model="sortBy"
             indicator-color="primary"
-            class="text-primary rounded q-mt-md q-mb-sm q-mx-lg"
+            class="text-primary rounded q-mt-md q-mx-lg"
             :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
           >
             <q-tab
@@ -189,15 +188,11 @@
               :disable="chartWidth > 5000"
             />
           </div>
-          <q-tab-panels
-            v-model="sortBy"
-            animated
-            class="q-mb-xl shadow-2 rounded"
-          >
+          <q-tab-panels v-model="sortBy" animated class="q-mb-xl">
             <q-tab-panel name="sgpa" class="rounded">
               <q-scroll-area
                 horizontal
-                style="height:550px;"
+                style="height:500px;"
                 :thumb-style="{
                   bottom: '4px',
                   borderRadius: '5px',
@@ -205,7 +200,7 @@
                   width: '10px',
                   opacity: 1
                 }"
-                :style="!$q.screen.lt.md ? 'height:700px' : ''"
+                :style="!$q.screen.lt.md ? '' : ''"
               >
                 <LineChart
                   :style="'height:500px; width:' + chartWidth + 'px'"
@@ -224,7 +219,7 @@
               />
               <q-scroll-area
                 horizontal
-                style="height:550px;"
+                style="height:500px;"
                 :thumb-style="{
                   bottom: '4px',
                   borderRadius: '5px',
@@ -248,6 +243,33 @@
           title="Important"
           desc="Students who are failed even in 1 subject wont be plotted!"
         />
+        <q-card class="sgpa-container q-pa-md rounded" flat>
+          <div class="q-px-sm">
+            <div class="text-h5 text-center">
+              <i class="fas fa-download"></i> Download XL sheet
+            </div>
+            <div class="row q-mt-lg flex flex-center">
+              <!-- <div class="flex flex-center col"> -->
+              <q-btn
+                flat
+                label="XLSX file"
+                icon="download"
+                @click="downloadSheet"
+                style="background:#25D366"
+              />
+              <!-- </div> -->
+              <!-- <div class="flex flex-center col">
+                <q-btn
+                  flat
+                  label="Sub wise"
+                  icon="download"
+                  @click="downloadSheet('sub')"
+                  style="background:#25D366"
+                />
+              </div> -->
+            </div>
+          </div>
+        </q-card>
       </div>
       <div
         v-else
@@ -270,6 +292,7 @@
 
 <script>
 import axios from "axios";
+import XLSX from "XLSX";
 import apiRoutes from "src/apiRoutes";
 
 import LineChart from "../charts/LineChart.vue";
@@ -279,6 +302,7 @@ import Footer from "../components/Footer.vue";
 
 import { getBestAttempts } from "../utils/utils";
 import rollsArray from "../utils/rolls";
+import G2GP from "src/utils/G2GP";
 
 export default {
   components: {
@@ -297,23 +321,12 @@ export default {
       sortBy: "sgpa",
       range: {
         min: 1,
-        max: 50
+        max: 65
       },
-      g_to_gp: {
-        S: 10,
-        O: 10,
-        A: 9,
-        B: 8,
-        C: 7,
-        D: 6,
-        E: 5,
-        F: 0,
-        AB: 0,
-        Y: 0
-      },
+      G2GP: G2GP,
       sgpaDataCollection: {},
       subDataCollection: {},
-      studentsResultsArr: {},
+      studentsResultsArr: [],
       subjectList: [],
       selectedSubject: "",
       selectionInput: {}
@@ -428,8 +441,8 @@ export default {
       // console.log(subIndex);
       studentsResults.sort((a, b) => {
         return (
-          this.g_to_gp[b.bestAttempt[subIndex].Grade.toUpperCase()] -
-          this.g_to_gp[a.bestAttempt[subIndex].Grade.toUpperCase()]
+          this.G2GP[b.bestAttempt[subIndex].Grade.toUpperCase()] -
+          this.G2GP[a.bestAttempt[subIndex].Grade.toUpperCase()]
         );
       });
       let rank = 1;
@@ -442,7 +455,7 @@ export default {
           `${studentsResults[i]["name"]}(${studentsResults[i]["htn"].slice(
             -2
           )}) #${
-            this.g_to_gp[
+            this.G2GP[
               studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
             ] > 0
               ? rank
@@ -450,16 +463,16 @@ export default {
           }`
         );
         studentSubGrade.push(
-          this.g_to_gp[
+          this.G2GP[
             studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
           ]
         );
         if (studentsResults[i + 1])
           if (
-            this.g_to_gp[
+            this.G2GP[
               studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
             ] !=
-            this.g_to_gp[
+            this.G2GP[
               studentsResults[i + 1].bestAttempt[subIndex].Grade.toUpperCase()
             ]
           )
@@ -499,7 +512,7 @@ export default {
             "/" +
             this.selectionInput.sem
         )
-       .then(res => {
+        .then(res => {
           this.loading = false;
           console.log(res);
           // res.data.map(s => console.log(s.sgpa));
@@ -544,7 +557,7 @@ export default {
         .then(() => {
           //scroll bottom
           setTimeout(() => {
-            window.scrollTo(0, document.body.scrollHeight - 1000);
+            window.scrollTo(0, document.body.scrollHeight - 1500);
           }, 300);
         })
         .finally(() => {
@@ -559,9 +572,58 @@ export default {
               }
             ]
           };
-          this.changeSort()
+          this.changeSort();
         });
       console.log(this.sgpaDataCollection);
+    },
+    downloadSheet(option) {
+      //get students in asc order of htn
+      let students = this.studentsResultsArr;
+      students.sort((a, b) => {
+        return a.htn.slice(-2) - b.htn.slice(-2);
+      });
+      students.forEach(s => {
+        const bestAttempt = getBestAttempts(s.attempts);
+        bestAttempt.forEach(attempt => {
+          s["cred-" + attempt["Subject Name"]] = attempt["Credits"];
+          s["grade-" + attempt["Subject Name"]] = attempt["Grade"];
+          s["status-" + attempt["Subject Name"]] = attempt["Result Status"];
+          s["passingMonth-" + attempt["Subject Name"]] = attempt["month"];
+        });
+      });
+      var studentsJson = students;
+      console.log(delete studentsJson.attempts);
+      console.log(delete studentsJson.collegeCode)
+      console.log(delete studentsJson.lastViewed)
+      console.log(delete studentsJson.reg)
+      console.log(delete studentsJson.course)
+      console.log(delete studentsJson.year)
+      console.log(delete studentsJson.sem)
+      console.log(delete studentsJson.viewCount)
+      console.log(delete studentsJson._id)
+      console.log(delete studentsJson.__v)
+      console.log(studentsJson);
+      const fileName =
+        this.selectionInput.reg +
+        "-" +
+        this.selectionInput.course +
+        "-" +
+        this.selectionInput.year +
+        "-" +
+        this.selectionInput.sem +
+        "-" +
+        this.rollPrefix +
+        this.range.min +
+        "-" +
+        this.rollPrefix +
+        this.range.max +
+        "-sgpa.xlsx";
+      const wb = {};
+      wb.SheetNames = ["Sheet1"];
+      wb.Sheets = {};
+      wb.Sheets["Sheet1"] = XLSX.utils.json_to_sheet(studentsJson);
+
+      XLSX.writeFile(wb, fileName);
     }
   }
 };

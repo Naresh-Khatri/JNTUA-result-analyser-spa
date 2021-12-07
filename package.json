@@ -20,7 +20,8 @@
     "gsap": "^3.8.0",
     "jssoup": "^0.0.12",
     "quasar": "^1.0.0",
-    "vue-chartjs": "^3.5.1"
+    "vue-chartjs": "^3.5.1",
+    "xlsx": "^0.17.4"
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",
