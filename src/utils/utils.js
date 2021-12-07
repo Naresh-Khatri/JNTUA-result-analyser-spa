@@ -13,6 +13,8 @@ function getShort(str) {
       // add &
       else if (strSplit[i] == '&' || strSplit[i].toLowerCase() == 'and')
         short += '&'
+      //dont include 'O' in case of 'of'
+      else if (strSplit[i].toLowerCase() == 'of') continue
       else {
         //get first uppercase letter then append to short
         if (!strSplit[i][0].match(/^[^A-Z]*$/g)) {
@@ -59,4 +61,4 @@ function getBestAttempts(attempts) {
   }
   return bestAttempts
 }
-module.exports = { getShort, getBestAttempts } 
+module.exports = { getShort, getBestAttempts }
