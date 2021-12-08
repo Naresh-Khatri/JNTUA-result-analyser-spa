@@ -2,10 +2,11 @@
   <div class="container">
     <div
       v-if="loading"
-      style="position: fixed;width: 100vw;height: 100vh;
-                 top: 0;left: 0;right: 0;bottom: 0;
-                 background-color: rgba(0,0,0,0.5);z-index: 2;
-                cursor: pointer; "
+      style="position: fixed; width: 100vw; height: 100vh;
+             top: 0; left: 0; right: 0; bottom: 0;
+             background-color: rgba(0,0,0,0.5); z-index: 2;
+             backdrop-filter: blur(2.5px);
+             cursor: pointer; "
     >
       <transition
         appear
@@ -93,7 +94,7 @@
           </q-btn-group>
     </div> -->
 
-        <q-card class="sgpa-container q-pa-md rounded" flat>
+        <q-card class="sgpa-container q-pa-md rounded glass" flat>
           <div class="flex flex-center q-px-sm">
             <div class="col">
               <div
@@ -243,7 +244,7 @@
           title="Important"
           desc="Students who are failed even in 1 subject wont be plotted!"
         />
-        <q-card class="sgpa-container q-pa-md rounded" flat>
+        <q-card class="sgpa-container q-pa-md rounded glass" flat>
           <div class="q-px-sm">
             <div class="text-h5 text-center">
               <i class="fas fa-download"></i> Download XL sheet
@@ -427,6 +428,7 @@ export default {
     },
     changeSort() {
       let studentsResults = [];
+      console.log(this.studentsResultsArr);
       this.studentsResultsArr.forEach(student => {
         studentsResults.push({
           name: student.name,
@@ -578,31 +580,43 @@ export default {
     },
     downloadSheet(option) {
       //get students in asc order of htn
-      let students = this.studentsResultsArr;
+      const students = this.studentsResultsArr;
       students.sort((a, b) => {
         return a.htn.slice(-2) - b.htn.slice(-2);
       });
+      //get best attempts of each student
       students.forEach(s => {
         const bestAttempt = getBestAttempts(s.attempts);
+        //loop through each subject in best attempt
         bestAttempt.forEach(attempt => {
           s["cred-" + attempt["Subject Name"]] = attempt["Credits"];
           s["grade-" + attempt["Subject Name"]] = attempt["Grade"];
           s["status-" + attempt["Subject Name"]] = attempt["Result Status"];
           s["passingMonth-" + attempt["Subject Name"]] = attempt["month"];
+          delete s.attempts;
+          delete s.collegeCode;
+          delete s.lastViewed;
+          delete s.reg;
+          delete s.course;
+          delete s.year;
+          delete s.sem;
+          delete s.viewCount;
+          delete s._id;
+          delete s.__v;
         });
       });
-      var studentsJson = students;
-      console.log(delete studentsJson.attempts);
-      console.log(delete studentsJson.collegeCode)
-      console.log(delete studentsJson.lastViewed)
-      console.log(delete studentsJson.reg)
-      console.log(delete studentsJson.course)
-      console.log(delete studentsJson.year)
-      console.log(delete studentsJson.sem)
-      console.log(delete studentsJson.viewCount)
-      console.log(delete studentsJson._id)
-      console.log(delete studentsJson.__v)
-      console.log(studentsJson);
+      const batchOverall = {
+        Registered: students.length,
+        attended: students.filter(s => s.sgpa != 0).length,
+        absent: students.filter(s => s.sgpa == 0).length,
+        passed: students.filter(s => s.sgpa > 0).length,
+        failed: students.filter(s => s.sgpa == -1).length,
+        sgpa: students.reduce((acc, s) => acc + s.sgpa, 0) / students.filter(s => s.sgpa > 0).length,
+        passPercentage:students.filter(s => s.sgpa > 0).length / students.filter(s => s.sgpa != 0).length * 100,
+        failPercentage:
+          students.filter(s => s.sgpa == -1).length / students.filter(s => s.sgpa != 0).length * 100
+      };
+
       const fileName =
         this.selectionInput.reg +
         "-" +
@@ -619,10 +633,11 @@ export default {
         this.range.max +
         "-sgpa.xlsx";
       const wb = {};
-      wb.SheetNames = ["Sheet1"];
+      wb.SheetNames = ["Students", "overall"];
       wb.Sheets = {};
-      wb.Sheets["Sheet1"] = XLSX.utils.json_to_sheet(studentsJson);
-
+      console.log(students, batchOverall);
+      wb.Sheets["Students"] = XLSX.utils.json_to_sheet(students);
+      wb.Sheets["overall"] = XLSX.utils.json_to_sheet([batchOverall]);
       XLSX.writeFile(wb, fileName);
     }
   }

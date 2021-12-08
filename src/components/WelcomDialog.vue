@@ -6,14 +6,14 @@
       </q-card-section>
       <q-card-section class="row items-center">
         <li style="font-size:1.2em">
-          Subject wise batch result
+          👩‍🏫 Faculty can now download batch result in <strong>EXCEL</strong> format.
         </li>
         <li style="font-size:1.2em">
-          Join the telegram group and ask for help!
+          ⛄Not a major update but do you like this snowfall? ❄ 👀
         </li>
         <br />
-        If you want this app to get better then head over to the feedback
-        section on top 🙋‍♀️
+        <!-- If you want this app to get better then head over to the feedback
+        section on top 🙋‍♀️ -->
       </q-card-section>
 
       <q-card-actions align="right" class="q-ma-sm">

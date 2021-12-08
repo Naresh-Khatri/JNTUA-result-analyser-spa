@@ -20,7 +20,7 @@
             @success="setSelection($event)"
           />
           <div
-            class="roll-input q-pa-lg rounded"
+            class="roll-input q-pa-lg rounded glass"
             :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
           >
             <!-- Roll number input with forward and backward buttons -->
@@ -66,7 +66,7 @@
           </div>
           <div class="flex justify-center">
             <q-card
-              class="sgpa-container q-px-lg rounded"
+              class="sgpa-container q-px-lg rounded glass"
               v-if="datacollection.datasets"
               flat
               ><transition
@@ -180,7 +180,7 @@
             <!-- sub full forms -->
             <div class="flex justify-center q-mt-sm">
               <q-card
-                class="sgpa-container q-px-lg rounded"
+                class="sgpa-container q-px-lg rounded glass"
                 style="width:90%"
                 v-if="datacollection.datasets"
                 flat
@@ -637,6 +637,7 @@ export default {
 };
 </script>
 <style scoped>
+
 @media screen and (min-width: 1000px) {
   .wrapper {
     display: grid;

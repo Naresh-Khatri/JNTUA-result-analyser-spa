@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex column rounded q-pa-lg "
+    class="flex column rounded q-pa-lg glass"
     :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
   >
     <!-- <div class="text-h6">Sected your batch</div> -->

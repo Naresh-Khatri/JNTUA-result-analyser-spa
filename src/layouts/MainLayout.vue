@@ -157,6 +157,7 @@
       :class="$q.dark.isActive ? 'dark' : 'bg-grey-4'"
       style="transition: background-color .3s"
     >
+      <div class="snowflake" v-for="i in 50" :key="i"></div>
       <router-view />
     </q-page-container>
   </q-layout>
@@ -168,7 +169,7 @@ import RateDialog from "src/components/RateDialog.vue";
 export default {
   data() {
     return {
-      left: true,
+      left: false,
       link: "single-result"
     };
   },
@@ -183,7 +184,7 @@ export default {
     //   persistent: true,
     //   component: RateDialog
     // });
-    if (window.location.href.includes("8080"))
+    if (!window.location.href.includes("8080"))
       //patch logs
       this.$q.dialog({
         //   title: "New Features! 👩‍🔧",
@@ -210,10 +211,52 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+.snowflake {
+  --size: 1vw;
+  width: var(--size);
+  height: var(--size);
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: -5vh;
+}
+
+@keyframes snowfall {
+  0% {
+    transform: translate3d(var(--left-ini), 0, 0);
+  }
+  100% {
+    transform: translate3d(var(--left-end), 110vh, 0);
+  }
+}
+
+@for $i from 1 through 50 {
+  .snowflake:nth-child(#{$i}) {
+    --size: #{random(5) * 0.2}vw;
+    --left-ini: #{random(20) - 10}vw;
+    --left-end: #{random(20) - 10}vw;
+    left: #{random(100)}vw;
+    animation: snowfall #{5 + random(10)}s linear infinite;
+    animation-delay: -#{random(10)}s;
+  }
+}
+/* added small blur every 6 snowflakes*/
+.snowflake:nth-child(6n) {
+  filter: blur(1px);
+}
+.snowflake:nth-child(5n) {
+  filter: blur(4px);
+}
+</style>
 <style>
-/* @import "tailwindcss/base"; */
-/* @import "tailwindcss/components"; */
-/* @import "tailwindcss/utilities"; */
+.rounded {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  /* background-color: rgba(17, 25, 40, 0.75); */
+  opacity: 0.9;
+}
+
 .body--light {
   background: #e0e0e0;
   transition: 0.3s;
@@ -234,7 +277,8 @@ export default {
   opacity: 0;
   transform: rotate(90deg);
 }
-.q-drawer__backdrop, .q-dialog__backdrop {
+.q-drawer__backdrop,
+.q-dialog__backdrop {
   backdrop-filter: blur(3px);
 }
 </style>
