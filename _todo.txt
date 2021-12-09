@@ -18,9 +18,10 @@ only add one new record in searches collection
 
 
 merge pharmcy with pharmacy
-add new sheet that has following columns
+✅add new sheet that has following columns
     - total students registered
     - total students who have taken test
-    - total students who have taken test and passed
+    - total students who have taken test and all clear
     - passing %
     - average sgpa
+add missing rolls in batch result

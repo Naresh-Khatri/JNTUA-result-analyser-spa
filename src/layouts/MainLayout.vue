@@ -45,6 +45,7 @@
         <q-list
           class="rounded-borders text-primary"
           :style="$q.screen.lt.md ? 'margin-top:200px' : ''"
+          style="font-size:1.5em;"
         >
           <!-- <q-item
             clickable
@@ -67,6 +68,7 @@
             @click="link = 'single-result'"
             active-class="bg-primary"
             to="/single-result"
+            style=" border-radius:10px"
           >
             <q-item-section avatar>
               <q-icon name="person_outline" />
@@ -81,6 +83,7 @@
             @click="link = 'compare-result'"
             active-class="bg-primary"
             to="/compare-result"
+            style=" border-radius:10px"
           >
             <q-item-section avatar>
               <q-icon name="person_add_alt" />
@@ -96,6 +99,7 @@
             @click="link = 'batch-result'"
             active-class="bg-primary"
             to="/batch-result"
+            style=" border-radius:10px"
           >
             <q-item-section avatar>
               <q-icon name="school" />
@@ -113,6 +117,7 @@
             @click="link = 'stats'"
             active-class="bg-primary"
             to="/stats"
+            style=" border-radius:10px"
           >
             <q-item-section avatar>
               <q-icon name="leaderboard" />
@@ -127,6 +132,7 @@
             @click="link = 'feedback'"
             active-class="bg-primary"
             to="/feedback"
+            style=" border-radius:10px"
           >
             <q-item-section avatar>
               <q-icon name="feedback" />
@@ -142,6 +148,7 @@
             :active="link === 'help'"
             @click="link = 'help'"
             active-class="bg-primary"
+            style=" border-radius:10px"
           >
             <q-item-section avatar>
               <q-icon name="help" />
@@ -169,7 +176,7 @@ import RateDialog from "src/components/RateDialog.vue";
 export default {
   data() {
     return {
-      left: false,
+      left: true,
       link: "single-result"
     };
   },
@@ -227,7 +234,7 @@ export default {
     transform: translate3d(var(--left-ini), 0, 0);
   }
   100% {
-    transform: translate3d(var(--left-end), 110vh, 0);
+    transform: translate3d(var(--left-end), 120vh, 0);
   }
 }
 
@@ -250,10 +257,18 @@ export default {
 }
 </style>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles:wght@700&family=Rubik:wght@500&display=swap');
+*{
+  font-family: 'Rubik', sans-serif;
+}
+.q-item__section{
+  font-family: 'Fuzzy Bubbles', cursive;
+}
 .rounded {
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
   /* background-color: rgba(17, 25, 40, 0.75); */
+  border-radius: 20px;
   opacity: 0.9;
 }
 

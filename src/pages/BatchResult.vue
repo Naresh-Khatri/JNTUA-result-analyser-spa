@@ -55,6 +55,52 @@
             <span class="text-h5">{{ rollWithPrefix(range.max) }} </span>
           </q-badge>
         </div>
+        <q-expansion-item
+          expand-separator
+          expand-icon-toggle
+          class="q-ma-md"
+          icon="add"
+          label="Extra Rolls"
+        >
+          <q-card>
+            <q-card-section>
+              <div v-for="(rollNo, index) in extraRolls" :key="index">
+                <div class="flex flex-center">
+                  <q-input
+                    filled
+                    ref="rollInput"
+                    label="Roll Number"
+                    :color="$q.dark.isActive ? 'white' : 'primary'"
+                    :rules="[val => validateRollNo(val)]"
+                    v-model="extraRolls[index]"
+                  >
+                    <template v-slot:append>
+                      <q-btn
+                        round
+                        dense
+                        flat
+                        icon="remove_circle"
+                        color="negative"
+                        v-show="extraRolls.length > 1"
+                        @click="removeRollNo(index)"
+                      />
+                    </template>
+                  </q-input>
+                </div>
+              </div>
+              <div class="flex flex-center">
+                <q-btn
+                  icon="add"
+                  round
+                  class="q-mt-sm"
+                  color="primary"
+                  size="md"
+                  @click="addExtraRoll"
+                />
+              </div>
+            </q-card-section>
+          </q-card>
+        </q-expansion-item>
         <div class="flex justify-center">
           <q-btn
             style="width:150px"
@@ -324,6 +370,7 @@ export default {
         min: 1,
         max: 65
       },
+      extraRolls: ["19fh1a0546"],
       G2GP: G2GP,
       sgpaDataCollection: {},
       subDataCollection: {},
@@ -360,6 +407,30 @@ export default {
     setSelection(selection) {
       this.selectionInput = selection;
       this.canSearch = true;
+    },
+    removeRollNo(index) {
+      this.extraRolls.splice(index, 1);
+      this.canSearch = true;
+    },
+    addExtraRoll() {
+      this.extraRolls.push(this.extraRolls[0].slice(0, -2));
+      setTimeout(() => {
+        this.$refs.rollInput.slice(-1)[0].focus();
+      });
+      console.log("added new roll");
+      this.canSearch = false;
+    },
+    validateRollNo(roll) {
+      if (roll.length != 10) {
+        this.$q.notify({
+          color: "negative",
+          message: "Roll no length should be 10"
+        });
+        this.canSearch = false;
+        return "Roll no length should be 10";
+      }
+      this.canSearch = true;
+      return true;
     },
     checkQueries() {
       if (!Object.keys(this.$route.query).includes("reg")) return;
@@ -611,10 +682,17 @@ export default {
         absent: students.filter(s => s.sgpa == 0).length,
         passed: students.filter(s => s.sgpa > 0).length,
         failed: students.filter(s => s.sgpa == -1).length,
-        sgpa: students.reduce((acc, s) => acc + s.sgpa, 0) / students.filter(s => s.sgpa > 0).length,
-        passPercentage:students.filter(s => s.sgpa > 0).length / students.filter(s => s.sgpa != 0).length * 100,
+        sgpa:
+          students.reduce((acc, s) => acc + s.sgpa, 0) /
+          students.filter(s => s.sgpa > 0).length,
+        passPercentage:
+          (students.filter(s => s.sgpa > 0).length /
+            students.filter(s => s.sgpa != 0).length) *
+          100,
         failPercentage:
-          students.filter(s => s.sgpa == -1).length / students.filter(s => s.sgpa != 0).length * 100
+          (students.filter(s => s.sgpa == -1).length /
+            students.filter(s => s.sgpa != 0).length) *
+          100
       };
 
       const fileName =

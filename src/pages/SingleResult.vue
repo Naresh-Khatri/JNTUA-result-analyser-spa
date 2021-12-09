@@ -140,6 +140,7 @@
                         :color="
                           props.row.status == '✔' ? 'positive' : 'negative'
                         "
+                        :style="props.row.status == '✔' ? 'filter: drop-shadow(0 0 0.5rem #25D366)':'filter: drop-shadow(0 0 0.5rem #FF4D01)' "
                         class="text-white q-pa-xm"
                         >{{ props.row.status }}</q-chip
                       >
@@ -304,7 +305,7 @@ export default {
     return {
       datacollection: {},
       canSearch: false,
-      rollNo: "19fh1a0541",
+      rollNo: "19fh1a0546",
       selection: {},
       sem: "1",
       studentName: "",
@@ -684,8 +685,5 @@ export default {
   .data-container {
     margin: 20px 10px;
   }
-}
-.rounded {
-  border-radius: 20px;
 }
 </style>

@@ -1,30 +1,23 @@
 <template>
   <q-page padding :key="pieDataCollection.labels.length">
     <!-- content -->
-    
+
     <!-- <LineChart
       style="min-width:90%"
       :chart-data="lineDataCollection"
       :key="$q.dark.isActive"
     /> -->
-  
 
     <div class="flex flex-center">
       <div
-        class="q-my-md q-py-md row"
+        class="q-my-md q-py-md row rounded"
         :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-        style="border-radius:20px; width: 60%"
+        style="width: 60%"
       >
         <div class="col-8">
-          <!-- <transition
-            appear
-            enter-active-class="animated fadeIn"
-            leave-active-class="animated fadeOut"
-          > -->
-            <div class="text-h4 text-center">
-              {{ animatedNumber }}
-            </div>
-          <!-- </transition> -->
+          <div class="text-h4 text-center">
+            {{ animatedNumber }}
+          </div>
         </div>
         <div class="col-4">
           <span class="row text-caption">total</span>
@@ -33,9 +26,8 @@
       </div>
     </div>
     <div
-      class="q-my-md q-pa-md"
+      class="q-my-md q-pa-md rounded"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-      style="border-radius:20px"
       v-if="topColleges.length"
     >
       <div class="text-h4 q-mt-lg q-ml-lg">
@@ -62,9 +54,8 @@
     </div>
 
     <div
-      class="q-my-md q-py-md"
+      class="q-my-md q-py-md rounded"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-      style="border-radius:20px"
     >
       <div class="text-center text-h6 q-ma-md">
         College code (Searches count)
@@ -106,9 +97,8 @@
       <div class="q-pa-md text-right text-grey-6">
         *Note: Only top 30 colleges are shown
       </div>
-
     </div>
-      <div
+    <div
       class="flex column rounded q-pa-md q-my-md"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
       style="border-radius:20px"
@@ -238,9 +228,7 @@ export default {
         this.lineDataCollection.datasets[0].backgroundColor.push(
           backgroundColors[1]
         );
-        this.lineDataCollection.datasets[0].borderColor.push(
-          borderColors[1]
-        );
+        this.lineDataCollection.datasets[0].borderColor.push(borderColors[1]);
 
         res.data.searchesArr.map((item, index) => {
           this.lineDataCollection.labels.push(item["date"].slice(5, 10));
@@ -276,3 +264,6 @@ export default {
   }
 };
 </script>
+
+<style>
+</style>
