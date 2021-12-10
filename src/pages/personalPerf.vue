@@ -14,7 +14,7 @@
     >
       <div style="display:flex; justify-content:center;">
         <div class="wrapper" style="width:100%; max-width:1000px">
-          <StudentInput
+          <StudentInputShort
             class="result-input"
             v-model="selection"
             @success="setSelection($event)"
@@ -220,7 +220,7 @@
                   :key="$q.dark.isActive"
                 />
               </q-tab-panel>
-            sdfdsfsdfasdf
+              sdfdsfsdfasdf
             </q-tab-panels>
           </div>
           <div
@@ -252,7 +252,7 @@ import RadarChart from "../charts/RadarChart.vue";
 import BarChart from "../charts/BarChart.vue";
 import LineChart from "../charts/LineChart.vue";
 
-import StudentInput from "../components/StudentInput.vue";
+import StudentInputShort from "../components/StudentInputShort.vue";
 import Tip from "../components/Tip.vue";
 
 export default {
@@ -261,7 +261,7 @@ export default {
     BarChart,
     LineChart,
     Tip,
-    StudentInput
+    StudentInputShort
   },
   data() {
     return {
@@ -269,7 +269,7 @@ export default {
       canSearch: false,
       rollNo: "19fh1a0547",
       selection: {},
-      sem: "1",
+      releasedResults: {},
       studentName: "",
       chartName: "radar",
       columns: [
@@ -344,14 +344,32 @@ export default {
     // this.resultID = "56736469";
     // this.canSearch = true;
     // this.fillData();
-    this.checkQueries();
+
+    // this.checkQueries();
+    this.getReleasedResults();
   },
   methods: {
+    getReleasedResults() {
+      axios
+        .get(apiRoutes.releasedResults)
+        .then(async res => {
+          this.releasedResults = res.data;
+          setTimeout(() => {
+            console.log(this.releasedResults);
+            this.fillData();
+            // console.log(res.data[this.selectionInput.reg][this.selectionInput.course])
+          }, 300);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
     setSelection(selection) {
       //dont set selection if params passed
+      console.log(selection);
       // if (Object.keys(this.$route.query).includes("roll")) return;
       this.selectionInput = selection;
-      this.canSearch = !!this.selectionInput.sem;
+      this.canSearch = !!this.selectionInput.course;
     },
     checkQueries() {
       console.log(this.$route.query);
@@ -377,7 +395,8 @@ export default {
           .share({
             title: "Hey I compared our results on this cool webApp!",
             url:
-              window.location.origin + window.location.pathname+
+              window.location.origin +
+              window.location.pathname +
               "#/?reg=" +
               this.selectionInput.reg +
               "&course=" +
@@ -496,83 +515,112 @@ export default {
       var subjectNames = [];
       var subjectGrade = [];
       this.rowData = [];
-      axios
-        .get(
-          apiRoutes.singleResultv2 +
-            "/" +
-            this.rollNo +
-            "/" +
-            this.selectionInput.reg +
-            "/" +
-            this.selectionInput.course +
-            "/" +
-            this.selectionInput.year +
-            "/" +
-            this.selectionInput.sem
-        )
-        .then(res => {
-          if (res.data) {
-            this.$q.notify({
-              type: "positive",
-              message: `Result retrieved`
-            });
-            console.log(res.data);
-            console.log("Best Attempt = ");
-            // console.log(getBestAttempts(res.data.attempts));
-            const bestAttempts = getBestAttempts(res.data.attempts);
-            console.log(bestAttempts);
-
-            bestAttempts.forEach(sub => {
-              this.rowData.push({
-                subject_name: getShort(sub["Subject Name"]),
-                status: sub["Result Status"] == "P" ? "✔" : "❌",
-                grade: sub["Grade"] + " (" + this.g_to_gp[sub["Grade"]] + ")",
-                internals: sub["Internals"],
-                externals: sub["Externals"],
-                total: sub["Total Marks"],
-                credit: sub["Credits"],
-                month: sub["month"]
-              });
-              subjectNames.push(
-                `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
-              );
-              subjectGrade.push(this.g_to_gp[sub["Grade"]]);
-            });
-            this.studentName = res.data["name"];
-            this.studentSGPA = Number.parseFloat(res.data.sgpa);
-          }
-        })
-        .then(() => {
-          //scroll bottom
-          window.scrollTo(0, document.body.scrollHeight + 100);
-          this.$refs.scrollArea.setScrollPosition(375, 200);
-        })
-        .catch(error => {
-          console.log(error);
-          this.resultNotFoundDialog = true;
-
-          this.datacollection.datasets = [];
-          this.$q.notify({
-            type: "negative",
-            message: `Result not found`
-          });
-          this.studentName = "N/A";
-          this.studentSGPA = 0;
-        })
-        .finally(() => {
-          this.datacollection = {
-            labels: subjectNames,
-            datasets: [
-              {
-                label: this.studentName,
-                data: subjectGrade,
-                backgroundColor: backgroundColors[1],
-                borderColor: borderColors[1],
-                borderWidth: 1
-              }
-            ]
-          };
+      console.log(
+        Object.keys(this.releasedResults[this.selectionInput.reg]).length
+      );
+      const selectedCourse = this.releasedResults[this.selectionInput.reg][
+        this.selectionInput.course
+      ];
+      const promises = [];
+      Object.keys(selectedCourse).forEach(year => {
+        Object.keys(selectedCourse[year]).forEach(sem => {
+          console.log(year, sem);
+          promises.push(
+            axios.get(
+              apiRoutes.singleResultv2 +
+                "/" +
+                this.rollNo +
+                "/" +
+                this.selectionInput.reg +
+                "/" +
+                this.selectionInput.course +
+                "/" +
+                year +
+                "/" +
+                sem
+            )
+          );
         });
+      });
+      Promise.all(promises).then(res=>console.log(res))
+
+      // axios
+      //   .get(
+      //     apiRoutes.singleResultv2 +
+      //       "/" +
+      //       this.rollNo +
+      //       "/" +
+      //       this.selectionInput.reg +
+      //       "/" +
+      //       this.selectionInput.course +
+      //       "/" +
+      //       this.selectionInput.year +
+      //       "/" +
+      //       this.selectionInput.sem
+      //   )
+      //   .then(res => {
+      //     if (res.data) {
+      //       this.$q.notify({
+      //         type: "positive",
+      //         message: `Result retrieved`
+      //       });
+      //       console.log(res.data);
+      //       console.log("Best Attempt = ");
+      //       // console.log(getBestAttempts(res.data.attempts));
+      //       const bestAttempts = getBestAttempts(res.data.attempts);
+      //       console.log(bestAttempts);
+
+      //       bestAttempts.forEach(sub => {
+      //         this.rowData.push({
+      //           subject_name: getShort(sub["Subject Name"]),
+      //           status: sub["Result Status"] == "P" ? "✔" : "❌",
+      //           grade: sub["Grade"] + " (" + this.g_to_gp[sub["Grade"]] + ")",
+      //           internals: sub["Internals"],
+      //           externals: sub["Externals"],
+      //           total: sub["Total Marks"],
+      //           credit: sub["Credits"],
+      //           month: sub["month"]
+      //         });
+      //         subjectNames.push(
+      //           `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
+      //         );
+      //         subjectGrade.push(this.g_to_gp[sub["Grade"]]);
+      //       });
+      //       this.studentName = res.data["name"];
+      //       this.studentSGPA = Number.parseFloat(res.data.sgpa);
+      //     }
+      //   })
+      //   .then(() => {
+      //     //scroll bottom
+      //     window.scrollTo(0, document.body.scrollHeight + 100);
+      //     this.$refs.scrollArea.setScrollPosition(375, 200);
+      //   })
+      //   .catch(error => {
+      //     console.log(error);
+      //     this.resultNotFoundDialog = true;
+
+      //     this.datacollection.datasets = [];
+      //     this.$q.notify({
+      //       type: "negative",
+      //       message: `Result not found`
+      //     });
+      //     this.studentName = "N/A";
+      //     this.studentSGPA = 0;
+      //   })
+      //   .finally(() => {
+      //   this.datacollection = {
+      //     labels: subjectNames,
+      //     datasets: [
+      //       {
+      //         label: this.studentName,
+      //         data: subjectGrade,
+      //         backgroundColor: backgroundColors[1],
+      //         borderColor: borderColors[1],
+      //         borderWidth: 1
+      //       }
+      //     ]
+      //   };
+      // });
     }
   }
 };

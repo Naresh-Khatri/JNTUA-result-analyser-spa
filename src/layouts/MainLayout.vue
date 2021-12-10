@@ -176,7 +176,7 @@ import RateDialog from "src/components/RateDialog.vue";
 export default {
   data() {
     return {
-      left: true,
+      left: false,
       link: "single-result"
     };
   },
