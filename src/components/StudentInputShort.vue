@@ -57,7 +57,7 @@ export default {
   },
   mounted() {
     this.init();
-    console.log(this.value);
+    // console.log(this.value);
   },
   watch: {
     async value(val) {
@@ -144,19 +144,14 @@ export default {
         await this.sleep(150);
         this.selectedFn("course", localStorage.getItem("course"));
       }
-      // if (localStorage.getItem("title")) {
-      //   await this.sleep(500);
-      //   console.log(localStorage.getItem("title"));
-      //   this.selectedTitle = localStorage.getItem("title").label;
-      //   this.selectedFn("title", localStorage.getItem("title"));
-      // }
     },
     emitSelection() {
-      // localStorage.setItem('lastUniques', JSON.stringify(this.uniques))
-      this.$emit("success", {
+      //selection is the object of the selected course
+      const selection = {
         reg: this.selectedReg,
-        course: this.selectedCourse
-      });
+        course: this.selectedCourse,
+        yearSemObj: this.resultObj[this.selectedReg][this.selectedCourse]}
+      this.$emit("success", selection);
     }
   }
 };

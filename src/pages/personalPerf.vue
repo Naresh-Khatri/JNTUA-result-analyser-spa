@@ -13,14 +13,14 @@
       }"
     >
       <div style="display:flex; justify-content:center;">
-        <div class="wrapper" style="width:100%; max-width:1000px">
+        <div style="width:100%; max-width:1000px">
           <StudentInputShort
-            class="result-input"
+            class="q-my-md q-mx-sm"
             v-model="selection"
             @success="setSelection($event)"
           />
           <div
-            class="roll-input q-pa-lg rounded"
+            class="roll-input q-pa-lg q-my-md q-mx-sm rounded"
             :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
           >
             <!-- Roll number input with forward and backward buttons -->
@@ -57,32 +57,19 @@
             </div>
           </div>
           <div class="flex justify-center">
-            <q-card
-              class="sgpa-container q-px-lg rounded"
-              v-if="datacollection.datasets"
+            <!-- <q-btn color="brown" label="Button" v-for="n in 7" :key="`xs-${n}`" /> -->
+            <div
+              class="row q-col-gutter rounded"
               flat
+              v-for="(result, index) in resultsList"
+              :key="index"
             >
-              <div class="flex flex-center q-px-sm">
-                <div class="col">
-                  <div class=" text-center" style="font-size:1.3rem">
-                    {{ studentName }}
-                  </div>
-                </div>
-                <div class="col" style="max-width:150px">
-                  <q-knob
-                    readonly
-                    v-model="studentSGPA"
-                    show-value
-                    size="90px"
-                    :thickness="0.22"
-                    :max="10"
-                    color="green"
-                    track-color="grey-3"
-                    class=" q-ma-md"
-                  ></q-knob>
-                </div>
-              </div>
-            </q-card>
+              <SgpaTile
+                :sgpa="result.sgpa"
+                :year="result.year"
+                :sem="result.sem"
+              />
+            </div>
             <transition v-if="datacollection.datasets">
               <div style="display:flex; justify-content:center">
                 <q-btn
@@ -253,6 +240,7 @@ import BarChart from "../charts/BarChart.vue";
 import LineChart from "../charts/LineChart.vue";
 
 import StudentInputShort from "../components/StudentInputShort.vue";
+import SgpaTile from "../components/SgpaTile.vue";
 import Tip from "../components/Tip.vue";
 
 export default {
@@ -261,13 +249,14 @@ export default {
     BarChart,
     LineChart,
     Tip,
+    SgpaTile,
     StudentInputShort
   },
   data() {
     return {
       datacollection: {},
       canSearch: false,
-      rollNo: "19fh1a0547",
+      rollNo: "19fh1a0546",
       selection: {},
       releasedResults: {},
       studentName: "",
@@ -317,7 +306,7 @@ export default {
           sortable: true
         }
       ],
-      studentSGPA: 0,
+      resultsList: [],
       rowData: [],
       pagination: {
         sortBy: "name",
@@ -344,32 +333,15 @@ export default {
     // this.resultID = "56736469";
     // this.canSearch = true;
     // this.fillData();
-
     // this.checkQueries();
-    this.getReleasedResults();
   },
   methods: {
-    getReleasedResults() {
-      axios
-        .get(apiRoutes.releasedResults)
-        .then(async res => {
-          this.releasedResults = res.data;
-          setTimeout(() => {
-            console.log(this.releasedResults);
-            this.fillData();
-            // console.log(res.data[this.selectionInput.reg][this.selectionInput.course])
-          }, 300);
-        })
-        .catch(err => {
-          console.log(err);
-        });
-    },
     setSelection(selection) {
       //dont set selection if params passed
-      console.log(selection);
       // if (Object.keys(this.$route.query).includes("roll")) return;
       this.selectionInput = selection;
       this.canSearch = !!this.selectionInput.course;
+      this.fillData();
     },
     checkQueries() {
       console.log(this.$route.query);
@@ -515,15 +487,10 @@ export default {
       var subjectNames = [];
       var subjectGrade = [];
       this.rowData = [];
-      console.log(
-        Object.keys(this.releasedResults[this.selectionInput.reg]).length
-      );
-      const selectedCourse = this.releasedResults[this.selectionInput.reg][
-        this.selectionInput.course
-      ];
+      console.log(this.selectionInput);
       const promises = [];
-      Object.keys(selectedCourse).forEach(year => {
-        Object.keys(selectedCourse[year]).forEach(sem => {
+      Object.keys(this.selectionInput.yearSemObj).forEach(year => {
+        Object.keys(this.selectionInput.yearSemObj[year]).forEach(sem => {
           console.log(year, sem);
           promises.push(
             axios.get(
@@ -542,8 +509,28 @@ export default {
           );
         });
       });
-      Promise.all(promises).then(res=>console.log(res))
-
+      Promise.all(promises).then(res => {
+        console.log(res);
+        this.resultsList = [];
+        if (res) {
+          this.$q.notify({
+            type: "positive",
+            message: `${res.length} result retrieved 👀`
+          });
+        }
+        res.forEach(result => {
+          const bestAttempt = getBestAttempts(result.data.attempts);
+          const { sgpa, sem, year } = result.data;
+          console.log(result);
+          this.resultsList.push({
+            sgpa,
+            sem,
+            year,
+            bestAttempt
+          });
+        });
+        console.log(this.resultsList);
+      });
       // axios
       //   .get(
       //     apiRoutes.singleResultv2 +
@@ -625,55 +612,4 @@ export default {
   }
 };
 </script>
-<style scoped>
-@media screen and (min-width: 1000px) {
-  .wrapper {
-    display: grid;
-    gap: 25px;
-    margin-top: 50px;
-    width: 60%;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    grid-template-areas:
-      "result-input roll-input"
-      "result-input sgpa-container"
-      "data-container data-container";
-  }
-  .sgpa-container {
-    grid-area: sgpa-container;
-    align-self: center;
-    width: 100%;
-  }
-  .roll-input {
-    grid-area: roll-input;
-  }
-  .result-input {
-    grid-area: result-input;
-  }
-  .data-container {
-    grid-area: data-container;
-  }
-  .container {
-    display: grid;
-    justify-items: center;
-  }
-}
-@media screen and (max-width: 1000px) {
-  .result-input {
-    margin: 20px 10px;
-  }
-  .roll-input {
-    margin: 20px 10px;
-  }
-  .sgpa-container {
-    margin: 20px 10px;
-    width: 70%;
-  }
-  .data-container {
-    margin: 20px 10px;
-  }
-}
-.rounded {
-  border-radius: 20px;
-}
-</style>
+<style scoped></style>
