@@ -4,13 +4,20 @@
       <q-card-section>
         <div class="text-h6">New Features! 👩‍🔧</div>
       </q-card-section>
-      <q-card-section class="row items-center">
+      <q-card-section class="flex flex-center row items-center">
         <li style="font-size:1.2em">
-          👩‍🏫 Faculty can now download batch result in <strong>EXCEL</strong> format.
+          <!-- 👩‍🏫 Faculty can now download batch result in <strong>EXCEL</strong> format. -->
+          Check your past results in <strong>History</strong> section.
         </li>
-        <li style="font-size:1.2em">
-          ⛄Not a major update but do you like this snowfall? ❄ 👀
-        </li>
+        <img
+          class="q-mt-md"
+          height="300"
+          src="https://i.imgur.com/hhg6Th1.png"
+          alt=""
+        />
+        <!-- <li style="font-size:1.2em"> -->
+        <!-- ⛄Not a major update but do you like this snowfall? ❄ 👀 -->
+        <!-- </li> -->
         <br />
         <!-- If you want this app to get better then head over to the feedback
         section on top 🙋‍♀️ -->
@@ -21,6 +28,9 @@
           <img style="height:40px" src="../assets/telegram-logo.png" />
           <div class="q-ml-sm">join</div>
         </q-btn>
+        <!-- <div to="/compare-result">
+          <q-btn flat label="Check now!" color="primary" />
+        </div> -->
         <q-btn flat label="OK" color="primary" @click="confirm = false" />
       </q-card-actions>
     </q-card>

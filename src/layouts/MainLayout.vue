@@ -73,8 +73,22 @@
             <q-item-section avatar>
               <q-icon name="person_outline" />
             </q-item-section>
-
             <q-item-section>Single</q-item-section>
+          </q-item>
+          <q-item
+            clickable
+            v-ripple
+            :active="link === 'personal-perf'"
+            @click="link = 'personal-perf'"
+            active-class="bg-primary"
+            to="/personal-perf"
+            style=" border-radius:10px"
+          >
+            <q-item-section avatar>
+              <q-icon name="trending_up" />
+            </q-item-section>
+
+            <q-item-section>Histroy (⚡beta)</q-item-section>
           </q-item>
           <q-item
             clickable
@@ -102,7 +116,7 @@
             style=" border-radius:10px"
           >
             <q-item-section avatar>
-              <q-icon name="school" />
+              <q-icon name="groups" />
             </q-item-section>
 
             <q-item-section>Batch</q-item-section>
@@ -257,12 +271,12 @@ export default {
 }
 </style>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles:wght@700&family=Rubik:wght@500&display=swap');
-*{
-  font-family: 'Rubik', sans-serif;
+@import url("https://fonts.googleapis.com/css2?family=Fuzzy+Bubbles:wght@700&family=Rubik:wght@500&display=swap");
+* {
+  font-family: "Rubik", sans-serif;
 }
-.q-item__section{
-  font-family: 'Fuzzy Bubbles', cursive;
+.q-item__section {
+  font-family: "Fuzzy Bubbles", cursive;
 }
 .rounded {
   backdrop-filter: blur(16px) saturate(180%);

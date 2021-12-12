@@ -56,21 +56,41 @@
               />
             </div>
           </div>
-          <div class="flex justify-center">
+          <q-card class="relative q-mx-xl q-my-md q-pa-lg rounded" flat>
+            <div class="text-h5 text-center">
+              {{ studentName }}
+            </div>
+            <!-- <div class="text-center text-caption">
+              backlogs: {{ totalBacklogs }}
+            </div> -->
+            <div
+              v-if="isDetained"
+              class="flex flex-center"
+              style="position:absolute; width:100%; height:100%; 
+              top:0px; left:0px;background:rgba(200,0,0,0.5);
+              border-radius:20px"
+            >
+              <q-icon size="xl" color="white" name="block" />
+            </div>
+          </q-card>
+          <div class="row">
             <!-- <q-btn color="brown" label="Button" v-for="n in 7" :key="`xs-${n}`" /> -->
             <div
-              class="row q-col-gutter rounded"
+              class="col-4 flex flex-center q-my-md rounded"
+              style="flex-basis:50%; width:25%;"
               flat
               v-for="(result, index) in resultsList"
-              :key="index"
+              :key="index + rollNo"
+              @click="setSemIndex(index)"
             >
               <SgpaTile
                 :sgpa="result.sgpa"
                 :year="result.year"
                 :sem="result.sem"
+                :active="index == selectedSemIndex"
               />
             </div>
-            <transition v-if="datacollection.datasets">
+            <!-- <transition v-if="datacollection.datasets">
               <div style="display:flex; justify-content:center">
                 <q-btn
                   text-color="white"
@@ -81,7 +101,7 @@
                   <img width="50px" src="../assets/whatsapp.svg" />
                 </q-btn>
               </div>
-            </transition>
+            </transition> -->
           </div>
           <div class="data-container q-mb-xl" v-if="datacollection.datasets">
             <div>
@@ -159,7 +179,7 @@
             <q-tabs
               v-model="chartName"
               indicator-color="primary"
-              class="text-primary rounded q-mb-sm q-mx-lg"
+              class="text-primary rounded q-my-md q-mx-lg"
               :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
             >
               <q-tab
@@ -191,6 +211,19 @@
                   :chart-data="datacollection"
                   :key="$q.dark.isActive"
                 />
+                <div
+                  class="text-right  text-grey-6"
+                  v-if="zeroCredSubs.length > 0"
+                >
+                  *Note not including zero cred subs.
+                  <div
+                    v-for="(sub, index) in zeroCredSubs"
+                    :key="index"
+                    class="q-px-md text-right text-white"
+                  >
+                    {{ sub }}
+                  </div>
+                </div>
               </q-tab-panel>
 
               <q-tab-panel name="line" class="flex flex-center flex-row">
@@ -207,7 +240,6 @@
                   :key="$q.dark.isActive"
                 />
               </q-tab-panel>
-              sdfdsfsdfasdf
             </q-tab-panels>
           </div>
           <div
@@ -307,6 +339,11 @@ export default {
         }
       ],
       resultsList: [],
+      selectedSemIndex: 0,
+      zeroCredSubs: [],
+      isDetained: false,
+      isOnCooldown: false,
+      totalBacklogs: 0,
       rowData: [],
       pagination: {
         sortBy: "name",
@@ -401,6 +438,18 @@ export default {
       });
     },
     changeRoll(val) {
+      //limit search
+      if (this.isOnCooldown) {
+        this.$q.notify({
+          type: "warning",
+          message: `calm down bro chill!😤`
+        });
+        return;
+      }
+      this.isOnCooldown = true;
+      setTimeout(() => {
+        this.isOnCooldown = false;
+      }, 500);
       if (!this.datacollection.datasets) {
         this.$q.notify({
           message: "Please select exam first!",
@@ -438,7 +487,7 @@ export default {
       ];
       //check if roll > 99 by checking whether 2nd from last elem is char
       if (!chars.includes(this.rollNo[this.rollNo.length - 2])) {
-        console.log("of");
+        // console.log("of");
 
         var prefix = "";
         for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
@@ -487,11 +536,13 @@ export default {
       var subjectNames = [];
       var subjectGrade = [];
       this.rowData = [];
-      console.log(this.selectionInput);
+      this.totalBacklogs = 0;
+      this.resultsList = [];
+      this.isDetained = false;
       const promises = [];
       Object.keys(this.selectionInput.yearSemObj).forEach(year => {
         Object.keys(this.selectionInput.yearSemObj[year]).forEach(sem => {
-          console.log(year, sem);
+          // console.log(year, sem);
           promises.push(
             axios.get(
               apiRoutes.singleResultv2 +
@@ -518,39 +569,37 @@ export default {
             message: `${res.length} result retrieved 👀`
           });
         }
-        res.forEach(result => {
-          const bestAttempt = getBestAttempts(result.data.attempts);
-          const { sgpa, sem, year } = result.data;
-          console.log(result);
+        //set student name
+        for (let i = 0; i < res.length; i++) {
+          // console.log(result.data.attempts);
+          if (res[i].data.attempts == undefined) {
+            this.isDetained = true;
+            continue;
+          }
+          this.studentName = res[i].data.name;
+          const bestAttempt = getBestAttempts(res[i].data.attempts);
+          //calc totalBacklogs
+          // console.log(bestAttempt);
+          bestAttempt.forEach(sub => {
+            if (sub["Result Status"].toUpperCase() === "F")
+              this.totalBacklogs++;
+          });
+          const { sgpa, sem, year } = res[i].data;
+          // console.log(result);
           this.resultsList.push({
             sgpa,
             sem,
             year,
             bestAttempt
           });
-        });
+        }
+        //if no results found then set student name as NA
+        if (this.resultsList.length == 0) {
+          this.studentName = "NA";
+        }
         console.log(this.resultsList);
+        this.setSemIndex(0);
       });
-      // axios
-      //   .get(
-      //     apiRoutes.singleResultv2 +
-      //       "/" +
-      //       this.rollNo +
-      //       "/" +
-      //       this.selectionInput.reg +
-      //       "/" +
-      //       this.selectionInput.course +
-      //       "/" +
-      //       this.selectionInput.year +
-      //       "/" +
-      //       this.selectionInput.sem
-      //   )
-      //   .then(res => {
-      //     if (res.data) {
-      //       this.$q.notify({
-      //         type: "positive",
-      //         message: `Result retrieved`
-      //       });
       //       console.log(res.data);
       //       console.log("Best Attempt = ");
       //       // console.log(getBestAttempts(res.data.attempts));
@@ -608,6 +657,47 @@ export default {
       //     ]
       //   };
       // });
+    },
+    setSemIndex(semIndex) {
+      this.selectedSemIndex = semIndex;
+      const subjectNames = [];
+      const subjectGrades = [];
+      this.rowData = [];
+      this.zeroCredSubs = [];
+      if (this.resultsList[0] == undefined) return;
+      this.resultsList[semIndex].bestAttempt.forEach(sub => {
+        this.rowData.push({
+          subject_name: getShort(sub["Subject Name"]),
+          status: sub["Result Status"] == "P" ? "✔" : "❌",
+          grade: sub["Grade"] + " (" + this.g_to_gp[sub["Grade"]] + ")",
+          internals: sub["Internals"],
+          externals: sub["Externals"],
+          total: sub["Total Marks"],
+          credit: sub["Credits"],
+          month: sub["month"]
+        });
+        //dont plot the subjects having 0 credits
+        if (sub["Grade"].toUpperCase() != "Y") {
+          subjectNames.push(
+            `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
+          );
+          subjectGrades.push(this.g_to_gp[sub["Grade"]]);
+        } else {
+          this.zeroCredSubs.push(sub["Subject Name"]);
+        }
+      });
+      this.datacollection = {
+        labels: subjectNames,
+        datasets: [
+          {
+            label: this.studentName,
+            data: subjectGrades,
+            backgroundColor: backgroundColors[1],
+            borderColor: borderColors[1],
+            borderWidth: 1
+          }
+        ]
+      };
     }
   }
 };

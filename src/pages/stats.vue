@@ -266,4 +266,20 @@ export default {
 </script>
 
 <style>
+.rounded {
+  position: relative;
+  border-radius: 20px;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  /* background-color: rgba(17, 25, 40, 0.75); */
+}
+/* .rounded::after{
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.9;
+} */
 </style>
