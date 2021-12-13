@@ -140,7 +140,11 @@
                         :color="
                           props.row.status == '✔' ? 'positive' : 'negative'
                         "
-                        :style="props.row.status == '✔' ? 'filter: drop-shadow(0 0 0.5rem #25D366)':'filter: drop-shadow(0 0 0.5rem #FF4D01)' "
+                        :style="
+                          props.row.status == '✔'
+                            ? 'filter: drop-shadow(0 0 0.5rem #25D366)'
+                            : 'filter: drop-shadow(0 0 0.5rem #FF4D01)'
+                        "
                         class="text-white q-pa-xm"
                         >{{ props.row.status }}</q-chip
                       >
@@ -238,6 +242,19 @@
                   :chart-data="datacollection"
                   :key="$q.dark.isActive"
                 />
+                <div
+                  class="text-right  text-grey-6"
+                  v-if="zeroCredSubs.length > 0"
+                >
+                  *Note not including zero cred subs.
+                  <div
+                    v-for="(sub, index) in zeroCredSubs"
+                    :key="index"
+                    class="q-px-md text-right text-white"
+                  >
+                    {{ sub }}
+                  </div>
+                </div>
               </q-tab-panel>
 
               <q-tab-panel name="line" class="flex flex-center flex-row">
@@ -310,6 +327,7 @@ export default {
       sem: "1",
       studentName: "",
       chartName: "radar",
+      zeroCredSubs: [],
       columns: [
         {
           name: "subject_name",
@@ -541,104 +559,110 @@ export default {
     },
     fillData() {
       var subjectNames = [];
-      var subjectGrade = [];
+      var subjectsGrades = [];
       this.rowData = [];
-      axios
-        .get(
-          apiRoutes.singleResultv2 +
-            "/" +
-            this.rollNo +
-            "/" +
-            this.selectionInput.reg +
-            "/" +
-            this.selectionInput.course +
-            "/" +
-            this.selectionInput.year +
-            "/" +
-            this.selectionInput.sem
-        )
-        .then(res => {
-          if (res.data) {
+      (this.zeroCredSubs = []),
+        axios
+          .get(
+            apiRoutes.singleResultv2 +
+              "/" +
+              this.rollNo +
+              "/" +
+              this.selectionInput.reg +
+              "/" +
+              this.selectionInput.course +
+              "/" +
+              this.selectionInput.year +
+              "/" +
+              this.selectionInput.sem
+          )
+          .then(res => {
+            if (res.data) {
+              this.$q.notify({
+                type: "positive",
+                message: `Result retrieved`
+              });
+              console.log(res.data);
+              console.log("Best Attempt = ");
+              // console.log(getBestAttempts(res.data.attempts));
+              const bestAttempts = getBestAttempts(res.data.attempts);
+              console.log(bestAttempts);
+
+              //calc total attempts
+              this.totalAttempts = 0;
+              res.data.attempts.forEach(attempt => {
+                if (Object.keys(attempt).length > 0) this.totalAttempts++;
+              });
+              console.log("attempts count", this.totalAttempts);
+              this.fullFormsArr = [];
+              bestAttempts.forEach(sub => {
+                //push to full forms array
+                this.fullFormsArr.push({
+                  shortForm: getShort(sub["Subject Name"]),
+                  fullForm: sub["Subject Name"]
+                });
+                //push to subject names rowData array
+                this.rowData.push({
+                  subject_name: getShort(sub["Subject Name"]),
+                  status: sub["Result Status"] == "P" ? "✔" : "❌",
+                  grade: sub["Grade"] + " (" + this.G2GP[sub["Grade"]] + ")",
+                  internals: sub["Internals"],
+                  externals: sub["Externals"],
+                  total: sub["Total Marks"],
+                  credit: sub["Credits"],
+                  month: sub["month"]
+                });
+
+                //dont plot the subjects having 0 credits
+                if (sub["Grade"].toUpperCase() != "Y") {
+                  subjectNames.push(
+                    `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
+                  );
+                  subjectsGrades.push(this.G2GP[sub["Grade"]]);
+                } else {
+                  this.zeroCredSubs.push(sub["Subject Name"]);
+                }
+              });
+              this.studentName = res.data["name"];
+              this.studentSGPA = Number.parseFloat(res.data.sgpa);
+            }
+          })
+          .then(() => {
+            //scroll bottom
+            // window.scrollTo(0, document.body.scrollHeight);
+            this.$refs.scrollArea.setScrollPosition(350, 200);
+          })
+          .catch(error => {
+            console.log(error);
+            this.resultNotFoundDialog = true;
+
+            this.datacollection.datasets = [];
             this.$q.notify({
-              type: "positive",
-              message: `Result retrieved`
+              type: "negative",
+              message: `Result not found`
             });
-            console.log(res.data);
-            console.log("Best Attempt = ");
-            // console.log(getBestAttempts(res.data.attempts));
-            const bestAttempts = getBestAttempts(res.data.attempts);
-            console.log(bestAttempts);
-
-            //calc total attempts
-            this.totalAttempts = 0;
-            res.data.attempts.forEach(attempt => {
-              if (Object.keys(attempt).length > 0) this.totalAttempts++;
-            });
-            console.log("attempts count", this.totalAttempts);
-            this.fullFormsArr = [];
-            bestAttempts.forEach(sub => {
-              //push to full forms array
-              this.fullFormsArr.push({
-                shortForm: getShort(sub["Subject Name"]),
-                fullForm: sub["Subject Name"]
-              });
-              //push to subject names rowData array
-              this.rowData.push({
-                subject_name: getShort(sub["Subject Name"]),
-                status: sub["Result Status"] == "P" ? "✔" : "❌",
-                grade: sub["Grade"] + " (" + this.G2GP[sub["Grade"]] + ")",
-                internals: sub["Internals"],
-                externals: sub["Externals"],
-                total: sub["Total Marks"],
-                credit: sub["Credits"],
-                month: sub["month"]
-              });
-              subjectNames.push(
-                `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
-              );
-              subjectGrade.push(this.G2GP[sub["Grade"]]);
-            });
-            this.studentName = res.data["name"];
-            this.studentSGPA = Number.parseFloat(res.data.sgpa);
-          }
-        })
-        .then(() => {
-          //scroll bottom
-          // window.scrollTo(0, document.body.scrollHeight);
-          this.$refs.scrollArea.setScrollPosition(350, 200);
-        })
-        .catch(error => {
-          console.log(error);
-          this.resultNotFoundDialog = true;
-
-          this.datacollection.datasets = [];
-          this.$q.notify({
-            type: "negative",
-            message: `Result not found`
+            this.studentName = "N/A";
+            this.studentSGPA = 0;
+          })
+          .finally(() => {
+            this.datacollection = {
+              labels: subjectNames,
+              datasets: [
+                {
+                  label: this.studentName,
+                  data: subjectsGrades,
+                  backgroundColor: backgroundColors[1],
+                  borderColor: borderColors[1],
+                  borderWidth: 1
+                }
+              ]
+            };
           });
-          this.studentName = "N/A";
-          this.studentSGPA = 0;
-        })
-        .finally(() => {
-          this.datacollection = {
-            labels: subjectNames,
-            datasets: [
-              {
-                label: this.studentName,
-                data: subjectGrade,
-                backgroundColor: backgroundColors[1],
-                borderColor: borderColors[1],
-                borderWidth: 1
-              }
-            ]
-          };
-        });
     }
   }
 };
 </script>
 <style scoped>
-
 @media screen and (min-width: 1000px) {
   .wrapper {
     display: grid;
