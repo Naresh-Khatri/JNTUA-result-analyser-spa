@@ -59,7 +59,7 @@
       <div class="data-container q-mb-xl" v-if="datasets.length">
         <div class="flex flex-center">
           <q-card
-            class="q-pa-sm q-ma-md rounded"
+            class="q-pa-sm q-ma-md rounded glass"
             flat
             style="display:flex; flex-wrap:wrap; justify-content:center"
           >

@@ -35,6 +35,7 @@
                 filled
                 label="Roll Number"
                 :color="$q.dark.isActive ? 'white' : 'primary'"
+                :hide-hint="rollNo != '19fh1a0546'"
                 v-model="rollNo"
                 :rules="[
                   val =>

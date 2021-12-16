@@ -1,55 +1,49 @@
 <template>
-  <q-page padding :key="pieDataCollection.labels.length">
-    <!-- content -->
-
-    <!-- <LineChart
-      style="min-width:90%"
-      :chart-data="lineDataCollection"
-      :key="$q.dark.isActive"
-    /> -->
-
-    <div class="flex flex-center">
-      <div
-        class="q-my-md q-py-md row rounded"
-        :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-        style="width: 60%"
-      >
-        <div class="col-8">
-          <div class="text-h4 text-center">
-            {{ animatedNumber }}
+  <q-page padding class="container flex flex-center" :key="pieDataCollection.labels.length">
+    <div class="leaderboards">
+      <div class="flex flex-center">
+        <div
+          class="q-my-md q-py-md row rounded search-count-container"
+          :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+          style="width: 60%;"
+        >
+          <div class="col-8">
+            <div class="text-h4 text-center">
+              {{ animatedNumber }}
+            </div>
+          </div>
+          <div class="col-4">
+            <span class="row text-caption">total</span>
+            <span class="row text-caption">searches</span>
           </div>
         </div>
-        <div class="col-4">
-          <span class="row text-caption">total</span>
-          <span class="row text-caption">searches</span>
+      </div>
+      <div
+        class="q-my-md q-pa-md rounded"
+        :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
+        v-if="topColleges.length"
+      >
+        <div class="text-h4 q-mt-lg q-ml-lg">
+          🏆Leaderboards
         </div>
-      </div>
-    </div>
-    <div
-      class="q-my-md q-pa-md rounded"
-      :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-      v-if="topColleges.length"
-    >
-      <div class="text-h4 q-mt-lg q-ml-lg">
-        🏆Leaderboards
-      </div>
-      <div class="text-body1 q-ma-md">
-        <i class="fas fa-crown" style="color:gold"> </i>
-        {{ topColleges[0].collegeCode }} - {{ topColleges[0].collegeName }}({{
-          topColleges[0].district
-        }})
-      </div>
-      <div class="text-body1 q-ma-md">
-        <i class="fas fa-crown" style="color:silver"> </i>
-        {{ topColleges[1].collegeCode }} - {{ topColleges[1].collegeName }}({{
-          topColleges[1].district
-        }})
-      </div>
-      <div class="text-body1 q-ma-md">
-        <i class="fas fa-crown" style="color:brown"> </i>
-        {{ topColleges[2].collegeCode }} - {{ topColleges[2].collegeName }}({{
-          topColleges[2].district
-        }})
+        <div class="text-body1 q-ma-md">
+          <i class="fas fa-crown" style="color:gold"> </i>
+          {{ topColleges[0].collegeCode }} - {{ topColleges[0].collegeName }}({{
+            topColleges[0].district
+          }})
+        </div>
+        <div class="text-body1 q-ma-md">
+          <i class="fas fa-crown" style="color:silver"> </i>
+          {{ topColleges[1].collegeCode }} - {{ topColleges[1].collegeName }}({{
+            topColleges[1].district
+          }})
+        </div>
+        <div class="text-body1 q-ma-md">
+          <i class="fas fa-crown" style="color:brown"> </i>
+          {{ topColleges[2].collegeCode }} - {{ topColleges[2].collegeName }}({{
+            topColleges[2].district
+          }})
+        </div>
       </div>
     </div>
 
@@ -59,35 +53,6 @@
     >
       <div class="text-center text-h6 q-ma-md">
         College code (Searches count)
-        <!-- <div class="row q-col-gutter-none">
-          <q-chip
-            v-for="(d, i) in pieDataCollection.labels"
-            :key="i"
-            dense
-            class="col-2"
-            :style="
-              `background: ${backgroundColors[i % 7]};border: 2px solid ${
-                borderColors[i % 7]
-              }; opacity:.7`
-            "
-            style="font-size:11px; font-weight:400;display:flex; justify-content:center; align-items:center;height:20px;padding:5px"
-            :label="d"
-          >
-            <span>
-              <div
-                :style="
-                  `background: ${backgroundColors[i % 7]};border: 2px solid ${
-                    borderColors[i % 7]
-                  }; opacity:.7`
-                "
-                style="width:10px; height:10px "
-              ></div>
-            </span>
-            <span style="font-size:11px; font-weight:300">
-              {{ d }}
-            </span>
-          </q-chip> 
-        </div> -->
       </div>
       <PieChart
         style="height:600px"
@@ -266,6 +231,27 @@ export default {
 </script>
 
 <style>
+@media screen and (min-width: 1000px) {
+  .container{
+  }
+  .container > div{
+    width: 1000px
+  }
+  .leaderboards {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+  }
+  .search-count-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    min-width: 300px;
+    margin: 20px;
+    height: 85%;
+  }
+}
+
 .rounded {
   position: relative;
   border-radius: 20px;

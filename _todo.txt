@@ -25,3 +25,6 @@ merge pharmcy with pharmacy
     - passing %
     - average sgpa
 add missing rolls in batch result
+
+
+fix data in xlsx file

@@ -56,7 +56,9 @@
               />
             </div>
           </div>
-          <q-card class="relative q-mx-xl q-my-md q-pa-lg rounded" flat>
+          <q-card
+          v-if="resultsList.length"
+           class="relative q-mx-xl q-my-md q-pa-lg rounded" flat>
             <div class="text-h5 text-center">
               {{ studentName }}
             </div>
