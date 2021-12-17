@@ -48,7 +48,7 @@
     </div>
 
     <div
-      class="q-my-md q-py-md rounded"
+      class="q-my-md q-py-md rounded pie-container"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
     >
       <div class="text-center text-h6 q-ma-md">
@@ -64,7 +64,7 @@
       </div>
     </div>
     <div
-      class="flex column rounded q-pa-md q-my-md"
+      class="flex column rounded q-pa-md q-my-md searches-container"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
       style="border-radius:20px"
     >
@@ -250,6 +250,12 @@ export default {
     margin: 20px;
     height: 85%;
   }
+}
+.pie-container{
+  width: 100%;
+}
+.searches-container{
+  width: 100%;
 }
 
 .rounded {
