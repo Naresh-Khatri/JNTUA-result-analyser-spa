@@ -1,20 +1,24 @@
 <template>
   <q-dialog v-model="confirm" ref="dialog">
-    <q-card>
+    <q-card >
       <q-card-section>
-        <div class="text-h6">New Features! 👩‍🔧</div>
+        <!-- <div class="text-h6">New Features! 👩‍🔧</div> -->
       </q-card-section>
-      <q-card-section class="flex flex-center row items-center">
-        <li style="font-size:1.2em">
-          <!-- 👩‍🏫 Faculty can now download batch result in <strong>EXCEL</strong> format. -->
-          Check your past results in <strong>History</strong> section.
+      <q-card-section class="flex flex-center ro w column justify-center">
+        <h4 style="margin-bottom:5px; margin:0px 20px">Happy New Year!</h4>
+        <h3 style="margin-bottom:5px">2022</h3>
+        <h2 style="margin-bottom:5px">🎉🙌</h2>
+        <!-- < -->
+        <!-- <li style="font-size:1.2em"> -->
+        <!-- 👩‍🏫 Faculty can now download batch result in <strong>EXCEL</strong> format. -->
+        <!-- Check your past results in <strong>History</strong> section.
         </li>
-        <img
+        <q-img
           class="q-mt-md"
           height="300"
           src="https://i.imgur.com/hhg6Th1.png"
           alt=""
-        />
+        /> -->
         <!-- <li style="font-size:1.2em"> -->
         <!-- ⛄Not a major update but do you like this snowfall? ❄ 👀 -->
         <!-- </li> -->

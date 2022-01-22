@@ -3,9 +3,41 @@
     <q-header :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'">
       <div class="bg-primary text-white">
         <q-toolbar>
-          <q-btn dense flat round icon="menu" @click="left = !left" />
+          <transition
+            appear
+            duration="900"
+            delay="1000"
+            enter-active-class="animated tada"
+            leave-active-class="animated fadeOut"
+          >
+            <q-btn dense flat round @click="left = !left">
+              <!-- icon="../assets/candy_cane.png" -->
+              <img style="transform:rotateY(180deg);" src="../assets/candy_cane.png" width="20" />
+            </q-btn>
+          </transition>
           <q-space />
-
+          <!-- <transition name="fade" mode="out-in">
+            <q-btn
+              flat
+              v-if="!playAnimation"
+              round
+              key="1"
+              icon="ac_unit"
+              class="q-mr-xs"
+              size="lg"
+              @click="playAnimation = !playAnimation"
+            />
+            <q-btn
+              flat
+              round
+              key="2"
+              v-else
+              icon="motion_photos_off"
+              class="q-mr-xs"
+              size="lg"
+              @click="playAnimation = !playAnimation"
+            />
+          </transition> -->
           <transition name="fade" mode="out-in">
             <q-btn
               flat
@@ -29,24 +61,20 @@
             />
           </transition>
           <!-- <q-btn flat round disabled dense icon="search" class="q-mr-xs" />
-          <q-btn flat round disabled dense icon="group_add" /> -->
+          <q-btn flat round disabled dense icon="group_add" />-->
         </q-toolbar>
         <q-toolbar inset style="padding:0px">
-          <q-toolbar-title class="text-center"
-            ><strong>JNTUA</strong> Results analyser</q-toolbar-title
-          >
+          <q-toolbar-title class="text-center">
+            <strong>JNTUA</strong> Results analyser
+          </q-toolbar-title>
         </q-toolbar>
       </div>
     </q-header>
 
     <q-drawer v-model="left" side="left" overlay bordered>
       <!-- drawer content -->
-      <div class="q-pa-md">
-        <q-list
-          class="rounded-borders text-primary"
-          :style="$q.screen.lt.md ? 'margin-top:200px' : ''"
-          style="font-size:1.5em;"
-        >
+      <div class="q-pa-md" style="display:flex; align-items:center;">
+        <q-list class="rounded-borders text-primary" style="font-size:1.5em;">
           <!-- <q-item
             clickable
             v-ripple
@@ -60,7 +88,7 @@
             </q-item-section>
 
             <q-item-section>Personal Performance</q-item-section>
-          </q-item> -->
+          </q-item>-->
           <q-item
             clickable
             v-ripple
@@ -178,7 +206,16 @@
       :class="$q.dark.isActive ? 'dark' : 'bg-grey-4'"
       style="transition: background-color .3s"
     >
-      <div class="snowflake" v-for="i in 50" :key="i"></div>
+      <!-- <div v-if="playAnimation" class="animation-container">
+        <div class="snowflake" v-for="j in [51, 52, 53]" :key="j">
+          <img
+            :style="'transform:rotate(' + j * 100 + 'deg);'"
+            src="../assets/candy_cane.png"
+            width="20"
+          />
+        </div> 
+        <div class="snowflake" v-for="i in 50" :key="i"></div> 
+      </div>-->
       <router-view />
     </q-page-container>
   </q-layout>
@@ -191,7 +228,8 @@ export default {
   data() {
     return {
       left: false,
-      link: "single-result"
+      link: "single-result",
+      playAnimation: true
     };
   },
   mounted() {
@@ -207,20 +245,20 @@ export default {
     // });
     if (!window.location.href.includes("8080"))
       //patch logs
-      this.$q.dialog({
-        //   title: "New Features! 👩‍🔧",
-        //   html: true,
-        //   message: `<li style='font-size:1.2em'>
-        // 🆕 Added 🏆statstics for every college</li>
-        // <li style='font-size:1.2em'>
-        // Now you can share any result with your friends😎🤟</li>
-        //   <br>
-        //   If you want this app to get better then head over to
-        //   the feedback section on top 🙋‍♀️
-        //   `
-        component: WelcomDialog
-      });
-    localStorage.setItem("logDisplayed", true);
+      // this.$q.dialog({
+      //   //   title: "New Features! 👩‍🔧",
+      //   //   html: true,
+      //   //   message: `<li style='font-size:1.2em'>
+      //   // 🆕 Added 🏆statstics for every college</li>
+      //   // <li style='font-size:1.2em'>
+      //   // Now you can share any result with your friends😎🤟</li>
+      //   //   <br>
+      //   //   If you want this app to get better then head over to
+      //   //   the feedback section on top 🙋‍♀️
+      //   //   `
+      //   component: WelcomDialog
+      // });
+      localStorage.setItem("logDisplayed", true);
   },
   methods: {
     toggleTheme() {
@@ -258,6 +296,7 @@ export default {
     --left-ini: #{random(20) - 10}vw;
     --left-end: #{random(20) - 10}vw;
     left: #{random(100)}vw;
+    rotate: #{random(360)}deg;
     animation: snowfall #{5 + random(10)}s linear infinite;
     animation-delay: -#{random(10)}s;
   }
@@ -275,6 +314,11 @@ export default {
 * {
   font-family: "Rubik", sans-serif;
 }
+.q-drawer__content {
+  display: flex;
+  align-items: center;
+}
+
 .q-item__section {
   font-family: "Fuzzy Bubbles", cursive;
 }

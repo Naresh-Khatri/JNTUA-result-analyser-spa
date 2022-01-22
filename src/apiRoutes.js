@@ -1,5 +1,6 @@
 
-let prefix = window.location.href.includes("8080") ? "http://localhost:3000/" : "https://jntua.plasmatch.in/"
+let prefix = window.location.href.includes("8080") ?
+ "http://localhost:3000/" : "https://jntua.plasmatch.in/"
 console.log(window.location.href)
 module.exports = {
     stats: prefix + "stats/public",

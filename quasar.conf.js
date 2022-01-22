@@ -83,12 +83,10 @@ module.exports = function (/* ctx */) {
     framework: {
       iconSet: 'material-icons', // Quasar icon set
       lang: 'en-us', // Quasar language pack
-      config: {},
-
       // Possible values for "importStrategy":
       // * 'auto' - (DEFAULT) Auto-import needed Quasar components & directives
       // * 'all'  - Manually specify what to import
-      importStrategy: 'all',
+      importStrategy: 'auto',
 
       // For special cases outside of where "auto" importStrategy can have an impact
       // (like functional components as one of the examples),
@@ -98,7 +96,10 @@ module.exports = function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Notify', 'AddressbarColor']
+      plugins: ['Notify', 'AddressbarColor', 'LoadingBar', ],
+      config: {
+        loadingBar: { /* look at QuasarConfOptions from the API card */ }
+      }
     },
 
     // animations: 'all', // --- includes all animations
@@ -106,6 +107,7 @@ module.exports = function (/* ctx */) {
     animations: [
       'fadeIn',
       'fadeOut',
+      'tada',
       'bounceIn',
       'bounceOut',
       'rotateOut',
