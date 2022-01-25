@@ -37,7 +37,7 @@
               size="lg"
               @click="playAnimation = !playAnimation"
             />
-          </transition> -->
+          </transition>-->
           <transition name="fade" mode="out-in">
             <q-btn
               flat
@@ -239,26 +239,23 @@ export default {
     });
     this.$q.addressbarColor.set("#ff4d01");
     this.$q.dark.toggle();
-    // this.$q.dialog({
-    //   persistent: true,
-    //   component: RateDialog
-    // });
-    if (!window.location.href.includes("8080"))
+    if (!window.location.href.includes("8080")) {
       //patch logs
-      // this.$q.dialog({
-      //   //   title: "New Features! 👩‍🔧",
-      //   //   html: true,
-      //   //   message: `<li style='font-size:1.2em'>
-      //   // 🆕 Added 🏆statstics for every college</li>
-      //   // <li style='font-size:1.2em'>
-      //   // Now you can share any result with your friends😎🤟</li>
-      //   //   <br>
-      //   //   If you want this app to get better then head over to
-      //   //   the feedback section on top 🙋‍♀️
-      //   //   `
-      //   component: WelcomDialog
-      // });
+      this.$q.dialog({
+        //   title: "New Features! 👩‍🔧",
+        //   html: true,
+        //   message: `<li style='font-size:1.2em'>
+        // 🆕 Added 🏆statstics for every college</li>
+        // <li style='font-size:1.2em'>
+        // Now you can share any result with your friends😎🤟</li>
+        //   <br>
+        //   If you want this app to get better then head over to
+        //   the feedback section on top 🙋‍♀️
+        //   `
+        component: WelcomDialog
+      });
       localStorage.setItem("logDisplayed", true);
+    }
   },
   methods: {
     toggleTheme() {

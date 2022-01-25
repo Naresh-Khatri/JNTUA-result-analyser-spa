@@ -14,11 +14,7 @@
     >
       <div style="display:flex; justify-content:center;">
         <div class="wrapper" style="width:100%; max-width:1000px">
-          <StudentInput
-            class="result-input"
-            v-model="selection"
-            @success="setSelection($event)"
-          />
+          <StudentInput class="result-input" v-model="selection" @success="setSelection($event)" />
           <div
             class="roll-input q-pa-lg rounded glass"
             :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -70,16 +66,12 @@
               class="sgpa-container q-px-lg rounded glass"
               v-if="datacollection.datasets"
               flat
-              ><transition
-                appear
-                enter-active-class="animated bounceIn"
-                mode="out-in"
-              >
+            >
+              <transition appear enter-active-class="animated bounceIn" mode="out-in">
                 <div class="flex flex-center q-px-sm" :key="studentName">
                   <div class="col">
-                    <div class=" text-center" style="font-size:1.3rem">
-                      {{ studentName }}
-                    </div>
+                    <div class="text-center" style="font-size:1.3rem">{{ studentName }}</div>
+                    <q-chip style="float: right;" :label="viewCount" icon="visibility" size="sm" />
                   </div>
                   <div class="col" style="max-width:150px">
                     <q-knob
@@ -92,7 +84,7 @@
                       color="green"
                       :style="knobStyle"
                       track-color="grey-3"
-                      class=" q-ma-md"
+                      class="q-ma-md"
                     ></q-knob>
                   </div>
                 </div>
@@ -100,12 +92,7 @@
             </q-card>
             <transition v-if="datacollection.datasets">
               <div style="display:flex; justify-content:center">
-                <q-btn
-                  text-color="white"
-                  label="Share"
-                  style="background:#25D366"
-                  @click="share"
-                >
+                <q-btn text-color="white" label="Share" style="background:#25D366" @click="share">
                   <img width="50px" src="../assets/whatsapp.svg" />
                 </q-btn>
               </div>
@@ -113,10 +100,7 @@
           </div>
           <div class="data-container q-mb-xl" v-if="datacollection.datasets">
             <div>
-              <Tip
-                title="Tip 1"
-                desc="Click on the column name to sort the rows accordingly"
-              />
+              <Tip title="Tip 1" desc="Click on the column name to sort the rows accordingly" />
 
               <q-table
                 title="Result Table"
@@ -130,9 +114,12 @@
               >
                 <template v-slot:body="props">
                   <q-tr :props="props" style="width:10px">
-                    <q-td dense auto-width key="subject_name" :props="props">
-                      {{ props.row.subject_name }}
-                    </q-td>
+                    <q-td
+                      dense
+                      auto-width
+                      key="subject_name"
+                      :props="props"
+                    >{{ props.row.subject_name }}</q-td>
                     <q-td dense auto-width key="status" :props="props">
                       <q-chip
                         dense
@@ -147,38 +134,31 @@
                             : 'filter: drop-shadow(0 0 0.5rem #FF4D01)'
                         "
                         class="text-white q-pa-xm"
-                        >{{ props.row.status }}</q-chip
-                      >
+                      >{{ props.row.status }}</q-chip>
                     </q-td>
 
-                    <q-td
-                      dense
-                      auto-width
-                      style="padding:0px"
-                      key="marks"
-                      :props="props"
-                    >
+                    <q-td dense auto-width style="padding:0px" key="marks" :props="props">
                       <!-- 25 + 50 = 75 -->
-                      <div v-if="!props.row.total" style="font-size:22px;">
-                        🤷‍♀️
-                      </div>
+                      <div v-if="!props.row.total" style="font-size:22px;">🤷‍♀️</div>
                       <div v-else>
                         {{ props.row.total }} ({{ props.row.externals }} +
                         {{ props.row.internals }})
                       </div>
                     </q-td>
-                    <q-td dense auto-width key="grade" :props="props">
-                      {{ props.row.grade }}
-                    </q-td>
+                    <q-td dense auto-width key="grade" :props="props">{{ props.row.grade }}</q-td>
                     <!-- <q-td dense auto-width key="points" :props="props">
                       {{ props.row.points }}
-                    </q-td> -->
-                    <q-td dense auto-width key="credit" :props="props">{{
-                      props.row.credit
-                    }}</q-td>
-                    <q-td dense auto-width key="month" :props="props">{{
-                      props.row.month
-                    }}</q-td>
+                    </q-td>-->
+                    <q-td dense auto-width key="credit" :props="props">
+                      {{
+                        props.row.credit
+                      }}
+                    </q-td>
+                    <q-td dense auto-width key="month" :props="props">
+                      {{
+                        props.row.month
+                      }}
+                    </q-td>
                   </q-tr>
                 </template>
               </q-table>
@@ -191,16 +171,14 @@
                 v-if="datacollection.datasets"
                 flat
               >
-                <q-expansion-item
-                  v-model="fullFormsExpanded"
-                  label="sub full forms"
-                >
+                <q-expansion-item v-model="fullFormsExpanded" label="sub full forms">
                   <div v-for="(row, index) in fullFormsArr" :key="index">
-                    <span class="text-h6"> {{ row.shortForm }}</span
-                    >: <span class="text-caption">{{ row.fullForm }}</span>
+                    <span class="text-h6">{{ row.shortForm }}</span>:
+                    <span class="text-caption">{{ row.fullForm }}</span>
                     <q-separator />
-                  </div> </q-expansion-item
-              ></q-card>
+                  </div>
+                </q-expansion-item>
+              </q-card>
             </div>
             <Tip
               title="Tip 2"
@@ -233,28 +211,16 @@
                 :style="$q.dark.isActive ? 'color:white' : ''"
               />
             </q-tabs>
-            <q-tab-panels
-              v-model="chartName"
-              animated
-              class="q-mb-xl shadow-2 rounded"
-            >
+            <q-tab-panels v-model="chartName" animated class="q-mb-xl shadow-2 rounded">
               <q-tab-panel name="radar" class="rounded">
-                <RadarChart
-                  :chart-data="datacollection"
-                  :key="$q.dark.isActive"
-                />
-                <div
-                  class="text-right  text-grey-6"
-                  v-if="zeroCredSubs.length > 0"
-                >
+                <RadarChart :chart-data="datacollection" :key="$q.dark.isActive" />
+                <div class="text-right text-grey-6" v-if="zeroCredSubs.length > 0">
                   *Note not including zero cred subs.
                   <div
                     v-for="(sub, index) in zeroCredSubs"
                     :key="index"
                     class="q-px-md text-right text-white"
-                  >
-                    {{ sub }}
-                  </div>
+                  >{{ sub }}</div>
                 </div>
               </q-tab-panel>
 
@@ -267,26 +233,18 @@
               </q-tab-panel>
 
               <q-tab-panel name="bar">
-                <BarChart
-                  :chart-data="datacollection"
-                  :key="$q.dark.isActive"
-                />
-              </q-tab-panel>
-              sdfdsfsdfasdf
+                <BarChart :chart-data="datacollection" :key="$q.dark.isActive" />
+              </q-tab-panel>sdfdsfsdfasdf
             </q-tab-panels>
           </div>
-          <div
-            v-else
-            class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl"
-          >
+          <div v-else class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl">
             <q-intersection>
               <q-img
                 width="400px"
                 src="../assets/sad-emoji.gif"
                 style="filter: drop-shadow(0px 0px 4px yellow);"
               />
-            </q-intersection>
-            Looks so empty here
+            </q-intersection>Looks so empty here
           </div>
         </div>
       </div>
@@ -323,10 +281,11 @@ export default {
     return {
       datacollection: {},
       canSearch: false,
+      studentName: "",
       rollNo: "19fh1a0546",
+      viewCount: 0,
       selection: {},
       sem: "1",
-      studentName: "",
       chartName: "radar",
       zeroCredSubs: [],
       columns: [
@@ -391,16 +350,14 @@ export default {
   },
   computed: {
     submitBtnStyle() {
-      return `${
-        this.canSearch
-          ? "width:fit-content; filter: drop-shadow(0 0 0.5rem #ff4d01)"
-          : ""
-      }`;
+      return `${this.canSearch
+        ? "width:fit-content; filter: drop-shadow(0 0 0.5rem #ff4d01)"
+        : ""
+        }`;
     },
     knobStyle() {
-      return `filter: drop-shadow(0 0 0.5rem ${
-        this.studentSGPA > 0 ? "green" : "red"
-      });`;
+      return `filter: drop-shadow(0 0 0.5rem ${this.studentSGPA > 0 ? "green" : "red"
+        });`;
     }
   },
   mounted() {
@@ -562,103 +519,104 @@ export default {
       var subjectNames = [];
       var subjectsGrades = [];
       this.rowData = [];
-      (this.zeroCredSubs = []),
-        axios
-          .get(
-            apiRoutes.singleResultv2 +
-              "/" +
-              this.rollNo +
-              "/" +
-              this.selectionInput.reg +
-              "/" +
-              this.selectionInput.course +
-              "/" +
-              this.selectionInput.year +
-              "/" +
-              this.selectionInput.sem
-          )
-          .then(res => {
-            if (res.data) {
-              this.$q.notify({
-                type: "positive",
-                message: `Result retrieved`
-              });
-              console.log(res.data);
-              console.log("Best Attempt = ");
-              // console.log(getBestAttempts(res.data.attempts));
-              const bestAttempts = getBestAttempts(res.data.attempts);
-              console.log(bestAttempts);
-
-              //calc total attempts
-              this.totalAttempts = 0;
-              res.data.attempts.forEach(attempt => {
-                if (Object.keys(attempt).length > 0) this.totalAttempts++;
-              });
-              console.log("attempts count", this.totalAttempts);
-              this.fullFormsArr = [];
-              bestAttempts.forEach(sub => {
-                //push to full forms array
-                this.fullFormsArr.push({
-                  shortForm: getShort(sub["Subject Name"]),
-                  fullForm: sub["Subject Name"]
-                });
-                //push to subject names rowData array
-                this.rowData.push({
-                  subject_name: getShort(sub["Subject Name"]),
-                  status: sub["Result Status"] == "P" ? "✔" : "❌",
-                  grade: sub["Grade"] + " (" + this.G2GP[sub["Grade"]] + ")",
-                  internals: sub["Internals"],
-                  externals: sub["Externals"],
-                  total: sub["Total Marks"],
-                  credit: sub["Credits"],
-                  month: sub["month"]
-                });
-
-                //dont plot the subjects having 0 credits
-                if (sub["Grade"].toUpperCase() != "Y") {
-                  subjectNames.push(
-                    `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
-                  );
-                  subjectsGrades.push(this.G2GP[sub["Grade"]]);
-                } else {
-                  this.zeroCredSubs.push(sub["Subject Name"]);
-                }
-              });
-              this.studentName = res.data["name"];
-              this.studentSGPA = Number.parseFloat(res.data.sgpa);
-            }
-          })
-          .then(() => {
-            //scroll bottom
-            // window.scrollTo(0, document.body.scrollHeight);
-            this.$refs.scrollArea.setScrollPosition(350, 200);
-          })
-          .catch(error => {
-            console.log(error);
-            this.resultNotFoundDialog = true;
-
-            this.datacollection.datasets = [];
+      this.zeroCredSubs = [];
+      axios.get(
+        apiRoutes.singleResultv2 +
+        "/" +
+        this.rollNo +
+        "/" +
+        this.selectionInput.reg +
+        "/" +
+        this.selectionInput.course +
+        "/" +
+        this.selectionInput.year +
+        "/" +
+        this.selectionInput.sem
+      )
+        .then(res => {
+          this.viewCount = res.data.viewCount
+          // console.log(res.data.viewCount);
+          if (res.data) {
             this.$q.notify({
-              type: "negative",
-              message: `Result not found`
+              type: "positive",
+              message: `Result retrieved`
             });
-            this.studentName = "N/A";
-            this.studentSGPA = 0;
-          })
-          .finally(() => {
-            this.datacollection = {
-              labels: subjectNames,
-              datasets: [
-                {
-                  label: this.studentName,
-                  data: subjectsGrades,
-                  backgroundColor: backgroundColors[1],
-                  borderColor: borderColors[1],
-                  borderWidth: 1
-                }
-              ]
-            };
+            console.log(res.data);
+            console.log("Best Attempt = ");
+            // console.log(getBestAttempts(res.data.attempts));
+            const bestAttempts = getBestAttempts(res.data.attempts);
+            console.log(bestAttempts);
+
+            //calc total attempts
+            this.totalAttempts = 0;
+            res.data.attempts.forEach(attempt => {
+              if (Object.keys(attempt).length > 0) this.totalAttempts++;
+            });
+            console.log("attempts count", this.totalAttempts);
+            this.fullFormsArr = [];
+            bestAttempts.forEach(sub => {
+              //push to full forms array
+              this.fullFormsArr.push({
+                shortForm: getShort(sub["Subject Name"]),
+                fullForm: sub["Subject Name"]
+              });
+              //push to subject names rowData array
+              this.rowData.push({
+                subject_name: getShort(sub["Subject Name"]),
+                status: sub["Result Status"] == "P" ? "✔" : "❌",
+                grade: sub["Grade"] + " (" + this.G2GP[sub["Grade"]] + ")",
+                internals: sub["Internals"],
+                externals: sub["Externals"],
+                total: sub["Total Marks"],
+                credit: sub["Credits"],
+                month: sub["month"]
+              });
+
+              //dont plot the subjects having 0 credits
+              if (sub["Grade"].toUpperCase() != "Y") {
+                subjectNames.push(
+                  `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
+                );
+                subjectsGrades.push(this.G2GP[sub["Grade"]]);
+              } else {
+                this.zeroCredSubs.push(sub["Subject Name"]);
+              }
+            });
+            this.studentName = res.data["name"];
+            this.studentSGPA = Number.parseFloat(res.data.sgpa);
+          }
+        })
+        .then(() => {
+          //scroll bottom
+          // window.scrollTo(0, document.body.scrollHeight);
+          this.$refs.scrollArea.setScrollPosition(350, 200);
+        })
+        .catch(error => {
+          console.log(error);
+          this.resultNotFoundDialog = true;
+
+          this.datacollection.datasets = [];
+          this.$q.notify({
+            type: "negative",
+            message: `Result not found`
           });
+          this.studentName = "N/A";
+          this.studentSGPA = 0;
+        })
+        .finally(() => {
+          this.datacollection = {
+            labels: subjectNames,
+            datasets: [
+              {
+                label: this.studentName,
+                data: subjectsGrades,
+                backgroundColor: backgroundColors[1],
+                borderColor: borderColors[1],
+                borderWidth: 1
+              }
+            ]
+          };
+        });
     }
   }
 };
