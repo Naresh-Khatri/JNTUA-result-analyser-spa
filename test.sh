@@ -1,5 +1,5 @@
 #!/bin/bash
-
+export NODE_OPTIONS=--openssl-legacy-provider
 echo script started
 quasar build
 cd dist/spa/
@@ -14,4 +14,3 @@ git status
 git commit -m 'Add page to router'
 #git pull origin gh-pages --allow-unrelated-histories
 git push origin gh-pages --force
-

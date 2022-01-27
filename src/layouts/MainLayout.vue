@@ -239,7 +239,7 @@ export default {
     });
     this.$q.addressbarColor.set("#ff4d01");
     this.$q.dark.toggle();
-    if (window.location.href.includes("8080")) {
+    if (!window.location.href.includes("8080")) {
       //patch logs
       this.$q.dialog({
         //   title: "New Features! 👩‍🔧",

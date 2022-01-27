@@ -352,16 +352,16 @@ export default {
     };
   },
   mounted() {
-    this.$q.dialog({
-      title: "Section Currently disabled😢😭",
-      html: true,
-      persistent: true,
-      message: `This feature is disabled due to a bug . Please check back later!`,
-    })
-      .onOk(() => {
-        this.$router.push("/");
-      })
-    return
+    // this.$q.dialog({
+    //   title: "Section Currently disabled😢😭",
+    //   html: true,
+    //   persistent: true,
+    //   message: `This feature is disabled due to a bug . Please check back later!`,
+    // })
+    //   .onOk(() => {
+    //     this.$router.push("/");
+    //   })
+    // return
     // this.resultID = "56736469";
     // this.canSearch = true;
     this.checkQueries();
