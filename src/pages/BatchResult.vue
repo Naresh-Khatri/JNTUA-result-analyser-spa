@@ -8,24 +8,16 @@
              backdrop-filter: blur(2.5px);
              cursor: pointer; "
     >
-      <transition
-        appear
-        enter-active-class="animated fadeIn"
-        leave-active-class="animated fadeOut"
-      >
+      <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
         <q-img class="loading-img" src="../assets/loading-head.gif">
-          <div class="absolute-bottom-right text-subtitle2 flex flex-center">
-            This takes around 10 second...🙋‍♀️
-          </div>
+          <div
+            class="absolute-bottom-right text-subtitle2 flex flex-center"
+          >This takes around 10 second...🙋‍♀️</div>
         </q-img>
       </transition>
     </div>
     <div class="wrapper">
-      <StudentInput
-        class="result-input"
-        v-model="selection"
-        @success="setSelection($event)"
-      />
+      <StudentInput class="result-input" v-model="selection" @success="setSelection($event)" />
       <div
         class="roll-input flex column rounded q-pa-md"
         :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -42,17 +34,16 @@
           label="Roll no prefix"
           clearable
         >
-          <template v-slot:hint>
-            Example: 19fh1a05
-          </template></q-input
-        >
+          <template v-slot:hint>Example: 19fh1a05</template>
+        </q-input>
         <div class="q-pa-md">
           <q-range v-model="range" :min="1" :max="350" drag-range />
           <q-badge color="secondary" class="q-mb-lg text-subtitle2">
             Selected : {{ rollPrefix }}
-            <span class="text-h5">{{ rollWithPrefix(range.min) }} </span> -
+            <span class="text-h5">{{ rollWithPrefix(range.min) }}</span>
+            -
             {{ rollPrefix }}
-            <span class="text-h5">{{ rollWithPrefix(range.max) }} </span>
+            <span class="text-h5">{{ rollWithPrefix(range.max) }}</span>
           </q-badge>
         </div>
         <q-expansion-item
@@ -111,16 +102,12 @@
           >
             Submit
             <template v-slot:loading>
-              <q-spinner-gears class="on-left" />
-              Fetching...
+              <q-spinner-gears class="on-left" />Fetching...
             </template>
           </q-btn>
         </div>
       </div>
-      <div
-        class="data-container"
-        v-if="Object.keys(sgpaDataCollection).length > 0"
-      >
+      <div class="data-container" v-if="Object.keys(sgpaDataCollection).length > 0">
         <!-- <div class="flex flex-center q-mt-lg">
           <q-btn-group
             ><q-btn
@@ -138,29 +125,26 @@
               @click="changeSem(2)"
             />
           </q-btn-group>
-    </div> -->
+        </div>-->
 
         <q-card class="sgpa-container q-pa-md rounded glass" flat>
           <div class="flex flex-center q-px-sm">
             <div class="col">
-              <div
-                class=" text-center"
-                style="font-size:1.3em; font-weight:4000"
-              >
+              <div class="text-center" style="font-size:1.3em; font-weight:4000">
                 Toppers 😒
                 <q-separator class="q-my-md" spaced="true" />
 
-                <i class="fas fa-crown" style="color:gold"> </i>
+                <i class="fas fa-crown" style="color:gold"></i>
                 {{ sgpaDataCollection.labels[0].slice(0, -7) }}(
                 {{ sgpaDataCollection.datasets[0].data[0] }}
                 )
                 <br />
-                <i class="fas fa-crown" style="color:silver"> </i>
+                <i class="fas fa-crown" style="color:silver"></i>
                 {{ sgpaDataCollection.labels[1].slice(0, -7) }}(
                 {{ sgpaDataCollection.datasets[0].data[1] }}
                 )
                 <br />
-                <i class="fas fa-crown" style="color:brown"> </i>
+                <i class="fas fa-crown" style="color:brown"></i>
                 {{ sgpaDataCollection.labels[2].slice(0, -7) }}(
                 {{ sgpaDataCollection.datasets[0].data[2] }}
                 )
@@ -177,16 +161,11 @@
                     track-color="grey-3"
                     class=" q-ma-md"
                   ></q-knob>
-                </div> -->
+            </div>-->
           </div>
         </q-card>
         <div style="display:flex; justify-content:center">
-          <q-btn
-            class="text-white"
-            label="Share"
-            style="background:#25D366"
-            @click="share"
-          >
+          <q-btn class="text-white" label="Share" style="background:#25D366" @click="share">
             <img width="50px" src="../assets/whatsapp.svg" />
           </q-btn>
         </div>
@@ -286,10 +265,7 @@
             </q-tab-panel>
           </q-tab-panels>
         </div>
-        <Tip
-          title="Important"
-          desc="Students who are failed even in 1 subject wont be plotted!"
-        />
+        <Tip title="Important" desc="Students who are failed even in 1 subject wont be plotted!" />
         <q-card class="sgpa-container q-pa-md rounded glass" flat>
           <div class="q-px-sm">
             <div class="text-h5 text-center">
@@ -313,24 +289,19 @@
                   @click="downloadSheet('sub')"
                   style="background:#25D366"
                 />
-              </div> -->
+              </div>-->
             </div>
           </div>
         </q-card>
       </div>
-      <div
-        v-else
-        class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl"
-      >
+      <div v-else class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl">
         <q-intersection>
           <q-img
             width="400px"
             src="../assets/sad-emoji.gif"
             style="filter: drop-shadow(0px 0px 6px yellow);"
           />
-        </q-intersection>
-
-        Looks so empty here
+        </q-intersection>Looks so empty here
       </div>
     </div>
     <Footer />
@@ -381,6 +352,16 @@ export default {
     };
   },
   mounted() {
+    this.$q.dialog({
+      title: "Section Currently disabled😢😭",
+      html: true,
+      persistent: true,
+      message: `This feature is disabled due to a bug . Please check back later!`,
+    })
+      .onOk(() => {
+        this.$router.push("/");
+      })
+    return
     // this.resultID = "56736469";
     // this.canSearch = true;
     this.checkQueries();
@@ -527,26 +508,25 @@ export default {
         studentNames.push(
           `${studentsResults[i]["name"]}(${studentsResults[i]["htn"].slice(
             -2
-          )}) #${
-            this.G2GP[
-              studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
-            ] > 0
-              ? rank
-              : "na"
+          )}) #${this.G2GP[
+            studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
+          ] > 0
+            ? rank
+            : "na"
           }`
         );
         studentSubGrade.push(
           this.G2GP[
-            studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
+          studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
           ]
         );
         if (studentsResults[i + 1])
           if (
             this.G2GP[
-              studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
+            studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
             ] !=
             this.G2GP[
-              studentsResults[i + 1].bestAttempt[subIndex].Grade.toUpperCase()
+            studentsResults[i + 1].bestAttempt[subIndex].Grade.toUpperCase()
             ]
           )
             rank++;
@@ -570,20 +550,20 @@ export default {
       axios
         .get(
           apiRoutes.batchResultsv2 +
-            "/" +
-            this.rollPrefix +
-            "/" +
-            this.range.min +
-            "/" +
-            this.range.max +
-            "/" +
-            this.selectionInput.reg +
-            "/" +
-            this.selectionInput.course +
-            "/" +
-            this.selectionInput.year +
-            "/" +
-            this.selectionInput.sem
+          "/" +
+          this.rollPrefix +
+          "/" +
+          this.range.min +
+          "/" +
+          this.range.max +
+          "/" +
+          this.selectionInput.reg +
+          "/" +
+          this.selectionInput.course +
+          "/" +
+          this.selectionInput.year +
+          "/" +
+          this.selectionInput.sem
         )
         .then(res => {
           this.loading = false;
@@ -608,8 +588,7 @@ export default {
             studentNames.push(
               `${this.studentsResultsArr[i]["name"]} (${this.studentsResultsArr[
                 i
-              ]["htn"].slice(-2)}) #${
-                this.studentsResultsArr[i].sgpa > 0 ? rank : "na"
+              ]["htn"].slice(-2)}) #${this.studentsResultsArr[i].sgpa > 0 ? rank : "na"
               }`
             );
             studentSGPAs.push(this.studentsResultsArr[i].sgpa);

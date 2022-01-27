@@ -1,13 +1,17 @@
 <template>
   <q-dialog v-model="confirm" ref="dialog">
-    <q-card >
+    <q-card>
       <q-card-section>
-        <!-- <div class="text-h6">New Features! 👩‍🔧</div> -->
+        <div class="text-h6">Updates!👩‍🔧</div>
       </q-card-section>
       <q-card-section class="flex flex-center ro w column justify-center">
-        <h4 style="margin-bottom:5px; margin:0px 20px">Happy New Year!</h4>
+        <!-- <h4 style="margin-bottom:5px; margin:0px 20px">Happy New Year!</h4>
         <h3 style="margin-bottom:5px">2022</h3>
-        <h2 style="margin-bottom:5px">🎉🙌</h2>
+        <h2 style="margin-bottom:5px">🎉🙌</h2>-->
+        <li style="font-size:1.2em">📑BTech/BPharmacy 1-2 ( R20, R19) results are out!</li>
+        <li style="font-size:1.2em">
+          😥Batch results section is currectly disabled!
+        </li>
         <!-- < -->
         <!-- <li style="font-size:1.2em"> -->
         <!-- 👩‍🏫 Faculty can now download batch result in <strong>EXCEL</strong> format. -->
@@ -18,13 +22,13 @@
           height="300"
           src="https://i.imgur.com/hhg6Th1.png"
           alt=""
-        /> -->
+        />-->
         <!-- <li style="font-size:1.2em"> -->
         <!-- ⛄Not a major update but do you like this snowfall? ❄ 👀 -->
         <!-- </li> -->
         <br />
         <!-- If you want this app to get better then head over to the feedback
-        section on top 🙋‍♀️ -->
+        section on top 🙋‍♀️-->
       </q-card-section>
 
       <q-card-actions align="right" class="q-ma-sm">
@@ -34,7 +38,7 @@
         </q-btn>
         <!-- <div to="/compare-result">
           <q-btn flat label="Check now!" color="primary" />
-        </div> -->
+        </div>-->
         <q-btn flat label="OK" color="primary" @click="confirm = false" />
       </q-card-actions>
     </q-card>

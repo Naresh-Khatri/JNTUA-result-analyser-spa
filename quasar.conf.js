@@ -96,7 +96,7 @@ module.exports = function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Notify', 'AddressbarColor', 'LoadingBar', ],
+      plugins: ['Notify','Dialog', 'AddressbarColor', 'LoadingBar', ],
       config: {
         loadingBar: { /* look at QuasarConfOptions from the API card */ }
       }
