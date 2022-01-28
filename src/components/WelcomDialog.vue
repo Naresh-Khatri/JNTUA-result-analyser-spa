@@ -10,10 +10,10 @@
         <h2 style="margin-bottom:5px">🎉🙌</h2>-->
         <li style="font-size:1.2em">📑BTech/BPharmacy 1-2 ( R20, R19) results are out!</li>
 
-        <!-- <li style="font-size:1.2em">
-          😥Batch results section is currectly disabled!
-        </li> -->
-        
+        <li style="font-size:1.2em">
+          Batch results is back again! 😎
+        </li>
+
         <!-- < -->
         <!-- <li style="font-size:1.2em"> -->
         <!-- 👩‍🏫 Faculty can now download batch result in <strong>EXCEL</strong> format. -->
