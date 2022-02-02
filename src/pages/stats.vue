@@ -8,9 +8,7 @@
           style="width: 60%;"
         >
           <div class="col-8">
-            <div class="text-h4 text-center">
-              {{ animatedNumber }}
-            </div>
+            <div class="text-h4 text-center">{{ animatedNumber }}</div>
           </div>
           <div class="col-4">
             <span class="row text-caption">total</span>
@@ -23,23 +21,21 @@
         :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
         v-if="topColleges.length"
       >
-        <div class="text-h4 q-mt-lg q-ml-lg">
-          🏆Leaderboards
-        </div>
+        <div class="text-h4 q-mt-lg q-ml-lg">🏆Leaderboards</div>
         <div class="text-body1 q-ma-md">
-          <i class="fas fa-crown" style="color:gold"> </i>
+          <i class="fas fa-crown" style="color:gold"></i>
           {{ topColleges[0].collegeCode }} - {{ topColleges[0].collegeName }}({{
             topColleges[0].district
           }})
         </div>
         <div class="text-body1 q-ma-md">
-          <i class="fas fa-crown" style="color:silver"> </i>
+          <i class="fas fa-crown" style="color:silver"></i>
           {{ topColleges[1].collegeCode }} - {{ topColleges[1].collegeName }}({{
             topColleges[1].district
           }})
         </div>
         <div class="text-body1 q-ma-md">
-          <i class="fas fa-crown" style="color:brown"> </i>
+          <i class="fas fa-crown" style="color:brown"></i>
           {{ topColleges[2].collegeCode }} - {{ topColleges[2].collegeName }}({{
             topColleges[2].district
           }})
@@ -51,17 +47,9 @@
       class="q-my-md q-py-md rounded pie-container"
       :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
     >
-      <div class="text-center text-h6 q-ma-md">
-        College code (Searches count)
-      </div>
-      <PieChart
-        style="height:600px"
-        :chart-data="pieDataCollection"
-        :key="$q.dark.isActive"
-      />
-      <div class="q-pa-md text-right text-grey-6">
-        *Note: Only top 30 colleges are shown
-      </div>
+      <div class="text-center text-h6 q-ma-md">College code (Searches count)</div>
+      <PieChart style="height:600px" :chart-data="pieDataCollection" :key="$q.dark.isActive" />
+      <div class="q-pa-md text-right text-grey-6">*Note: Only top 30 colleges are shown</div>
     </div>
     <div
       class="flex column rounded q-pa-md q-my-md searches-container"
@@ -83,7 +71,7 @@
         :style="!$q.screen.lt.md ? 'height:400px' : ''"
       >
         <LineChart
-          style="width:1300px"
+          :style="`width:${20 * lineDataCollection.labels.length}px`"
           :chart-data="lineDataCollection"
           :key="$q.dark.isActive"
         />
@@ -199,6 +187,7 @@ export default {
           this.lineDataCollection.labels.push(item["date"].slice(5, 10));
           this.lineDataCollection.datasets[0].data.push(item["searchCount"]);
         });
+        console.log(this.lineDataCollection)
         // arr.map(item => {
         //   this.lineDataCollection.labels.push(item[0]);
         //   this.lineDataCollection.datasets[0].data.push(item[1]);
@@ -232,10 +221,10 @@ export default {
 
 <style>
 @media screen and (min-width: 1000px) {
-  .container{
+  .container {
   }
-  .container > div{
-    width: 1000px
+  .container > div {
+    width: 1000px;
   }
   .leaderboards {
     display: flex;
@@ -251,10 +240,10 @@ export default {
     height: 85%;
   }
 }
-.pie-container{
+.pie-container {
   width: 100%;
 }
-.searches-container{
+.searches-container {
   width: 100%;
 }
 
