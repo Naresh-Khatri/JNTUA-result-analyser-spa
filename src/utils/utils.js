@@ -16,8 +16,9 @@ function getShort(str) {
       //dont include 'O' in case of 'of'
       else if (strSplit[i].toLowerCase() == 'of') continue
       else {
-        //get first uppercase letter then append to short
-        if (!strSplit[i][0].match(/^[^A-Z]*$/g)) {
+        // check if present and get first uppercase 
+        // letter then append to short
+        if (!!strSplit[i][0] && !strSplit[i][0].match(/^[^A-Z]*$/g)) {
           //add Lab in short name when necessary
           if (strSplit[i].toLowerCase().includes('lab') && strSplit[i].length > 2)
             short += ' Lab'
