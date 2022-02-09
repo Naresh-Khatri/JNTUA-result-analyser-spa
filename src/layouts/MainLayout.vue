@@ -10,9 +10,9 @@
             enter-active-class="animated tada"
             leave-active-class="animated fadeOut"
           >
-            <q-btn dense flat round @click="left = !left">
+            <q-btn dense flat round icon="menu" @click="left = !left" size="xl">
               <!-- icon="../assets/candy_cane.png" -->
-              <img style="transform:rotateY(180deg);" src="../assets/candy_cane.png" width="20" />
+              <!-- <img style="transform:rotateY(180deg);" src="../assets/candy_cane.png" width="20" /> -->
             </q-btn>
           </transition>
           <q-space />
