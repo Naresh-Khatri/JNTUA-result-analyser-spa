@@ -290,7 +290,7 @@ export default {
     return {
       datacollection: {},
       canSearch: false,
-      rollNo: "19fh1a0546",
+      rollNo: "18fh1a0525",
       selection: {},
       releasedResults: {},
       studentName: "",
@@ -562,6 +562,7 @@ export default {
           );
         });
       });
+      console.log(promises)
       Promise.all(promises).then(res => {
         console.log(res);
         this.resultsList = [];
@@ -601,64 +602,8 @@ export default {
         }
         console.log(this.resultsList);
         this.setSemIndex(0);
-      });
-      //       console.log(res.data);
-      //       console.log("Best Attempt = ");
-      //       // console.log(getBestAttempts(res.data.attempts));
-      //       const bestAttempts = getBestAttempts(res.data.attempts);
-      //       console.log(bestAttempts);
-
-      //       bestAttempts.forEach(sub => {
-      //         this.rowData.push({
-      //           subject_name: getShort(sub["Subject Name"]),
-      //           status: sub["Result Status"] == "P" ? "✔" : "❌",
-      //           grade: sub["Grade"] + " (" + this.g_to_gp[sub["Grade"]] + ")",
-      //           internals: sub["Internals"],
-      //           externals: sub["Externals"],
-      //           total: sub["Total Marks"],
-      //           credit: sub["Credits"],
-      //           month: sub["month"]
-      //         });
-      //         subjectNames.push(
-      //           `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
-      //         );
-      //         subjectGrade.push(this.g_to_gp[sub["Grade"]]);
-      //       });
-      //       this.studentName = res.data["name"];
-      //       this.studentSGPA = Number.parseFloat(res.data.sgpa);
-      //     }
-      //   })
-      //   .then(() => {
-      //     //scroll bottom
-      //     window.scrollTo(0, document.body.scrollHeight + 100);
-      //     this.$refs.scrollArea.setScrollPosition(375, 200);
-      //   })
-      //   .catch(error => {
-      //     console.log(error);
-      //     this.resultNotFoundDialog = true;
-
-      //     this.datacollection.datasets = [];
-      //     this.$q.notify({
-      //       type: "negative",
-      //       message: `Result not found`
-      //     });
-      //     this.studentName = "N/A";
-      //     this.studentSGPA = 0;
-      //   })
-      //   .finally(() => {
-      //   this.datacollection = {
-      //     labels: subjectNames,
-      //     datasets: [
-      //       {
-      //         label: this.studentName,
-      //         data: subjectGrade,
-      //         backgroundColor: backgroundColors[1],
-      //         borderColor: borderColors[1],
-      //         borderWidth: 1
-      //       }
-      //     ]
-      //   };
-      // });
+      })
+      .catch(err=>console.log(err))
     },
     setSemIndex(semIndex) {
       this.selectedSemIndex = semIndex;
