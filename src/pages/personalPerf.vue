@@ -56,15 +56,11 @@
               />
             </div>
           </div>
-          <q-card
-          v-if="resultsList.length"
-           class="relative q-mx-xl q-my-md q-pa-lg rounded" flat>
-            <div class="text-h5 text-center">
-              {{ studentName }}
-            </div>
+          <q-card v-if="resultsList.length" class="relative q-mx-xl q-my-md q-pa-lg rounded" flat>
+            <div class="text-h5 text-center">{{ studentName }}</div>
             <!-- <div class="text-center text-caption">
               backlogs: {{ totalBacklogs }}
-            </div> -->
+            </div>-->
             <div
               v-if="isDetained"
               class="flex flex-center"
@@ -103,14 +99,11 @@
                   <img width="50px" src="../assets/whatsapp.svg" />
                 </q-btn>
               </div>
-            </transition> -->
+            </transition>-->
           </div>
           <div class="data-container q-mb-xl" v-if="datacollection.datasets">
             <div>
-              <Tip
-                title="Tip 1"
-                desc="Click on the column name to sort the rows accordingly"
-              />
+              <Tip title="Tip 1" desc="Click on the column name to sort the rows accordingly" />
 
               <q-table
                 title="Result Table"
@@ -124,9 +117,12 @@
               >
                 <template v-slot:body="props">
                   <q-tr :props="props" style="width:10px">
-                    <q-td dense auto-width key="subject_name" :props="props">
-                      {{ props.row.subject_name }}
-                    </q-td>
+                    <q-td
+                      dense
+                      auto-width
+                      key="subject_name"
+                      :props="props"
+                    >{{ props.row.subject_name }}</q-td>
                     <q-td dense auto-width key="status" :props="props">
                       <q-chip
                         dense
@@ -136,38 +132,31 @@
                           props.row.status == '✔' ? 'positive' : 'negative'
                         "
                         class="text-white q-pa-xm"
-                        >{{ props.row.status }}</q-chip
-                      >
+                      >{{ props.row.status }}</q-chip>
                     </q-td>
 
-                    <q-td
-                      dense
-                      auto-width
-                      style="padding:0px"
-                      key="marks"
-                      :props="props"
-                    >
+                    <q-td dense auto-width style="padding:0px" key="marks" :props="props">
                       <!-- 25 + 50 = 75 -->
-                      <div v-if="!props.row.total" style="font-size:22px;">
-                        🤷‍♀️
-                      </div>
+                      <div v-if="!props.row.total" style="font-size:22px;">🤷‍♀️</div>
                       <div v-else>
                         {{ props.row.total }} ({{ props.row.externals }} +
                         {{ props.row.internals }})
                       </div>
                     </q-td>
-                    <q-td dense auto-width key="grade" :props="props">
-                      {{ props.row.grade }}
-                    </q-td>
+                    <q-td dense auto-width key="grade" :props="props">{{ props.row.grade }}</q-td>
                     <!-- <q-td dense auto-width key="points" :props="props">
                       {{ props.row.points }}
-                    </q-td> -->
-                    <q-td dense auto-width key="credit" :props="props">{{
-                      props.row.credit
-                    }}</q-td>
-                    <q-td dense auto-width key="month" :props="props">{{
-                      props.row.month
-                    }}</q-td>
+                    </q-td>-->
+                    <q-td dense auto-width key="credit" :props="props">
+                      {{
+                        props.row.credit
+                      }}
+                    </q-td>
+                    <q-td dense auto-width key="month" :props="props">
+                      {{
+                        props.row.month
+                      }}
+                    </q-td>
                   </q-tr>
                 </template>
               </q-table>
@@ -203,28 +192,16 @@
                 :style="$q.dark.isActive ? 'color:white' : ''"
               />
             </q-tabs>
-            <q-tab-panels
-              v-model="chartName"
-              animated
-              class="q-mb-xl shadow-2 rounded"
-            >
+            <q-tab-panels v-model="chartName" animated class="q-mb-xl shadow-2 rounded">
               <q-tab-panel name="radar" class="rounded">
-                <RadarChart
-                  :chart-data="datacollection"
-                  :key="$q.dark.isActive"
-                />
-                <div
-                  class="text-right  text-grey-6"
-                  v-if="zeroCredSubs.length > 0"
-                >
+                <RadarChart :chart-data="datacollection" :key="$q.dark.isActive" />
+                <div class="text-right text-grey-6" v-if="zeroCredSubs.length > 0">
                   *Note not including zero cred subs.
                   <div
                     v-for="(sub, index) in zeroCredSubs"
                     :key="index"
                     class="q-px-md text-right text-white"
-                  >
-                    {{ sub }}
-                  </div>
+                  >{{ sub }}</div>
                 </div>
               </q-tab-panel>
 
@@ -237,25 +214,18 @@
               </q-tab-panel>
 
               <q-tab-panel name="bar">
-                <BarChart
-                  :chart-data="datacollection"
-                  :key="$q.dark.isActive"
-                />
+                <BarChart :chart-data="datacollection" :key="$q.dark.isActive" />
               </q-tab-panel>
             </q-tab-panels>
           </div>
-          <div
-            v-else
-            class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl"
-          >
+          <div v-else class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl">
             <q-intersection>
               <q-img
                 width="400px"
                 src="../assets/sad-emoji.gif"
                 style="filter: drop-shadow(0px 0px 4px yellow);"
               />
-            </q-intersection>
-            Looks so empty here
+            </q-intersection>Looks so empty here
           </div>
         </div>
       </div>
@@ -545,19 +515,21 @@ export default {
       Object.keys(this.selectionInput.yearSemObj).forEach(year => {
         Object.keys(this.selectionInput.yearSemObj[year]).forEach(sem => {
           // console.log(year, sem);
+          //only add promise if sem isn't null
+          if (sem == 'null') return
           promises.push(
             axios.get(
               apiRoutes.singleResultv2 +
-                "/" +
-                this.rollNo +
-                "/" +
-                this.selectionInput.reg +
-                "/" +
-                this.selectionInput.course +
-                "/" +
-                year +
-                "/" +
-                sem
+              "/" +
+              this.rollNo +
+              "/" +
+              this.selectionInput.reg +
+              "/" +
+              this.selectionInput.course +
+              "/" +
+              year +
+              "/" +
+              sem
             )
           );
         });
@@ -576,7 +548,7 @@ export default {
         for (let i = 0; i < res.length; i++) {
           // console.log(result.data.attempts);
           if (res[i].data.attempts == undefined) {
-            this.isDetained = true;
+            // this.isDetained = true;
             continue;
           }
           this.studentName = res[i].data.name;
@@ -603,7 +575,7 @@ export default {
         console.log(this.resultsList);
         this.setSemIndex(0);
       })
-      .catch(err=>console.log(err))
+        .catch(err => console.log(err))
     },
     setSemIndex(semIndex) {
       this.selectedSemIndex = semIndex;
