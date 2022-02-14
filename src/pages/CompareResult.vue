@@ -2,15 +2,8 @@
   <div class="container">
     <!-- <q-scroll-area ref='scrollArea' style="height:90vh; width:100%"> -->
     <div class="wrapper">
-      <StudentInput
-        v-model="selection"
-        class="result-input"
-        @success="setSelection($event)"
-      />
-      <div
-        class="roll-input q-pa-lg rounded"
-        :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-      >
+      <StudentInput v-model="selection" class="result-input" @success="setSelection($event)" />
+      <div class="roll-input q-pa-lg rounded" :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'">
         <div v-for="(rollNo, index) in rollNoList" :key="index">
           <div class="flex flex-center">
             <q-input
@@ -36,14 +29,7 @@
           </div>
         </div>
         <div class="flex flex-center">
-          <q-btn
-            icon="add"
-            round
-            class="q-mt-sm"
-            color="primary"
-            size="md"
-            @click="addRoll"
-          />
+          <q-btn icon="add" round class="q-mt-sm" color="primary" size="md" @click="addRoll" />
         </div>
         <div class="flex flex-center">
           <q-btn
@@ -81,21 +67,14 @@
                 <div
                   class="text-grey"
                   style="max-width:150px;font-size:1.1em; word-break: break-word;"
-                >
-                  {{ student.name }}
-                </div>
+                >{{ student.name }}</div>
               </div>
             </div>
           </q-card>
         </div>
         <transition>
           <div style="display:flex; justify-content:center">
-            <q-btn
-              class="text-white"
-              label="Share"
-              style="background:#25D366"
-              @click="share"
-            >
+            <q-btn class="text-white" label="Share" style="background:#25D366" @click="share">
               <img width="50px" src="../assets/whatsapp.svg" />
             </q-btn>
           </div>
@@ -129,21 +108,21 @@
             label="Bar"
           />
         </q-tabs>
-        <q-tab-panels
-          v-model="chartName"
-          animated
-          class="q-mx-sm shadow-2 rounded"
-        >
+        <q-tab-panels v-model="chartName" animated class="q-mx-sm shadow-2 rounded">
           <q-tab-panel name="radar">
             <RadarChart :key="$q.dark.isActive" :chart-data="datacollection" />
+            <div class="text-right text-grey-6" v-if="zeroCredSubs.length > 0">
+              *Note not including zero cred subs.
+              <div
+                v-for="(sub, index) in zeroCredSubs"
+                :key="index"
+                class="q-px-md text-right text-white"
+              >{{ sub }}</div>
+            </div>
           </q-tab-panel>
 
           <q-tab-panel name="line" class="flex flex-center flex-row">
-            <LineChart
-              style="min-width:90%"
-              :key="$q.dark.isActive"
-              :chart-data="datacollection"
-            />
+            <LineChart style="min-width:90%" :key="$q.dark.isActive" :chart-data="datacollection" />
           </q-tab-panel>
 
           <q-tab-panel name="bar">
@@ -151,16 +130,12 @@
           </q-tab-panel>
         </q-tab-panels>
       </div>
-      <div
-        v-else
-        class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl"
-      >
+      <div v-else class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl">
         <q-img
           width="400px"
           src="../assets/sad-emoji.gif"
           style="filter: drop-shadow(0px 0px 6px yellow);"
-        />
-        Looks so empty here
+        />Looks so empty here
       </div>
     </div>
     <Footer />
@@ -201,6 +176,7 @@ export default {
       // resultID: "",
       studentNameList: [],
       datasets: [],
+      zeroCredSubs: [],
       shareText: "",
       chartName: "radar",
       subjectNames: [],
@@ -283,7 +259,7 @@ export default {
           .share({
             title: "Hey I compared our results on this cool webApp!",
             url:
-              window.location.origin + window.location.pathname+
+              window.location.origin + window.location.pathname +
               "#/compare-result?reg=" +
               this.selectionInput.reg +
               "&course=" +
@@ -316,6 +292,8 @@ export default {
       });
     },
     async fillData() {
+      this.zeroCredSubs = [];
+
       if (!this.canSearch) return;
       this.resetData();
       try {
@@ -323,16 +301,16 @@ export default {
           this.rollNoList.map(roll =>
             axios.get(
               apiRoutes.singleResultv2 +
-                "/" +
-                roll +
-                "/" +
-                this.selectionInput.reg +
-                "/" +
-                this.selectionInput.course +
-                "/" +
-                this.selectionInput.year +
-                "/" +
-                this.selectionInput.sem
+              "/" +
+              roll +
+              "/" +
+              this.selectionInput.reg +
+              "/" +
+              this.selectionInput.course +
+              "/" +
+              this.selectionInput.year +
+              "/" +
+              this.selectionInput.sem
             )
           )
         );
@@ -357,9 +335,8 @@ export default {
               gradePoints.push(this.G2GP[sub["Grade"]]);
             });
             //get last 2 chars of roll
-            let shortRoll = `(${res.data["htn"][res.data["htn"].length - 2]}${
-              res.data["htn"][res.data["htn"].length - 1]
-            })`;
+            let shortRoll = `(${res.data["htn"][res.data["htn"].length - 2]}${res.data["htn"][res.data["htn"].length - 1]
+              })`;
             this.studentNameList.push(res.data["name"]);
             this.studentsList.push({
               id: res.data["htn"],
@@ -479,5 +456,4 @@ export default {
 .rounded {
   border-radius: 20px;
 }
-
 </style>
