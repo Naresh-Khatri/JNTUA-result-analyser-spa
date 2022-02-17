@@ -49,7 +49,7 @@
     >
       <div class="text-center text-h6 q-ma-md">College code (Searches count)</div>
       <PieChart style="height:600px" :chart-data="pieDataCollection" :key="$q.dark.isActive" />
-      <div class="q-pa-md text-right text-grey-6">*Note: Only top 30 colleges are shown</div>
+      <div class="q-pa-md text-right text-grey-6">*Note: Only top 30 colleges out of {{collegesReached}} are shown</div>
     </div>
     <div
       class="flex column rounded q-pa-md q-my-md searches-container"
@@ -125,6 +125,7 @@ export default {
         ]
       },
       topColleges: [],
+      collegesReached: 0,
       totalSearches: 0,
       tweenedNumber: 0,
       timeout: null,
@@ -158,6 +159,8 @@ export default {
         // }, 500);
         this.topColleges = res.data.topColleges;
         this.totalSearches = res.data.totalSearches;
+        this.collegesReached = res.data.searches.length
+
         let counter = 0;
         // let arr = Object.entries(res.data.colleges);
         // arr.sort(([a, b], [c, d]) => d - b);
