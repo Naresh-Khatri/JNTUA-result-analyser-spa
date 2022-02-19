@@ -63,10 +63,13 @@
           </div>
           <div class="flex justify-center">
             <q-card
-              class="sgpa-container q-px-lg rounded glass"
+              class="sgpa-container q-px-lg rounded glass "
+              :style="studnetName.toupperCase() == 'NARESH'? 'bg-cyan-8':''"
               v-if="datacollection.datasets"
               flat
             >
+              {{studnetName == 'NARESH'}}
+
               <transition appear enter-active-class="animated bounceIn" mode="out-in">
                 <div class="flex flex-center q-px-sm" :key="studentName">
                   <div class="col">
