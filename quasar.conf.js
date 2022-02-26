@@ -6,9 +6,9 @@
 // Configuration for your app
 // https://v1.quasar.dev/quasar-cli/quasar-conf-js
 /* eslint-env node */
-const ESLintPlugin = require('eslint-webpack-plugin')
+const ESLintPlugin = require("eslint-webpack-plugin");
 
-module.exports = function (/* ctx */) {
+module.exports = function(/* ctx */) {
   return {
     // https://v1.quasar.dev/quasar-cli/supporting-ts
     supportTS: false,
@@ -19,34 +19,28 @@ module.exports = function (/* ctx */) {
     // app boot file (/src/boot)
     // --> boot files are part of "main.js"
     // https://v1.quasar.dev/quasar-cli/boot-files
-    boot: [
-
-      'axios',
-      'charts'
-    ],
+    boot: ["gmtPlugin", "axios", "charts"],
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
-    css: [
-      'app.scss'
-    ],
+    css: ["app.scss"],
 
     // https://github.com/quasarframework/quasar/tree/dev/extras
     extras: [
       // 'ionicons-v4',
       // 'mdi-v5',
-      'fontawesome-v5',
+      "fontawesome-v5",
       // 'eva-icons',
       // 'themify',
       // 'line-awesome',
       // 'roboto-font-latin-ext', // this or either 'roboto-font', NEVER both!
 
-      'roboto-font', // optional, you are not bound to it
-      'material-icons', // optional, you are not bound to it
+      "roboto-font", // optional, you are not bound to it
+      "material-icons" // optional, you are not bound to it
     ],
 
     // Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-build
     build: {
-      vueRouterMode: 'hash', // available values: 'hash', 'history'
+      vueRouterMode: "hash", // available values: 'hash', 'history'
 
       // transpile: false,
 
@@ -67,9 +61,10 @@ module.exports = function (/* ctx */) {
       // https://v1.quasar.dev/quasar-cli/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
       chainWebpack(chain) {
-        chain.plugin('eslint-webpack-plugin')
-          .use(ESLintPlugin, [{ extensions: ['js', 'vue'] }])
-      },
+        chain
+          .plugin("eslint-webpack-plugin")
+          .use(ESLintPlugin, [{ extensions: ["js", "vue"] }]);
+      }
     },
 
     // Full list of options: https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-devServer
@@ -81,12 +76,12 @@ module.exports = function (/* ctx */) {
 
     // https://v1.quasar.dev/quasar-cli/quasar-conf-js#Property%3A-framework
     framework: {
-      iconSet: 'material-icons', // Quasar icon set
-      lang: 'en-us', // Quasar language pack
+      iconSet: "material-icons", // Quasar icon set
+      lang: "en-us", // Quasar language pack
       // Possible values for "importStrategy":
       // * 'auto' - (DEFAULT) Auto-import needed Quasar components & directives
       // * 'all'  - Manually specify what to import
-      importStrategy: 'auto',
+      importStrategy: "auto",
 
       // For special cases outside of where "auto" importStrategy can have an impact
       // (like functional components as one of the examples),
@@ -96,24 +91,31 @@ module.exports = function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ['Notify','Dialog', 'AddressbarColor', 'LoadingBar', ],
+      plugins: [
+        "Notify",
+        "Dialog",
+        "AddressbarColor",
+        "LoadingBar"
+      ],
       config: {
-        loadingBar: { /* look at QuasarConfOptions from the API card */ }
+        loadingBar: {
+          /* look at QuasarConfOptions from the API card */
+        }
       }
     },
 
     // animations: 'all', // --- includes all animations
     // https://v1.quasar.dev/options/animations
     animations: [
-      'fadeIn',
-      'fadeOut',
-      'tada',
-      'bounceIn',
-      'bounceOut',
-      'rotateOut',
-      'rotateIn',
-      'jackInTheBox',
-      'hinge'
+      "fadeIn",
+      "fadeOut",
+      "tada",
+      "bounceIn",
+      "bounceOut",
+      "rotateOut",
+      "rotateIn",
+      "jackInTheBox",
+      "hinge"
     ],
 
     // https://v1.quasar.dev/quasar-cli/developing-ssr/configuring-ssr
@@ -123,41 +125,41 @@ module.exports = function (/* ctx */) {
 
     // https://v1.quasar.dev/quasar-cli/developing-pwa/configuring-pwa
     pwa: {
-      workboxPluginMode: 'GenerateSW', // 'GenerateSW' or 'InjectManifest'
+      workboxPluginMode: "GenerateSW", // 'GenerateSW' or 'InjectManifest'
       workboxOptions: {}, // only for GenerateSW
       manifest: {
         name: `JNTUA Results Analyser`,
         short_name: `JNTUA Results Analyser`,
         description: `Analyse your result completely`,
-        display: 'standalone',
-        orientation: 'portrait',
-        background_color: '#ffffff',
-        theme_color: '#027be3',
+        display: "standalone",
+        orientation: "portrait",
+        background_color: "#ffffff",
+        theme_color: "#027be3",
         icons: [
           {
-            src: 'icons/icon-128x128.png',
-            sizes: '128x128',
-            type: 'image/png'
+            src: "icons/icon-128x128.png",
+            sizes: "128x128",
+            type: "image/png"
           },
           {
-            src: 'icons/icon-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
+            src: "icons/icon-192x192.png",
+            sizes: "192x192",
+            type: "image/png"
           },
           {
-            src: 'icons/icon-256x256.png',
-            sizes: '256x256',
-            type: 'image/png'
+            src: "icons/icon-256x256.png",
+            sizes: "256x256",
+            type: "image/png"
           },
           {
-            src: 'icons/icon-384x384.png',
-            sizes: '384x384',
-            type: 'image/png'
+            src: "icons/icon-384x384.png",
+            sizes: "384x384",
+            type: "image/png"
           },
           {
-            src: 'icons/icon-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
+            src: "icons/icon-512x512.png",
+            sizes: "512x512",
+            type: "image/png"
           }
         ]
       }
@@ -175,17 +177,15 @@ module.exports = function (/* ctx */) {
 
     // Full list of options: https://v1.quasar.dev/quasar-cli/developing-electron-apps/configuring-electron
     electron: {
-      bundler: 'packager', // 'packager' or 'builder'
+      bundler: "packager", // 'packager' or 'builder'
 
       packager: {
         // https://github.com/electron-userland/electron-packager/blob/master/docs/api.md#options
-
         // OS X / Mac App Store
         // appBundleId: '',
         // appCategoryType: '',
         // osxSign: '',
         // protocol: 'myapp://path',
-
         // Windows only
         // win32metadata: { ... }
       },
@@ -193,7 +193,7 @@ module.exports = function (/* ctx */) {
       builder: {
         // https://www.electron.build/configuration/configuration
 
-        appId: 'jntua_aesult_analyser'
+        appId: "jntua_aesult_analyser"
       },
 
       // More info: https://v1.quasar.dev/quasar-cli/developing-electron-apps/node-integration
@@ -204,5 +204,5 @@ module.exports = function (/* ctx */) {
         // chainWebpack also available besides this extendWebpack
       }
     }
-  }
-}
+  };
+};

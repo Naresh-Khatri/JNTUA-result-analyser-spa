@@ -63,13 +63,12 @@
           </div>
           <div class="flex justify-center">
             <q-card
-              class="sgpa-container q-px-lg rounded glass "
-              :style="studnetName.toupperCase() == 'NARESH'? 'bg-cyan-8':''"
+              class="sgpa-container q-px-lg rounded glass"
+              :style="studnetName.toupperCase() == 'NARESH' ? 'bg-cyan-8' : ''"
               v-if="datacollection.datasets"
               flat
             >
-              {{studnetName == 'NARESH'}}
-
+              {{ studnetName == 'NARESH' }}
               <transition appear enter-active-class="animated bounceIn" mode="out-in">
                 <div class="flex flex-center q-px-sm" :key="studentName">
                   <div class="col">
@@ -258,6 +257,8 @@
 
 <script>
 import axios from "axios";
+import { event } from 'vue-gtag'
+
 import apiRoutes from "../apiRoutes";
 import { getShort, getBestAttempts } from "../utils/utils";
 import G2GP from "../utils/G2GP";
@@ -519,6 +520,7 @@ export default {
       this.fillData();
     },
     fillData() {
+      event('search', { htn: this.rollNo})
       var subjectNames = [];
       var subjectsGrades = [];
       this.rowData = [];
