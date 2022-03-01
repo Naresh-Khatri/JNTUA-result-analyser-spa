@@ -1,18 +1,8 @@
 <template>
-  <div
-    class="flex column rounded q-pa-lg glass"
-    :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
-  >
+  <div class="flex column rounded q-pa-lg glass" :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'">
     <!-- <div class="text-h6">Sected your batch</div> -->
     <div style="display:flex; flex-direction:row-reverse">
-      <q-btn
-        dense
-        flat
-        style="width:130px; "
-        icon="close"
-        label="clear all"
-        @click="clearStorage"
-      />
+      <q-btn dense flat style="width:130px; " icon="close" label="clear all" @click="clearStorage" />
     </div>
     <q-select
       :color="$q.dark.isActive ? 'white' : 'primary'"
@@ -20,10 +10,11 @@
       v-model="selectedReg"
       :options="regsOpts"
       outlined
-      @input="selectedFn('reg', selectedReg)"
+      @update:model-value="selectedFn('reg', selectedReg)"
       label="Regulation/Curriculum"
       clearable
     />
+    <!-- @input-value="selectedFn('reg', selectedReg)" -->
     <q-select
       :color="$q.dark.isActive ? 'white' : 'primary'"
       filled
@@ -31,7 +22,7 @@
       :options="coursesOpts"
       outlined
       label="Course"
-      @input="selectedFn('course', selectedCourse)"
+      @update:model-value="selectedFn('course', selectedCourse)"
       clearable
       :disable="!selectedReg"
     />
@@ -42,7 +33,7 @@
       :options="yearOpts"
       outlined
       label="Year"
-      @input="selectedFn('year', selectedYear)"
+      @update:model-value="selectedFn('year', selectedYear)"
       clearable
       :disable="!selectedCourse"
     />
@@ -52,212 +43,185 @@
       v-model="selectedSem"
       :options="semOpts"
       label="Sem"
-      @input="selectedFn('sem', selectedSem)"
+      @update:model-value="selectedFn('sem', selectedSem)"
       clearable
       :disable="!selectedYear"
     />
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue'
 import axios from "axios";
 import apiRoutes from "../apiRoutes";
-export default {
-  props: { value: Object },
-  data() {
-    return {
-      selectedReg: "",
-      selectedCourse: "",
-      selectedYear: "",
-      selectedSem: "",
-      selectedResultID: "",
-      uniques: {},
-      resultsList: [],
-      resultObj: {},
-      regsOpts: [],
-      coursesOpts: [],
-      yearOpts: [],
-      semOpts: [],
-      backupResultsList: []
-    };
-  },
-  mounted() {
-    this.init();
-    console.log(this.value);
-  },
-  watch: {
-    async value(val) {
-      console.log(val);
-    }
-  },
-  methods: {
-    setQueries() {
-      setTimeout(() => {
-        axios
-          .get(apiRoutes.resIDDetails + "/" + this.receivedResID)
-          .then(async res => {
-            // console.log(res.data);
-            this.selectedReg = res.data.reg;
-            await this.sleep(150);
-            this.selectedFn("reg", res.data.reg);
-            this.selectedCourse = res.data.course;
-            await this.sleep(150);
-            this.selectedFn("course", res.data.course);
-            this.selectedYear = res.data.year;
-            await this.sleep(150);
-            this.selectedFn("year", res.data.year);
-            this.selectedSem = res.data.sem;
-            await this.sleep(150);
-            this.selectedFn("sem", res.data.sem);
-            // this.selectedTitle = res.data.title;
-            // await this.sleep(150);
-            // this.selectedFn("title", {
-            //   label: res.data.title,
-            //   resultID: this.receivedResID
-            // });
-          });
-      });
-    },
-    init() {
-      axios.get(apiRoutes.releasedResults).then(async res => {
+
+const props = defineProps(['modelValue'])
+const emit = defineEmits(['update:modelValue', 'success'])
+const selectedReg = ref("");
+const selectedCourse = ref("");
+const selectedYear = ref("");
+const selectedSem = ref("");
+const selectedResultID = ref("");
+const uniques = ref({});
+const resultsList = ref([]);
+const resultObj = ref({});
+const regsOpts = ref([]);
+const coursesOpts = ref([]);
+const yearOpts = ref([]);
+const semOpts = ref([]);
+const backupResultsList = ref([]);
+// const selectedValue = ref(props.modelValue.value)
+onMounted(() => {
+  // console.log(props.modelValue)
+  init()
+  // console.log(value);
+});
+const setQueries = () => {
+  setTimeout(() => {
+    axios
+      .get(apiRoutes.resIDDetails + "/" + this.receivedResID)
+      .then(async res => {
         // console.log(res.data);
-        this.resultObj = res.data;
-        this.regsOpts = Object.keys(res.data);
-        //check if parent passed selection
-        if (Object.keys(this.value).length > 0) {
-          // console.log("setting params");
-          await this.sleep(150);
-          this.selectedReg = this.value.reg;
-          this.selectedFn("reg", this.value.reg);
-          await this.sleep(150);
-          this.selectedCourse = this.value.course;
-          this.selectedFn("course", this.value.course);
-          await this.sleep(150);
-          this.selectedYear = this.value.year;
-          this.selectedFn("year", this.value.year);
-          await this.sleep(150);
-          this.selectedSem = this.value.sem;
-          this.selectedFn("sem", this.value.sem);
-        } else this.loadStorage();
+        selectedReg.value = res.data.reg;
+        await sleep(150);
+        selectedFn("reg", res.data.reg);
+        selectedCourse.value = res.data.course;
+        await sleep(150);
+        selectedFn("course", res.data.course);
+        selectedYear.value = res.data.year;
+        await sleep(150);
+        selectedFn("year", res.data.year);
+        selectedSem.value = res.data.sem;
+        await sleep(150);
+        selectedFn("sem", res.data.sem);
       });
-    },
-    reset(option) {
-      if (option == "reg") {
-        this.selectedCourse = "";
-        this.selectedYear = "";
-        this.selectedSem = "";
-        // this.selectedTitle = "";
-        // localStorage.setItem("course", "");
-        // localStorage.setItem("year", "");
-        // localStorage.setItem("sem", "");
-        // localStorage.setItem("title", "");
-      } else if (option == "course") {
-        this.selectedYear = "";
-        this.selectedSem = "";
-        // this.selectedTitle = "";
-        // localStorage.setItem("year", "");
-        // localStorage.setItem("sem", "");
-        // localStorage.setItem("title", "");
-      } else if (option == "year") {
-        this.selectedSem = "";
-        // this.selectedTitle = "";
-        // localStorage.setItem("sem", "");
-        // localStorage.setItem("title", "");
-      } else if (option == "sem") {
-        // this.selectedTitle = "";
-        // localStorage.setItem("title", "");
-      }
-    },
-    selectedFn(option, value) {
-      //listen to when reset
-      // if (value == null) return this.reset(option);
-      // console.log(option, value);
-      this.save(option, value);
-      this.reset(option);
-      //if clicked on clear dont select anything and return
-      if (value == null) return;
-      if (option == "reg")
-        this.coursesOpts = Object.keys(this.resultObj[this.selectedReg]);
-      else if (option == "course")
-        this.yearOpts = Object.keys(
-          this.resultObj[this.selectedReg][this.selectedCourse]
-        );
-      else if (option == "year")
-        this.semOpts = Object.keys(
-          this.resultObj[this.selectedReg][this.selectedCourse][
-            this.selectedYear
-          ]
-        );
-      else if (option == "sem") {
-        this.emitSelection();
-      }
-      this.emitSelection();
-    },
-    clearStorage() {
-      localStorage.setItem("reg", "");
-      localStorage.setItem("course", "");
-      localStorage.setItem("year", "");
-      localStorage.setItem("sem", "");
-      // localStorage.setItem("title", "");
-      this.selectedReg = "";
-      this.selectedCourse = "";
-      this.selectedYear = "";
-      this.selectedSem = "";
-      // this.selectedTitle = "";
-    },
-    save(option, value) {
-      // console.log("saving ", option, " as ", value);
-      localStorage.setItem(option, value);
-    },
-    sleep(ms) {
-      return new Promise(r => {
-        setTimeout(() => r(), ms);
-      });
-    },
-    async loadStorage() {
-      // console.log(localStorage.getItem("reg"));
-      // console.log(localStorage.getItem("course"));
-      // console.log(localStorage.getItem("year"));
-      // console.log(localStorage.getItem("sem"));
-      // console.log(JSON.parse(localStorage.getItem("title")));
-      if (localStorage.getItem("reg")) {
-        this.selectedReg = localStorage.getItem("reg");
-        await this.sleep(150);
-        this.selectedFn("reg", localStorage.getItem("reg"));
-      }
-      if (localStorage.getItem("course")) {
-        this.selectedCourse = localStorage.getItem("course");
-        await this.sleep(150);
-        this.selectedFn("course", localStorage.getItem("course"));
-      }
-      if (localStorage.getItem("year")) {
-        this.selectedYear = localStorage.getItem("year");
-        await this.sleep(150);
-        this.selectedFn("year", localStorage.getItem("year"));
-      }
-      if (localStorage.getItem("sem")) {
-        this.selectedSem = localStorage.getItem("sem");
-        await this.sleep(150);
-        this.selectedFn("sem", localStorage.getItem("sem"));
-      }
-      // if (localStorage.getItem("title")) {
-      //   await this.sleep(500);
-      //   console.log(localStorage.getItem("title"));
-      //   this.selectedTitle = localStorage.getItem("title").label;
-      //   this.selectedFn("title", localStorage.getItem("title"));
-      // }
-    },
-    emitSelection() {
-      // localStorage.setItem('lastUniques', JSON.stringify(this.uniques))
-      this.$emit("success", {
-        reg: this.selectedReg,
-        course: this.selectedCourse,
-        year: this.selectedYear,
-        sem: this.selectedSem
-      });
-    }
-  }
+  });
 };
+const init = () => {
+  axios.get(apiRoutes.releasedResults).then(async res => {
+    // console.log(res.data);
+    resultObj.value = res.data;
+    regsOpts.value = Object.keys(res.data);
+    //check if parent passed selection
+    if (props.modelValue.sem.length > 0) {
+      console.log("setting params");
+      await sleep(150);
+      selectedReg.value = props.modelValue.reg;
+      selectedFn("reg", props.modelValue.reg);
+      await sleep(150);
+      selectedCourse.value = props.modelValue.course;
+      selectedFn("course", props.modelValue.course);
+      await sleep(150);
+      selectedYear.value = props.modelValue.year;
+      selectedFn("year", props.modelValue.year);
+      await sleep(150);
+      selectedSem.value = props.modelValue.sem;
+      selectedFn("sem", props.modelValue.sem);
+    } else loadStorage();
+  });
+};
+const reset = (option) => {
+  // console.warn('resetting', option)
+  if (option == "reg") {
+    selectedCourse.value = "";
+    selectedYear.value = "";
+    selectedSem.value = "";
+    // localStorage.setItem("course", "");
+    // localStorage.setItem("year", "");
+    // localStorage.setItem("sem", "");
+  } else if (option == "course") {
+    selectedYear.value = "";
+    selectedSem.value = "";
+    // localStorage.setItem("year", "");
+    // localStorage.setItem("sem", "");
+  } else if (option == "year")
+    selectedSem.value = "";
+  // localStorage.setItem("sem", "");
+};
+const selectedFn = (option, value) => {
+  // console.log(option, value);
+  //listen to when reset
+  if (value == null) {
+    console.log('returing')
+  }
+  reset(option);
+  save(option, value);
+  //if clicked on clear dont select anything and return
+  if (value == null) return;
+  if (option == "reg") {
+    selectedReg.value = value
+    coursesOpts.value = Object.keys(resultObj.value[selectedReg.value]);
+  }
+  else if (option == "course")
+    yearOpts.value = Object.keys(
+      resultObj.value[selectedReg.value][selectedCourse.value]
+    );
+  else if (option == "year")
+    semOpts.value = Object.keys(
+      resultObj.value[selectedReg.value][selectedCourse.value][
+      selectedYear.value
+      ]
+    );
+  else if (option == "sem") {
+    emitSelection();
+    emit('success')
+  }
+  emitSelection();
+};
+const clearStorage = () => {
+  localStorage.setItem("reg", "");
+  localStorage.setItem("course", "");
+  localStorage.setItem("year", "");
+  localStorage.setItem("sem", "");
+
+  selectedReg.value = "";
+  selectedCourse.value = "";
+  selectedYear.value = "";
+  selectedSem.value = "";
+};
+const save = (option, value) => {
+  localStorage.setItem(option, value);
+  // console.log("saving", option, "as", localStorage.getItem(option));
+};
+const sleep = (ms) => {
+  return new Promise(r => { setTimeout(() => r(), ms); });
+};
+const loadStorage = async () => {
+
+  if (localStorage.getItem("reg")) {
+    selectedReg.value = localStorage.getItem("reg");
+    await sleep(150);
+    selectedFn("reg", localStorage.getItem("reg"));
+  }
+  if (localStorage.getItem("course")) {
+    selectedCourse.value = localStorage.getItem("course");
+    console.log('setting course')
+    await sleep(150);
+    selectedFn("course", localStorage.getItem("course"));
+  }
+  if (localStorage.getItem("year")) {
+    selectedYear.value = localStorage.getItem("year");
+    await sleep(150);
+    selectedFn("year", localStorage.getItem("year"));
+  }
+  if (localStorage.getItem("sem")) {
+    selectedSem.value = localStorage.getItem("sem");
+    await sleep(150);
+    selectedFn("sem", localStorage.getItem("sem"));
+  }
+}
+const emitSelection = () => {
+  // localStorage.setItem('lastUniques', JSON.stringify(this.uniques))
+  emit("update:modelValue", {
+    reg: selectedReg.value,
+    course: selectedCourse.value,
+    year: selectedYear.value,
+    sem: selectedSem.value
+  });
+}
+const test = (val) => {
+  console.log(val)
+}
 </script>
 
 <style></style>
