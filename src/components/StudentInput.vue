@@ -141,9 +141,6 @@ const reset = (option) => {
 const selectedFn = (option, value) => {
   // console.log(option, value);
   //listen to when reset
-  if (value == null) {
-    console.log('returing')
-  }
   reset(option);
   save(option, value);
   //if clicked on clear dont select anything and return
