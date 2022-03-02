@@ -64,7 +64,7 @@
           <div class="flex justify-center">
             <q-card
               class="sgpa-container q-px-lg rounded glass"
-              :style="studnetName.toupperCase() == 'NARESH' ? 'bg-cyan-8' : ''"
+              :style="studnetName.toUpperCase() == 'NARESH' ? 'bg-cyan-8' : ''"
               v-if="datacollection.datasets"
               flat
             >
