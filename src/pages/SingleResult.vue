@@ -13,8 +13,9 @@
       }"
     >
       <div style="display:flex; justify-content:center;">
-        <div class="wrapper" style="width:100%; max-width:1000px">
-          <StudentInput class="result-input" v-model="selection" @success="setSelection($event)" />
+        <div class="wrapper" style="width:100vw; max-width:1000px">
+          <StudentInput class="result-input" v-model="selection" @success="onInputSuccess" />
+          <!-- @success="setSelection($event)" -->
           <div
             class="roll-input q-pa-lg rounded glass"
             :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -24,7 +25,7 @@
               <q-icon
                 name="arrow_back_ios_new"
                 style="font-size: 3em;"
-                :disabled="!datacollection.datasets"
+                :disabled="!!!series.length"
                 @click="changeRoll(-1)"
               />
               <q-input
@@ -45,7 +46,7 @@
               <q-icon
                 name="arrow_forward_ios"
                 style="font-size: 3em;"
-                :disabled="!datacollection.datasets"
+                :disabled="!!!series.length"
                 @click="changeRoll(1)"
               />
             </div>
@@ -64,11 +65,10 @@
           <div class="flex justify-center">
             <q-card
               class="sgpa-container q-px-lg rounded glass"
-              :style="studnetName.toupperCase() == 'NARESH' ? 'bg-cyan-8' : ''"
-              v-if="datacollection.datasets"
+              :style="studentName.toUpperCase() == 'NARESH' ? 'bg-cyan-8' : ''"
+              v-if="!!series.length"
               flat
             >
-              {{ studnetName == 'NARESH' }}
               <transition appear enter-active-class="animated bounceIn" mode="out-in">
                 <div class="flex flex-center q-px-sm" :key="studentName">
                   <div class="col">
@@ -92,7 +92,7 @@
                 </div>
               </transition>
             </q-card>
-            <transition v-if="datacollection.datasets">
+            <transition v-if="!!series.length">
               <div style="display:flex; justify-content:center">
                 <q-btn text-color="white" label="Share" style="background:#25D366" @click="share">
                   <img width="50px" src="../assets/whatsapp.svg" />
@@ -100,22 +100,20 @@
               </div>
             </transition>
           </div>
-          <div class="data-container q-mb-xl" v-if="datacollection.datasets">
+          <div class="data-container q-mb-xl" v-if="!!series.length">
             <div>
               <Tip title="Tip 1" desc="Click on the column name to sort the rows accordingly" />
 
               <q-table
                 title="Result Table"
-                class="q-pt-md"
-                dense
-                :data="rowData"
+                :rows="rowData"
                 :columns="columns"
+                row-key="name"
                 :hide-bottom="true"
                 :pagination="pagination"
-                row-key="name"
               >
                 <template v-slot:body="props">
-                  <q-tr :props="props" style="width:10px">
+                  <q-tr :props="props">
                     <q-td
                       dense
                       auto-width
@@ -124,23 +122,15 @@
                     >{{ props.row.subject_name }}</q-td>
                     <q-td dense auto-width key="status" :props="props">
                       <q-chip
-                        dense
                         auto-width
                         size="md"
                         :color="
                           props.row.status == '✔' ? 'positive' : 'negative'
                         "
-                        :style="
-                          props.row.status == '✔'
-                            ? 'filter: drop-shadow(0 0 0.5rem #25D366)'
-                            : 'filter: drop-shadow(0 0 0.5rem #FF4D01)'
-                        "
                         class="text-white q-pa-xm"
                       >{{ props.row.status }}</q-chip>
                     </q-td>
-
-                    <q-td dense auto-width style="padding:0px" key="marks" :props="props">
-                      <!-- 25 + 50 = 75 -->
+                    <q-td dense auto-width key="marks" :props="props">
                       <div v-if="!props.row.total" style="font-size:22px;">🤷‍♀️</div>
                       <div v-else>
                         {{ props.row.total }} ({{ props.row.externals }} +
@@ -148,9 +138,7 @@
                       </div>
                     </q-td>
                     <q-td dense auto-width key="grade" :props="props">{{ props.row.grade }}</q-td>
-                    <!-- <q-td dense auto-width key="points" :props="props">
-                      {{ props.row.points }}
-                    </q-td>-->
+                    <q-td dense auto-width key="points" :props="props">{{ props.row.points }}</q-td>
                     <q-td dense auto-width key="credit" :props="props">
                       {{
                         props.row.credit
@@ -170,7 +158,7 @@
               <q-card
                 class="sgpa-container q-px-lg rounded glass"
                 style="width:90%"
-                v-if="datacollection.datasets"
+                v-if="!!series.length"
                 flat
               >
                 <q-expansion-item v-model="fullFormsExpanded" label="sub full forms">
@@ -215,7 +203,14 @@
             </q-tabs>
             <q-tab-panels v-model="chartName" animated class="q-mb-xl shadow-2 rounded">
               <q-tab-panel name="radar" class="rounded">
-                <RadarChart :chart-data="datacollection" :key="$q.dark.isActive" />
+                {{ chartName }}
+                <VueApexCharts
+                  width="100%"
+                  height="350"
+                  :type="chartName"
+                  :options="chartOptions"
+                  :series="series"
+                />
                 <div class="text-right text-grey-6" v-if="zeroCredSubs.length > 0">
                   *Note not including zero cred subs.
                   <div
@@ -227,16 +222,40 @@
               </q-tab-panel>
 
               <q-tab-panel name="line" class="flex flex-center flex-row">
-                <LineChart
-                  style="min-width:90%"
-                  :chart-data="datacollection"
-                  :key="$q.dark.isActive"
+                <VueApexCharts
+                  width="100%"
+                  height="350"
+                  :type="chartName"
+                  :options="chartOptions"
+                  :series="series"
                 />
+                <div class="text-right text-grey-6" v-if="zeroCredSubs.length > 0">
+                  *Note not including zero cred subs.
+                  <div
+                    v-for="(sub, index) in zeroCredSubs"
+                    :key="index"
+                    class="q-px-md text-right text-white"
+                  >{{ sub }}</div>
+                </div>
               </q-tab-panel>
 
               <q-tab-panel name="bar">
-                <BarChart :chart-data="datacollection" :key="$q.dark.isActive" />
-              </q-tab-panel>sdfdsfsdfasdf
+                <VueApexCharts
+                  width="100%"
+                  height="350"
+                  :type="chartName"
+                  :options="chartOptions"
+                  :series="series"
+                />
+                <div class="text-right text-grey-6" v-if="zeroCredSubs.length > 0">
+                  *Note not including zero cred subs.
+                  <div
+                    v-for="(sub, index) in zeroCredSubs"
+                    :key="index"
+                    class="q-px-md text-right text-white"
+                  >{{ sub }}</div>
+                </div>
+              </q-tab-panel>
             </q-tab-panels>
           </div>
           <div v-else class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl">
@@ -255,8 +274,14 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router';
+import { useQuasar } from 'quasar';
+
 import axios from "axios";
+import VueApexCharts from 'vue3-apexcharts'
+
 import { event } from 'vue-gtag'
 
 import apiRoutes from "../apiRoutes";
@@ -264,367 +289,351 @@ import { getShort, getBestAttempts } from "../utils/utils";
 import G2GP from "../utils/G2GP";
 import { backgroundColors, borderColors } from "../colors/colors";
 
-import RadarChart from "../charts/RadarChart.vue";
-import BarChart from "../charts/BarChart.vue";
-import LineChart from "../charts/LineChart.vue";
+// import RadarChart from "../charts/RadarChart.vue";
+// import BarChart from "../charts/BarChart.vue";
+// import LineChart from "../charts/LineChart.vue";
 
 import StudentInput from "../components/StudentInput.vue";
 import Tip from "../components/Tip.vue";
 import Footer from "../components/Footer.vue";
+import { fill } from 'src/utils/rolls';
 
-export default {
-  components: {
-    RadarChart,
-    BarChart,
-    LineChart,
-    StudentInput,
-    Tip,
-    Footer
-  },
-  data() {
-    return {
-      datacollection: {},
-      canSearch: false,
-      studentName: "",
-      rollNo: "19fh1a0546",
-      viewCount: 0,
-      selection: {},
-      sem: "1",
-      chartName: "radar",
-      zeroCredSubs: [],
-      columns: [
-        {
-          name: "subject_name",
-          align: "left",
-          label: "Subject",
-          field: "subject_name",
-          sortable: true
-        },
-        {
-          name: "status",
-          align: "center",
-          label: "Status",
-          field: "status",
-          sortable: true
-        },
+const $route = useRoute()
+const $q = useQuasar()
 
-        {
-          name: "marks",
-          align: "center",
-          label: "Marks (Ext+Int)",
-          field: "marks",
-          sortable: true
-        },
-        {
-          name: "grade",
-          align: "center",
-          label: "Grade(pts)",
-          field: "grade",
-          sortable: true
-        },
-        {
-          name: "credit",
-          align: "center",
-          label: "Credits",
-          field: "credit",
-          sortable: true
-        },
-        {
-          name: "month",
-          align: "center",
-          label: "Month",
-          field: "month",
-          sortable: true
-        }
-      ],
-      studentSGPA: 0,
-      rowData: [],
-      fullFormsExpanded: false,
-      fullFormsArr: [],
-      pagination: {
-        sortBy: "name",
-        descending: false,
-        page: 0,
-        rowsPerPage: 0
-      },
-      G2GP: G2GP,
-      selectionInput: {},
-      totalAttempts: 0
-    };
+const canSearch = ref(false);
+const studentName = ref("");
+const rollNo = ref("19fh1a0546");
+const viewCount = ref(0);
+const selection = ref({ reg: '', course: '', year: '', sem: "" });
+const chartName = ref("radar");
+const zeroCredSubs = ref([]);
+const columns = [
+  {
+    name: "subject_name",
+    align: "left",
+    label: "Subject",
+    field: "subject_name",
+    sortable: true
   },
-  computed: {
-    submitBtnStyle() {
-      return `${this.canSearch
-        ? "width:fit-content; filter: drop-shadow(0 0 0.5rem #ff4d01)"
-        : ""
-        }`;
-    },
-    knobStyle() {
-      return `filter: drop-shadow(0 0 0.5rem ${this.studentSGPA > 0 ? "green" : "red"
-        });`;
-    }
+  {
+    name: "status",
+    align: "center",
+    label: "Status",
+    field: "status",
+    sortable: true
   },
-  mounted() {
-    // this.resultID = "56736469";
-    // this.canSearch = true;
-    // this.fillData();
-    this.checkQueries();
+
+  {
+    name: "marks",
+    align: "center",
+    label: "Marks (Ext+Int)",
+    field: "marks",
+    sortable: true
   },
-  methods: {
-    setSelection(selection) {
-      //dont set selection if params passed
-      // if (Object.keys(this.$route.query).includes("roll")) return;
-      this.selectionInput = selection;
-      this.canSearch = !!this.selectionInput.sem;
-    },
-    checkQueries() {
-      console.log(this.$route.query);
-      if (Object.keys(this.$route.query).length > 0) {
-        this.canSearch = true;
-        //set local selection and forward to selection component
-        this.selectionInput = this.$route.query;
-        this.selection = this.$route.query;
-        this.rollNo = this.selection.roll;
-        this.fillData();
-      }
-      if (!Object.keys(this.$route.query).includes("reg")) return;
-      console.log(window.location);
-      this.rollNo = this.$route.query.roll;
-      // console.log(this.rollNo, this.resultID);
-      this.canSearch = true;
-      // this.fillData();
-    },
-    submit() {
-      this.fillData();
-    },
-    share() {
-      if (navigator.share) {
-        navigator
-          .share({
-            title: "Hey I analysed my results on this cool website!",
-            url:
-              window.location.origin +
-              window.location.pathname +
-              "#/?reg=" +
-              this.selectionInput.reg +
-              "&course=" +
-              this.selectionInput.course +
-              "&sem=" +
-              this.selectionInput.sem +
-              "&year=" +
-              this.selectionInput.year +
-              "&roll=" +
-              this.rollNo
-          })
-          .then(() => {
-            this.sendSharedInfoToDB();
-            console.log("Thanks for sharing!");
-            this.$q.notify({
-              type: "positive",
-              message: `Thanks for sharing this page! 😀😁`
-            });
-          })
-          .catch(console.error);
-      } else {
-        // fallback
-      }
-    },
-    sendSharedInfoToDB() {
-      axios.post(apiRoutes.share, {
-        type: "single",
-        htns: [this.rollNo],
-        resultID: this.resultID
-      });
-    },
-    changeRoll(val) {
-      if (!this.datacollection.datasets) {
-        this.$q.notify({
-          message: "Please select exam first!",
-          type: "info"
+  {
+    name: "grade",
+    align: "center",
+    label: "Grade(pts)",
+    field: "grade",
+    sortable: true
+  },
+  {
+    name: "credit",
+    align: "center",
+    label: "Credits",
+    field: "credit",
+    sortable: true
+  },
+  {
+    name: "month",
+    align: "center",
+    label: "Month",
+    field: "month",
+    sortable: true
+  }
+]
+const studentSGPA = ref(0);
+const rowData = ref([]);
+const fullFormsExpanded = ref(false);
+const fullFormsArr = ref([]);
+const pagination = {
+  sortBy: "name",
+  descending: false,
+  page: 0,
+  rowsPerPage: 0
+}
+const totalAttempts = ref(0)
+
+const chartOptions = ref({
+  chart: { id: "vuechart-example", },
+  xaxis: {
+  },
+});
+const series = ref([
+])
+
+const scrollArea = ref(null)
+
+const submitBtnStyle = computed(() => `${canSearch.value
+  ? "width:fit-content; filter: drop-shadow(0 0 0.5rem #ff4d01)"
+  : ""
+  }`);
+const knobStyle = computed(() => `filter: drop-shadow(0 0 0.5rem ${studentSGPA.value > 0 ? "green" : "red"}`);
+onMounted(() => {
+  // this.resultID = "56736469";
+  // this.canSearch = true;
+  // this.fillData();
+  checkQueries();
+});
+const checkQueries = () => {
+  // console.log($route.query);
+  if (Object.keys($route.query).length > 0) {
+    canSearch.value = true;
+    //set local selection and forward to selection component
+    selection.value = $route.query;
+    rollNo.value = selection.value.roll;
+    fillData();
+  }
+  if (!Object.keys($route.query).includes("reg")) return;
+  console.log(window.location);
+  rollNo.value = $route.query.roll;
+  // console.log(rollNo.value, this.resultID);
+  canSearch.value = true;
+  // this.fillData();
+};
+const submit = () => {
+  fillData();
+};
+const share = () => {
+  if (navigator.share) {
+    navigator
+      .share({
+        title: "Hey I analysed my results on this cool website!",
+        url:
+          window.location.origin +
+          window.location.pathname +
+          "#/?reg=" +
+          selection.value.reg +
+          "&course=" +
+          selection.value.course +
+          "&sem=" +
+          selection.value.sem +
+          "&year=" +
+          selection.value.year +
+          "&roll=" +
+          rollNo.value
+      })
+      .then(() => {
+        sendSharedInfoToDB();
+        console.log("Thanks for sharing!");
+        $q.notify({
+          type: "positive",
+          message: `Thanks for sharing this page! 😀😁`
         });
-        return;
-      }
-      let chars = [
-        "a",
-        "b",
-        "c",
-        "d",
-        "e",
-        "f",
-        "g",
-        "h",
-        "i",
-        "j",
-        "k",
-        "l",
-        "m",
-        "n",
-        "o",
-        "p",
-        "q",
-        "r",
-        "s",
-        "t",
-        "u",
-        "v",
-        "w",
-        "x",
-        "y",
-        "z"
-      ];
-      //check if roll > 99 by checking whether 2nd from last elem is char
-      if (!chars.includes(this.rollNo[this.rollNo.length - 2])) {
-        console.log("of");
-
-        var prefix = "";
-        for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
-
-        var num = "";
-        for (var i = 8; i < this.rollNo.length; i++) num += this.rollNo[i];
-        num = parseInt(num);
-        num += val;
-        //check bounds
-        if (num < 1) {
-          this.$q.notify({
-            message: "Bound reached",
-            type: "info"
-          });
-          return;
-        }
-        //change roll to a0
-        if (num >= 100) {
-          this.rollNo = prefix + "a0";
-          return;
-        }
-        // add a 0 in front if num <10
-        this.rollNo = prefix + (num < 10 ? `0${num}` : num);
-      } else {
-        var prefix = "";
-        for (var i = 0; i < 8; i++) prefix += this.rollNo[i];
-        //TODO
-        let char = this.rollNo[8];
-        let num = parseInt(this.rollNo[9]);
-
-        num += val;
-        if (char.toLowerCase() == "a" && num < 0) {
-          char = "9";
-          num = 9;
-        }
-        if (num >= 10) char = chars[chars.indexOf(char) + 1];
-        else if (num < 0) {
-          num = 9;
-          char = chars[chars.indexOf(char) - 1];
-        }
-        this.rollNo = prefix + char + Math.abs(num % 10);
-      }
-      this.fillData();
-    },
-    fillData() {
-      event('search', { htn: this.rollNo})
-      var subjectNames = [];
-      var subjectsGrades = [];
-      this.rowData = [];
-      this.zeroCredSubs = [];
-      axios.get(
-        apiRoutes.singleResultv2 +
-        "/" +
-        this.rollNo +
-        "/" +
-        this.selectionInput.reg +
-        "/" +
-        this.selectionInput.course +
-        "/" +
-        this.selectionInput.year +
-        "/" +
-        this.selectionInput.sem
-      )
-        .then(res => {
-          this.viewCount = res.data.viewCount
-          // console.log(res.data.viewCount);
-          if (res.data) {
-            this.$q.notify({
-              type: "positive",
-              message: `Result retrieved`
-            });
-            console.log(res.data);
-            console.log("Best Attempt = ");
-            // console.log(getBestAttempts(res.data.attempts));
-            const bestAttempts = getBestAttempts(res.data.attempts);
-            console.log(bestAttempts);
-
-            //calc total attempts
-            this.totalAttempts = 0;
-            res.data.attempts.forEach(attempt => {
-              if (Object.keys(attempt).length > 0) this.totalAttempts++;
-            });
-            console.log("attempts count", this.totalAttempts);
-            this.fullFormsArr = [];
-            bestAttempts.forEach(sub => {
-              //push to full forms array
-              this.fullFormsArr.push({
-                shortForm: getShort(sub["Subject Name"]),
-                fullForm: sub["Subject Name"]
-              });
-              //push to subject names rowData array
-              this.rowData.push({
-                subject_name: getShort(sub["Subject Name"]),
-                status: sub["Result Status"] == "P" ? "✔" : "❌",
-                grade: sub["Grade"] + " (" + this.G2GP[sub["Grade"]] + ")",
-                internals: sub["Internals"],
-                externals: sub["Externals"],
-                total: sub["Total Marks"],
-                credit: sub["Credits"],
-                month: sub["month"]
-              });
-
-              //dont plot the subjects having 0 credits
-              if (sub["Grade"].toUpperCase() != "Y") {
-                subjectNames.push(
-                  `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
-                );
-                subjectsGrades.push(this.G2GP[sub["Grade"]]);
-              } else {
-                this.zeroCredSubs.push(sub["Subject Name"]);
-              }
-            });
-            this.studentName = res.data["name"];
-            this.studentSGPA = Number.parseFloat(res.data.sgpa);
-          }
-        })
-        .then(() => {
-          //scroll bottom
-          // window.scrollTo(0, document.body.scrollHeight);
-          this.$refs.scrollArea.setScrollPosition(350, 200);
-        })
-        .catch(error => {
-          console.log(error);
-          this.resultNotFoundDialog = true;
-
-          this.datacollection.datasets = [];
-          this.$q.notify({
-            type: "negative",
-            message: `Result not found`
-          });
-          this.studentName = "N/A";
-          this.studentSGPA = 0;
-        })
-        .finally(() => {
-          this.datacollection = {
-            labels: subjectNames,
-            datasets: [
-              {
-                label: this.studentName,
-                data: subjectsGrades,
-                backgroundColor: backgroundColors[1],
-                borderColor: borderColors[1],
-                borderWidth: 1
-              }
-            ]
-          };
-        });
-    }
+      })
+      .catch(console.error);
+  } else {
+    // fallback
   }
 };
+const sendSharedInfoToDB = () => {
+  axios.post(apiRoutes.share, {
+    type: "single",
+    htns: [rollNo.value],
+    resultID: resultID.value
+  });
+};
+const changeRoll = (val) => {
+  console.log(series.value.length)
+  if (!!!series.value.length) {
+    $q.notify({
+      message: "Please select exam first!",
+      type: "info"
+    });
+    return;
+  }
+  let chars = [
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "g",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z"
+  ];
+  //check if roll > 99 by checking whether 2nd from last elem is char
+  if (!chars.includes(rollNo.value[rollNo.value.length - 2])) {
+    console.log("of");
+
+    var prefix = "";
+    for (var i = 0; i < 8; i++) prefix += rollNo.value[i];
+
+    var num = "";
+    for (var i = 8; i < rollNo.value.length; i++) num += rollNo.value[i];
+    num = parseInt(num);
+    num += val;
+    //check bounds
+    if (num < 1) {
+      $q.notify({
+        message: "Bound reached",
+        type: "info"
+      });
+      return;
+    }
+    //change roll to a0
+    if (num >= 100) {
+      rollNo.value = prefix + "a0";
+      return;
+    }
+    // add a 0 in front if num <10
+    rollNo.value = prefix + (num < 10 ? `0${num}` : num);
+  } else {
+    var prefix = "";
+    for (var i = 0; i < 8; i++) prefix += rollNo.value[i];
+    //TODO
+    let char = rollNo.value[8];
+    let num = parseInt(rollNo.value[9]);
+
+    num += val;
+    if (char.toLowerCase() == "a" && num < 0) {
+      char = "9";
+      num = 9;
+    }
+    if (num >= 10) char = chars[chars.indexOf(char) + 1];
+    else if (num < 0) {
+      num = 9;
+      char = chars[chars.indexOf(char) - 1];
+    }
+    rollNo.value = prefix + char + Math.abs(num % 10);
+  }
+  fillData();
+};
+const onInputSuccess = () => {
+  //can search if sem is emited
+  canSearch.value = !!selection.value.sem
+  fillData()
+}
+const fillData = () => {
+  event('search', { htn: rollNo.value })
+  var subjectNames = [];
+  var subjectsGrades = [];
+  rowData.value = [];
+  zeroCredSubs.value = [];
+  axios.get(
+    apiRoutes.singleResultv2 +
+    "/" +
+    rollNo.value +
+    "/" +
+    selection.value.reg +
+    "/" +
+    selection.value.course +
+    "/" +
+    selection.value.year +
+    "/" +
+    selection.value.sem
+  )
+    .then(res => {
+      viewCount.value = res.data.viewCount
+      // console.log(res.data.viewCount);
+      if (res.data) {
+        $q.notify({
+          type: "positive",
+          message: `Result retrieved`
+        });
+        console.log(res.data);
+        console.log("Best Attempt = ");
+        // console.log(getBestAttempts(res.data.attempts));
+        const bestAttempts = getBestAttempts(res.data.attempts);
+        console.log(bestAttempts);
+
+        //calc total attempts
+        totalAttempts.value = 0;
+        res.data.attempts.forEach(attempt => {
+          if (Object.keys(attempt).length > 0) totalAttempts.value++;
+        });
+        console.log("attempts count", totalAttempts.value);
+        fullFormsArr.value = [];
+        bestAttempts.forEach(sub => {
+          //push to full forms array
+          fullFormsArr.value.push({
+            shortForm: getShort(sub["Subject Name"]),
+            fullForm: sub["Subject Name"]
+          });
+          //push to subject names rowData array
+          rowData.value.push({
+            subject_name: getShort(sub["Subject Name"]),
+            status: sub["Result Status"] == "P" ? "✔" : "❌",
+            grade: sub["Grade"] + " (" + G2GP[sub["Grade"]] + ")",
+            internals: sub["Internals"],
+            externals: sub["Externals"],
+            total: sub["Total Marks"],
+            credit: sub["Credits"],
+            month: sub["month"]
+          });
+
+          //dont plot the subjects having 0 credits
+          if (sub["Grade"].toUpperCase() != "Y") {
+            subjectNames.push(
+              `${getShort(sub["Subject Name"])} (${sub["Grade"]})`
+            );
+            subjectsGrades.push(G2GP[sub["Grade"]]);
+            console.log()
+          } else {
+            zeroCredSubs.value.push(sub["Subject Name"]);
+          }
+        });
+        studentName.value = res.data["name"];
+        studentSGPA.value = Number.parseFloat(res.data.sgpa);
+        console.log(rowData.value)
+      }
+    })
+    .then(() => {
+      //scroll bottom
+      // window.scrollTo(0, document.body.scrollHeight);
+      scrollArea.value.setScrollPosition(350, 200);
+    })
+    .catch(error => {
+      console.log(error);
+      resultNotFoundDialog.value = true;
+
+      $q.notify({
+        type: "negative",
+        message: `Result not found`
+      });
+      studentName.value = "N/A";
+      studentSGPA.value = 0;
+    })
+    .finally(() => {
+
+      chartOptions.value.xaxis.categories = subjectNames
+      series.value = [{ name: studentName.value, data: subjectsGrades }]
+    });
+
+  const test = (e) => {
+    console.log(e)
+  }
+
+}
 </script>
 <style scoped>
 @media screen and (min-width: 1000px) {
