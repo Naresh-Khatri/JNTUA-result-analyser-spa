@@ -233,7 +233,11 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import {ref, computed, onMounted} from 'vue'
+import {useRoute} from 'vue-router'
+import {useQuasar } from 'quasar'
+
 import axios from "axios";
 import apiRoutes from "../apiRoutes";
 import { getShort, getBestAttempts } from "../utils/utils";
@@ -247,25 +251,14 @@ import StudentInputShort from "../components/StudentInputShort.vue";
 import SgpaTile from "../components/SgpaTile.vue";
 import Tip from "../components/Tip.vue";
 
-export default {
-  components: {
-    RadarChart,
-    BarChart,
-    LineChart,
-    Tip,
-    SgpaTile,
-    StudentInputShort
-  },
-  data() {
-    return {
-      datacollection: {},
-      canSearch: false,
-      rollNo: "19fh1a0546",
-      selection: {},
-      releasedResults: {},
-      studentName: "",
-      chartName: "radar",
-      columns: [
+      const datacollection= ref({});
+      const canSearch= ref(false);
+      const rollNo= ref("19fh1a0546");
+      const selection= ref({});
+      const releasedResults= ref({});
+      const studentName= ref("");
+      const chartName= ref("radar");
+      const columns= [
         {
           name: "subject_name",
           align: "left",
@@ -309,21 +302,21 @@ export default {
           field: "month",
           sortable: true
         }
-      ],
-      resultsList: [],
-      selectedSemIndex: 0,
-      zeroCredSubs: [],
-      isDetained: false,
-      isOnCooldown: false,
-      totalBacklogs: 0,
-      rowData: [],
-      pagination: {
+      ];
+      const resultsList= ref([]);
+      const selectedSemIndex= ref(0);
+      const zeroCredSubs= ref([]);
+      const isDetained= ref(false);
+      const isOnCooldown= ref(false);
+      const totalBacklogs= ref(0);
+      const rowData= ref([]);
+      const pagination= ref({
         sortBy: "name",
         descending: false,
         page: 0,
         rowsPerPage: 0
-      },
-      g_to_gp: {
+      });
+      const g_to_gp = ref({
         S: 10,
         O: 10,
         A: 9,
@@ -334,11 +327,8 @@ export default {
         F: 0,
         AB: 0,
         Y: 0
-      },
-      selectionInput: {}
-    };
-  },
-  mounted() {
+      });
+  onMounted() {
     // this.resultID = "56736469";
     // this.canSearch = true;
     // this.fillData();
