@@ -12,6 +12,7 @@
   "dependencies": {
     "@quasar/cli": "^1.2.1",
     "@quasar/extras": "^1.0.0",
+    "apexcharts": "^3.33.1",
     "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
     "chart.js": "^3.7.1",
@@ -27,6 +28,7 @@
     "vue-chartjs": "^3.5.1",
     "vue-gtag": "^2.0.1",
     "vue-router": "4",
+    "vue3-apexcharts": "^1.4.1",
     "xlsx": "^0.17.4"
   },
   "devDependencies": {
