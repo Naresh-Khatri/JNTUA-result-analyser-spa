@@ -203,7 +203,6 @@
             </q-tabs>
             <q-tab-panels v-model="chartName" animated class="q-mb-xl shadow-2 rounded">
               <q-tab-panel name="radar" class="rounded">
-                {{ chartName }}
                 <VueApexCharts
                   width="100%"
                   height="350"
@@ -288,10 +287,6 @@ import apiRoutes from "../apiRoutes";
 import { getShort, getBestAttempts } from "../utils/utils";
 import G2GP from "../utils/G2GP";
 import { backgroundColors, borderColors } from "../colors/colors";
-
-// import RadarChart from "../charts/RadarChart.vue";
-// import BarChart from "../charts/BarChart.vue";
-// import LineChart from "../charts/LineChart.vue";
 
 import StudentInput from "../components/StudentInput.vue";
 import Tip from "../components/Tip.vue";
