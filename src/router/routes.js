@@ -10,6 +10,7 @@ const routes = [
       { path: '/feedback', component: () => import('src/pages/FeedbackPage.vue') },
       { path: '/batch-result', component: () => import('src/pages/BatchResult.vue') },
       { path: '/stats', component: () => import('src/pages/stats.vue') },
+      { path: '/test', component: () => import('src/pages/Test.vue') },
     ]
   },
 
