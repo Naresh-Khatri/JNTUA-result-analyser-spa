@@ -63,7 +63,7 @@
           <!-- <q-btn flat round disabled dense icon="search" class="q-mr-xs" />
           <q-btn flat round disabled dense icon="group_add" />-->
         </q-toolbar>
-        <q-toolbar inset style="padding:0px">
+        <q-toolbar inset style="padding: 0px">
           <q-toolbar-title class="text-center">
             <strong>JNTUA</strong> Results analyser
           </q-toolbar-title>
@@ -73,8 +73,8 @@
 
     <q-drawer v-model="left" side="left" overlay bordered>
       <!-- drawer content -->
-      <div class="q-pa-md" style="display:flex; align-items:center;">
-        <q-list class="rounded-borders text-primary" style="font-size:1.5em;">
+      <div class="q-pa-md" style="display: flex; align-items: center">
+        <q-list class="rounded-borders text-primary" style="font-size: 1.5em">
           <!-- <q-item
             clickable
             v-ripple
@@ -96,7 +96,7 @@
             @click="link = 'single-result'"
             active-class="bg-primary"
             to="/single-result"
-            style=" border-radius:10px"
+            style="border-radius: 10px"
           >
             <q-item-section avatar>
               <q-icon name="person_outline" />
@@ -110,7 +110,7 @@
             @click="link = 'personal-perf'"
             active-class="bg-primary"
             to="/personal-perf"
-            style=" border-radius:10px"
+            style="border-radius: 10px"
           >
             <q-item-section avatar>
               <q-icon name="trending_up" />
@@ -125,7 +125,7 @@
             @click="link = 'compare-result'"
             active-class="bg-primary"
             to="/compare-result"
-            style=" border-radius:10px"
+            style="border-radius: 10px"
           >
             <q-item-section avatar>
               <q-icon name="person_add_alt" />
@@ -141,7 +141,7 @@
             @click="link = 'batch-result'"
             active-class="bg-primary"
             to="/batch-result"
-            style=" border-radius:10px"
+            style="border-radius: 10px"
           >
             <q-item-section avatar>
               <q-icon name="groups" />
@@ -159,7 +159,7 @@
             @click="link = 'stats'"
             active-class="bg-primary"
             to="/stats"
-            style=" border-radius:10px"
+            style="border-radius: 10px"
           >
             <q-item-section avatar>
               <q-icon name="leaderboard" />
@@ -174,7 +174,7 @@
             @click="link = 'feedback'"
             active-class="bg-primary"
             to="/feedback"
-            style=" border-radius:10px"
+            style="border-radius: 10px"
           >
             <q-item-section avatar>
               <q-icon name="feedback" />
@@ -190,7 +190,7 @@
             :active="link === 'help'"
             @click="link = 'help'"
             active-class="bg-primary"
-            style=" border-radius:10px"
+            style="border-radius: 10px"
           >
             <q-item-section avatar>
               <q-icon name="help" />
@@ -204,7 +204,7 @@
 
     <q-page-container
       :class="$q.dark.isActive ? 'dark' : 'bg-grey-4'"
-      style="transition: background-color .3s"
+      style="transition: background-color 0.3s"
     >
       <!-- <div v-if="playAnimation" class="animation-container">
         <div class="snowflake" v-for="j in [51, 52, 53]" :key="j">
@@ -221,50 +221,47 @@
   </q-layout>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from "vue";
+import { useQuasar } from "quasar";
+
 import WelcomDialog from "src/components/WelcomDialog.vue";
 import RateDialog from "src/components/RateDialog.vue";
-export default {
-  data() {
-    return {
-      left: false,
-      link: "single-result",
-      playAnimation: true
-    };
-  },
-  mounted() {
-    this.$q.loadingBar.setDefaults({
-      color: "white",
-      size: "15px"
+const left = ref(false);
+const link = ref("single-result");
+const playAnimation = ref(true);
+
+const $q = useQuasar();
+onMounted(() => {
+  $q.loadingBar.setDefaults({
+    color: "white",
+    size: "15px",
+  });
+  $q.addressbarColor.set("#ff4d01");
+  $q.dark.toggle();
+  if (!window.location.href.includes("8080")) {
+    //patch logs
+    $q.dialog({
+      //   title: "New Features! 👩‍🔧",
+      //   html: true,
+      //   message: `<li style='font-size:1.2em'>
+      // 🆕 Added 🏆statstics for every college</li>
+      // <li style='font-size:1.2em'>
+      // Now you can share any result with your friends😎🤟</li>
+      //   <br>
+      //   If you want this app to get better then head over to
+      //   the feedback section on top 🙋‍♀️
+      //   `
+      component: WelcomDialog,
     });
-    this.$q.addressbarColor.set("#ff4d01");
-    this.$q.dark.toggle();
-    if (!window.location.href.includes("8080")) {
-      //patch logs
-      this.$q.dialog({
-        //   title: "New Features! 👩‍🔧",
-        //   html: true,
-        //   message: `<li style='font-size:1.2em'>
-        // 🆕 Added 🏆statstics for every college</li>
-        // <li style='font-size:1.2em'>
-        // Now you can share any result with your friends😎🤟</li>
-        //   <br>
-        //   If you want this app to get better then head over to
-        //   the feedback section on top 🙋‍♀️
-        //   `
-        component: WelcomDialog
-      });
-      localStorage.setItem("logDisplayed", true);
-    }
-  },
-  methods: {
-    toggleTheme() {
-      this.$q.dark.toggle();
-    },
-    show() {
-      this.$refs.dialog.show();
-    }
+    localStorage.setItem("logDisplayed", true);
   }
+});
+const toggleTheme = () => {
+  $q.dark.toggle();
+};
+const show = () => {
+  // this.$refs.dialog.show();
 };
 </script>
 <style lang="scss" scoped>
