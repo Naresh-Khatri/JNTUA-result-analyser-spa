@@ -2,22 +2,38 @@
   <div class="container">
     <div
       v-if="loading"
-      style="position: fixed; width: 100vw; height: 100vh;
-             top: 0; left: 0; right: 0; bottom: 0;
-             background-color: rgba(0,0,0,0.5); z-index: 2;
-             backdrop-filter: blur(2.5px);
-             cursor: pointer; "
+      style="
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 2;
+        backdrop-filter: blur(2.5px);
+        cursor: pointer;
+      "
     >
-      <transition appear enter-active-class="animated fadeIn" leave-active-class="animated fadeOut">
+      <transition
+        appear
+        enter-active-class="animated fadeIn"
+        leave-active-class="animated fadeOut"
+      >
         <q-img class="loading-img" src="../assets/loading-head.gif">
-          <div
-            class="absolute-bottom-right text-subtitle2 flex flex-center"
-          >This takes around 10 second...🙋‍♀️</div>
+          <div class="absolute-bottom-right text-subtitle2 flex flex-center">
+            This takes around 10 second...🙋‍♀️
+          </div>
         </q-img>
       </transition>
     </div>
     <div class="wrapper">
-      <StudentInput class="result-input" v-model="selection" @success="setSelection($event)" />
+      <StudentInput
+        class="result-input"
+        v-model="selection"
+        @success="onInputSuccess"
+      />
       <div
         class="roll-input flex column rounded q-pa-md"
         :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
@@ -28,8 +44,9 @@
           v-model="rollPrefix"
           bottom-slots
           :rules="[
-            val =>
-              val.length == 8 || 'Enter first 8 charaters of your full roll no.'
+            (val) =>
+              val.length == 8 ||
+              'Enter first 8 charaters of your full roll no.',
           ]"
           label="Roll no prefix"
           clearable
@@ -62,7 +79,7 @@
                     ref="rollInput"
                     label="Roll Number"
                     :color="$q.dark.isActive ? 'white' : 'primary'"
-                    :rules="[val => validateRollNo(val)]"
+                    :rules="[(val) => validateRollNo(val)]"
                     v-model="extraRolls[index]"
                   >
                     <template v-slot:append>
@@ -94,7 +111,7 @@
         </q-expansion-item>
         <div class="flex justify-center">
           <q-btn
-            style="width:150px"
+            style="width: 150px"
             color="primary"
             :loading="loading"
             :disable="!(canSearch && rollPrefix.length == 8)"
@@ -107,7 +124,10 @@
           </q-btn>
         </div>
       </div>
-      <div class="data-container" v-if="Object.keys(sgpaDataCollection).length > 0">
+      <div
+        class="data-container"
+        v-if="Object.keys(sgpaDataCollection).length > 0"
+      >
         <!-- <div class="flex flex-center q-mt-lg">
           <q-btn-group
             ><q-btn
@@ -130,21 +150,24 @@
         <q-card class="sgpa-container q-pa-md rounded glass" flat>
           <div class="flex flex-center q-px-sm">
             <div class="col">
-              <div class="text-center" style="font-size:1.3em; font-weight:4000">
+              <div
+                class="text-center"
+                style="font-size: 1.3em; font-weight: 4000"
+              >
                 Toppers 😒
                 <q-separator class="q-my-md" spaced="true" />
 
-                <i class="fas fa-crown" style="color:gold"></i>
+                <i class="fas fa-crown" style="color: gold"></i>
                 {{ sgpaDataCollection.labels[0].slice(0, -7) }}(
                 {{ sgpaDataCollection.datasets[0].data[0] }}
                 )
                 <br />
-                <i class="fas fa-crown" style="color:silver"></i>
+                <i class="fas fa-crown" style="color: silver"></i>
                 {{ sgpaDataCollection.labels[1].slice(0, -7) }}(
                 {{ sgpaDataCollection.datasets[0].data[1] }}
                 )
                 <br />
-                <i class="fas fa-crown" style="color:brown"></i>
+                <i class="fas fa-crown" style="color: brown"></i>
                 {{ sgpaDataCollection.labels[2].slice(0, -7) }}(
                 {{ sgpaDataCollection.datasets[0].data[2] }}
                 )
@@ -164,8 +187,13 @@
             </div>-->
           </div>
         </q-card>
-        <div style="display:flex; justify-content:center">
-          <q-btn class="text-white" label="Share" style="background:#25D366" @click="share">
+        <div style="display: flex; justify-content: center">
+          <q-btn
+            class="text-white"
+            label="Share"
+            style="background: #25d366"
+            @click="share"
+          >
             <img width="50px" src="../assets/whatsapp.svg" />
           </q-btn>
         </div>
@@ -175,7 +203,12 @@
                             Tap on any point to know more"
         />
         <div
-          style="overflow-x: auto;padding:20px; border-radius:25px;margin:20px 0px"
+          style="
+            overflow-x: auto;
+            padding: 20px;
+            border-radius: 25px;
+            margin: 20px 0px;
+          "
           :class="$q.dark.isActive ? 'bg-dark' : 'bg-white'"
         >
           <q-tabs
@@ -218,54 +251,72 @@
             <q-tab-panel name="sgpa" class="rounded">
               <q-scroll-area
                 horizontal
-                style="height:500px;"
+                style="height: 500px"
                 :thumb-style="{
                   bottom: '4px',
                   borderRadius: '5px',
                   background: '#b0b8b4ff',
                   width: '10px',
-                  opacity: 1
+                  opacity: 1,
                 }"
                 :style="!$q.screen.lt.md ? '' : ''"
               >
-                <LineChart
+                <VueApexCharts
+                  width="100%"
+                  height="350"
+                  type="line"
+                  :options="chartOptions"
+                  :series="series"
+                  :key="series"
+                />
+                <!-- <LineChart
                   :style="'height:500px; width:' + chartWidth + 'px'"
                   :chart-data="sgpaDataCollection"
                   :yMax="10"
                   :key="$q.dark.isActive"
-                />
+                /> -->
               </q-scroll-area>
             </q-tab-panel>
             <q-tab-panel name="sub" class="rounded">
               <q-select
                 :options="subjectList"
                 v-model="selectedSubject"
-                @input="changeSort"
+                @update:model-value="changeSort"
                 label="Select sub"
               />
               <q-scroll-area
                 horizontal
-                style="height:500px;"
+                style="height: 500px"
                 :thumb-style="{
                   bottom: '4px',
                   borderRadius: '5px',
                   background: '#b0b8b4ff',
                   width: '10px',
-                  opacity: 1
+                  opacity: 1,
                 }"
                 :style="!$q.screen.lt.md ? 'height:700px' : ''"
               >
-                <LineChart
+                <VueApexCharts
+                  width="100%"
+                  height="350"
+                  type="line"
+                  :options="subChartOptions"
+                  :series="subSeries"
+                />
+                <!-- <LineChart
                   :style="'height:500px; width:' + chartWidth + 'px'"
                   :chart-data="subDataCollection"
                   :yMax="10"
                   :key="$q.dark.isActive"
-                />
+                /> -->
               </q-scroll-area>
             </q-tab-panel>
           </q-tab-panels>
         </div>
-        <Tip title="Important" desc="Students who are failed even in 1 subject wont be plotted!" />
+        <Tip
+          title="Important"
+          desc="Students who are failed even in 1 subject wont be plotted!"
+        />
         <q-card class="sgpa-container q-pa-md rounded glass" flat>
           <div class="q-px-sm">
             <div class="text-h5 text-center">
@@ -278,7 +329,7 @@
                 label="XLSX file"
                 icon="download"
                 @click="downloadSheet"
-                style="background:#25D366"
+                style="background: #25d366"
               />
               <!-- </div> -->
               <!-- <div class="flex flex-center col">
@@ -294,26 +345,35 @@
           </div>
         </q-card>
       </div>
-      <div v-else class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl">
+      <div
+        v-else
+        class="data-container flex flex-center text-h4 text-center text-grey q-mb-xl"
+      >
         <q-intersection>
           <q-img
             width="400px"
             src="../assets/sad-emoji.gif"
-            style="filter: drop-shadow(0px 0px 6px yellow);"
-          />
-        </q-intersection>Looks so empty here
+            style="filter: drop-shadow(0px 0px 6px yellow)"
+          /> </q-intersection
+        >Looks so empty here
       </div>
     </div>
     <Footer />
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from "vue";
+import { useQuasar } from "quasar";
+import { useRoute } from "vue-router";
+
+import ApexCharts from "apexcharts";
+import VueApexCharts from "vue3-apexcharts";
+
 import axios from "axios";
 import XLSX from "XLSX";
 import apiRoutes from "src/apiRoutes";
 
-import LineChart from "../charts/LineChart.vue";
 import Tip from "../components/Tip.vue";
 import StudentInput from "../components/StudentInput.vue";
 import Footer from "../components/Footer.vue";
@@ -322,382 +382,380 @@ import { getBestAttempts } from "../utils/utils";
 import rollsArray from "../utils/rolls";
 import G2GP from "src/utils/G2GP";
 
-export default {
-  components: {
-    StudentInput,
-    LineChart,
-    Footer,
-    Tip
+const canSearch = ref(false);
+const chartWidth = ref(1300);
+const rollPrefix = ref("19fh1a05");
+const loading = ref(false);
+const sortBy = ref("sgpa");
+const range = ref({
+  min: 1,
+  max: 65,
+});
+const extraRolls = ref(["19fh1a0546"]);
+const chartOptions = ref({
+  xaxis: {},
+});
+const series = ref([
+  {
+    name: "Grade Point",
+    data: [7, 7, 6, 6, 6, 6, 6, 6, 6, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0],
   },
-  data() {
-    return {
-      canSearch: false,
-      chartWidth: 1300,
-      rollPrefix: "19fh1a05",
-      selection: {},
-      loading: false,
-      sortBy: "sgpa",
-      range: {
-        min: 1,
-        max: 65
+]);
+const subChartOptions = ref({
+  chart: { id: "vuechart-example" },
+  xaxis: {},
+});
+const subSeries = ref([]);
+const sgpaDataCollection = ref({});
+const subDataCollection = ref({});
+const studentsResultsArr = ref([]);
+const subjectList = ref([]);
+const selectedSubject = ref("");
+const selection = ref({ reg: "", course: "", year: "", sem: "" });
+const rollInput = ref(null);
+
+const $q = useQuasar();
+const $route = useRoute();
+onMounted(() => {
+  // this.$q.dialog({
+  //   title: "Section Currently disabled😢😭",
+  //   html: true,
+  //   persistent: true,
+  //   message: `This feature is disabled due to a bug . Please check back later!`,
+  // })
+  //   .onOk(() => {
+  //     this.$router.push("/");
+  //   })
+  // return
+  // this.resultID = "56736469";
+  // this.canSearch = true;
+  checkQueries();
+  //to show Under Development
+  if (false)
+    $q.dialog({
+      title: "Under Development",
+      html: true,
+      persistent: true,
+      message: `This feature is still under development. Please check back later!`,
+    });
+});
+const chartWidthPercentage = computed(() =>
+  ((chartWidth.value / 1300) * 100).toFixed()
+);
+const rollWithPrefix = (roll) => rollsArray[roll].toUpperCase();
+const onInputSuccess = () => {
+  canSearch.value = true;
+  console.log(selection.value);
+};
+const removeRollNo = (index) => {
+  extraRolls.value.splice(index, 1);
+  canSearch.value = true;
+};
+const addExtraRoll = () => {
+  extraRolls.value.push(extraRolls.value[0].slice(0, -2));
+  setTimeout(() => {
+    rollInput.value.slice(-1)[0].focus();
+  });
+  console.log("added new roll");
+  canSearch.value = false;
+};
+const validateRollNo = (roll) => {
+  if (roll.length != 10) {
+    $q.notify({
+      color: "negative",
+      message: "Roll no length should be 10",
+    });
+    canSearch.value = false;
+    return "Roll no length should be 10";
+  }
+  canSearch.value = true;
+  return true;
+};
+const checkQueries = () => {
+  if (!Object.keys($route.query).includes("reg")) return;
+
+  // console.log(Object.keys(this.$route.query).includes("resultID"));
+  selection.value = $route.query;
+  console.log(selection.value);
+  rollPrefix.value = selection.value.roll;
+  range.value.min = selection.value.min;
+  range.value.max = selection.value.max;
+  // console.log(this.$route.query);
+  resultID.value = $route.query.resultID;
+  range.value.rollPrefix = $route.query.prefix;
+  range.value.min = $route.query.min;
+  range.value.max = $route.query.max;
+
+  // console.log(window.location);
+  this.submit();
+};
+const share = () => {
+  if (navigator.share) {
+    navigator
+      .share({
+        title: "Hey I saw our entire batch result on this cool webApp!",
+        url:
+          window.location.origin +
+          window.location.pathname +
+          "#/batch-result?reg=" +
+          selection.value.reg +
+          "&course=" +
+          selection.value.course +
+          "&sem=" +
+          selection.value.sem +
+          "&year=" +
+          selection.value.year +
+          "&roll=" +
+          rollPrefix.value +
+          "&min=" +
+          range.value.min +
+          "&max=" +
+          range.value.max,
+      })
+      .then(() => {
+        sendSharedInfoToDB();
+        console.log("Thanks for sharing!");
+        $q.notify({
+          type: "positive",
+          message: `Thanks for sharing this page! 😀😁`,
+        });
+      })
+      .catch(console.error);
+  } else {
+    // fallback
+  }
+};
+const sendSharedInfoToDB = () => {
+  axios.post(apiRoutes.share, {
+    type: "batch",
+    htns: [
+      rollPrefix.value + rollWithPrefix(range.value.min),
+      rollPrefix.value + rollWithPrefix(range.value.max),
+    ],
+    resultID: resultID.value,
+  });
+};
+const changeSort = () => {
+  console.log("chaning sub");
+  let studentsResults = [];
+  console.log(studentsResultsArr.value);
+  studentsResultsArr.value.forEach((student) => {
+    studentsResults.push({
+      name: student.name,
+      htn: student.htn,
+      bestAttempt: getBestAttempts(student.attempts),
+    });
+  });
+  //sort studentResults
+  const subIndex = getBestAttempts(
+    studentsResultsArr.value[0].attempts
+  ).findIndex((sub) => sub["1"] === selectedSubject.value.value);
+  // console.log(subIndex);
+  studentsResults.sort((a, b) => {
+    return (
+      G2GP[b.bestAttempt[subIndex].Grade.toUpperCase()] -
+      G2GP[a.bestAttempt[subIndex].Grade.toUpperCase()]
+    );
+  });
+  console.log(studentsResults);
+  let rank = 1;
+  const studentNames = [];
+  const studentSubGrade = [];
+  for (let i = 0; i < studentsResults.length; i++) {
+    // console.log(studentsResults[i]);
+    //only add rank if not failed
+    studentNames.push(
+      `${studentsResults[i]["name"]}(${studentsResults[i]["htn"].slice(-2)}) #${
+        G2GP[studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()] > 0
+          ? rank
+          : "na"
+      }`
+    );
+    studentSubGrade.push(
+      G2GP[studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()]
+    );
+    if (studentsResults[i + 1])
+      if (
+        G2GP[studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()] !=
+        G2GP[studentsResults[i + 1].bestAttempt[subIndex].Grade.toUpperCase()]
+      )
+        rank++;
+  }
+  subChartOptions.value.xaxis.categories = studentNames;
+  subSeries.value = [{ name: "Grade Point", data: studentSubGrade }];
+  console.log("changing sort");
+  console.log(subChartOptions.value);
+  console.log(subSeries.value);
+  subDataCollection.value = {
+    labels: studentNames,
+    datasets: [
+      {
+        data: studentSubGrade,
+        backgroundColor: "#ff4d0155",
+        borderColor: "#ff4d01",
       },
-      extraRolls: ["19fh1a0546"],
-      G2GP: G2GP,
-      sgpaDataCollection: {},
-      subDataCollection: {},
-      studentsResultsArr: [],
-      subjectList: [],
-      selectedSubject: "",
-      selectionInput: {}
-    };
-  },
-  mounted() {
-    // this.$q.dialog({
-    //   title: "Section Currently disabled😢😭",
-    //   html: true,
-    //   persistent: true,
-    //   message: `This feature is disabled due to a bug . Please check back later!`,
-    // })
-    //   .onOk(() => {
-    //     this.$router.push("/");
-    //   })
-    // return
-    // this.resultID = "56736469";
-    // this.canSearch = true;
-    this.checkQueries();
-    //to show Under Development
-    if (false)
-      this.$q.dialog({
-        title: "Under Development",
-        html: true,
-        persistent: true,
-        message: `This feature is still under development. Please check back later!`
-      });
-  },
-  computed: {
-    chartWidthPercentage() {
-      return ((this.chartWidth / 1300) * 100).toFixed();
-    }
-  },
-  methods: {
-    rollWithPrefix(roll) {
-      return rollsArray[roll].toUpperCase();
-      // if (roll < 10) return `0${roll}`;
-      // else return roll;
-    },
-    setSelection(selection) {
-      this.selectionInput = selection;
-      this.canSearch = true;
-    },
-    removeRollNo(index) {
-      this.extraRolls.splice(index, 1);
-      this.canSearch = true;
-    },
-    addExtraRoll() {
-      this.extraRolls.push(this.extraRolls[0].slice(0, -2));
-      setTimeout(() => {
-        this.$refs.rollInput.slice(-1)[0].focus();
-      });
-      console.log("added new roll");
-      this.canSearch = false;
-    },
-    validateRollNo(roll) {
-      if (roll.length != 10) {
-        this.$q.notify({
-          color: "negative",
-          message: "Roll no length should be 10"
-        });
-        this.canSearch = false;
-        return "Roll no length should be 10";
-      }
-      this.canSearch = true;
-      return true;
-    },
-    checkQueries() {
-      if (!Object.keys(this.$route.query).includes("reg")) return;
+    ],
+  };
+};
+const submit = () => {
+  loading.value = true;
+  var studentNames = [];
+  var studentSGPAs = [];
 
-      // console.log(Object.keys(this.$route.query).includes("resultID"));
-      this.selectionInput = this.$route.query;
-      this.selection = this.$route.query;
-      console.log(this.selection);
-      this.rollPrefix = this.selection.roll;
-      this.range.min = this.selection.min;
-      this.range.max = this.selection.max;
-      // console.log(this.$route.query);
-      this.resultID = this.$route.query.resultID;
-      this.range.rollPrefix = this.$route.query.prefix;
-      this.range.min = this.$route.query.min;
-      this.range.max = this.$route.query.max;
+  axios
+    .get(
+      apiRoutes.batchResultsv2 +
+        "/" +
+        rollPrefix.value +
+        "/" +
+        range.value.min +
+        "/" +
+        range.value.max +
+        "/" +
+        selection.value.reg +
+        "/" +
+        selection.value.course +
+        "/" +
+        selection.value.year +
+        "/" +
+        selection.value.sem
+    )
+    .then((res) => {
+      loading.value = false;
+      console.log(res);
+      // res.data.map(s => console.log(s.sgpa));
 
-      // console.log(window.location);
-      this.submit();
-    },
-    share() {
-      if (navigator.share) {
-        navigator
-          .share({
-            title: "Hey I saw our entire batch result on this cool webApp!",
-            url:
-              window.location.origin +
-              window.location.pathname +
-              "#/batch-result?reg=" +
-              this.selectionInput.reg +
-              "&course=" +
-              this.selectionInput.course +
-              "&sem=" +
-              this.selectionInput.sem +
-              "&year=" +
-              this.selectionInput.year +
-              "&roll=" +
-              this.rollPrefix +
-              "&min=" +
-              this.range.min +
-              "&max=" +
-              this.range.max
-          })
-          .then(() => {
-            this.sendSharedInfoToDB();
-            console.log("Thanks for sharing!");
-            this.$q.notify({
-              type: "positive",
-              message: `Thanks for sharing this page! 😀😁`
-            });
-          })
-          .catch(console.error);
-      } else {
-        // fallback
-      }
-    },
-    sendSharedInfoToDB() {
-      axios.post(apiRoutes.share, {
-        type: "batch",
-        htns: [
-          this.rollPrefix + this.rollWithPrefix(this.range.min),
-          this.rollPrefix + this.rollWithPrefix(this.range.max)
-        ],
-        resultID: this.resultID
+      //get subject list
+      subjectList.value = [];
+      getBestAttempts(res.data[0].attempts).forEach((s) => {
+        subjectList.value.push({ value: s["1"], label: s["Subject Name"] });
       });
-    },
-    changeSort() {
-      let studentsResults = [];
-      console.log(this.studentsResultsArr);
-      this.studentsResultsArr.forEach(student => {
-        studentsResults.push({
-          name: student.name,
-          htn: student.htn,
-          bestAttempt: getBestAttempts(student.attempts)
-        });
+      selectedSubject.value = subjectList.value[0];
+      // console.log(this.subjectList)
+      res.data.sort((a, b) => {
+        return b.sgpa - a.sgpa;
       });
-      //sort studentResults
-      const subIndex = getBestAttempts(
-        this.studentsResultsArr[0].attempts
-      ).findIndex(sub => sub["1"] === this.selectedSubject.value);
-      // console.log(subIndex);
-      studentsResults.sort((a, b) => {
-        return (
-          this.G2GP[b.bestAttempt[subIndex].Grade.toUpperCase()] -
-          this.G2GP[a.bestAttempt[subIndex].Grade.toUpperCase()]
-        );
-      });
+      // res.data.map(s => console.log(s.sgpa));
+      studentsResultsArr.value = res.data;
       let rank = 1;
-      const studentNames = [];
-      const studentSubGrade = [];
-      for (let i = 0; i < studentsResults.length; i++) {
-        // console.log(studentsResults[i]);
+      for (let i = 0; i < studentsResultsArr.value.length; i++) {
         //only add rank if not failed
         studentNames.push(
-          `${studentsResults[i]["name"]}(${studentsResults[i]["htn"].slice(
-            -2
-          )}) #${this.G2GP[
-            studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
-          ] > 0
-            ? rank
-            : "na"
+          `${studentsResultsArr.value[i]["name"]} (${studentsResultsArr.value[
+            i
+          ]["htn"].slice(-2)}) #${
+            studentsResultsArr.value[i].sgpa > 0 ? rank : "na"
           }`
         );
-        studentSubGrade.push(
-          this.G2GP[
-          studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
-          ]
-        );
-        if (studentsResults[i + 1])
+        studentSGPAs.push(studentsResultsArr.value[i].sgpa);
+        if (studentsResultsArr.value[i + 1])
           if (
-            this.G2GP[
-            studentsResults[i].bestAttempt[subIndex].Grade.toUpperCase()
-            ] !=
-            this.G2GP[
-            studentsResults[i + 1].bestAttempt[subIndex].Grade.toUpperCase()
-            ]
+            studentsResultsArr.value[i].sgpa !=
+            studentsResultsArr.value[i + 1].sgpa
           )
             rank++;
       }
-      this.subDataCollection = {
+      // res.data.forEach((ele,i) => {
+      //   studentNames.push(`${ele["name"]} (${ele["htn"].slice(-2)}) #${i+1}`);
+      //   studentSGPAs.push(ele["sgpa"]);
+      //   if()
+      //   // console.log(ele.sgpa, ele.name, ele.htn);
+      // });
+    })
+    .then(() => {
+      //scroll bottom
+      setTimeout(() => {
+        window.scrollTo(0, document.body.scrollHeight - 1500);
+      }, 300);
+    })
+    .finally(() => {
+      chartOptions.value.xaxis.categories = studentNames;
+      series.value = [{ name: "SGPA", data: studentSGPAs }];
+      console.log(chartOptions.value);
+      console.log(series.value);
+      //create sgpaDataCollection then create subDataCollection
+      sgpaDataCollection.value = {
         labels: studentNames,
         datasets: [
           {
-            data: studentSubGrade,
+            data: studentSGPAs,
             backgroundColor: "#ff4d0155",
-            borderColor: "#ff4d01"
-          }
-        ]
+            borderColor: "#ff4d01",
+          },
+        ],
       };
-    },
-    submit() {
-      this.loading = true;
-      var studentNames = [];
-      var studentSGPAs = [];
+      changeSort();
+    });
+  console.log(sgpaDataCollection.value);
+};
+const downloadSheet = (option) => {
+  //get students in asc order of htn
+  const students = studentsResultsArr.value;
+  students.sort((a, b) => {
+    return a.htn.slice(-2) - b.htn.slice(-2);
+  });
+  //get best attempts of each student
+  students.forEach((s) => {
+    const bestAttempt = getBestAttempts(s.attempts);
+    //loop through each subject in best attempt
+    bestAttempt.forEach((attempt) => {
+      s["cred-" + attempt["Subject Name"]] = attempt["Credits"];
+      s["grade-" + attempt["Subject Name"]] = attempt["Grade"];
+      s["status-" + attempt["Subject Name"]] = attempt["Result Status"];
+      s["passingMonth-" + attempt["Subject Name"]] = attempt["month"];
+      delete s.attempts;
+      delete s.collegeCode;
+      delete s.lastViewed;
+      delete s.reg;
+      delete s.course;
+      delete s.year;
+      delete s.sem;
+      delete s.viewCount;
+      delete s._id;
+      delete s.__v;
+    });
+  });
+  const batchOverall = {
+    Registered: students.length,
+    attended: students.filter((s) => s.sgpa != 0).length,
+    absent: students.filter((s) => s.sgpa == 0).length,
+    passed: students.filter((s) => s.sgpa > 0).length,
+    failed: students.filter((s) => s.sgpa == -1).length,
+    sgpa:
+      students.reduce((acc, s) => acc + s.sgpa, 0) /
+      students.filter((s) => s.sgpa > 0).length,
+    passPercentage:
+      (students.filter((s) => s.sgpa > 0).length /
+        students.filter((s) => s.sgpa != 0).length) *
+      100,
+    failPercentage:
+      (students.filter((s) => s.sgpa == -1).length /
+        students.filter((s) => s.sgpa != 0).length) *
+      100,
+  };
 
-      axios
-        .get(
-          apiRoutes.batchResultsv2 +
-          "/" +
-          this.rollPrefix +
-          "/" +
-          this.range.min +
-          "/" +
-          this.range.max +
-          "/" +
-          this.selectionInput.reg +
-          "/" +
-          this.selectionInput.course +
-          "/" +
-          this.selectionInput.year +
-          "/" +
-          this.selectionInput.sem
-        )
-        .then(res => {
-          this.loading = false;
-          console.log(res);
-          // res.data.map(s => console.log(s.sgpa));
-
-          //get subject list
-          this.subjectList = [];
-          getBestAttempts(res.data[0].attempts).forEach(s => {
-            this.subjectList.push({ value: s["1"], label: s["Subject Name"] });
-          });
-          this.selectedSubject = this.subjectList[0];
-          // console.log(this.subjectList)
-          res.data.sort((a, b) => {
-            return b.sgpa - a.sgpa;
-          });
-          // res.data.map(s => console.log(s.sgpa));
-          this.studentsResultsArr = res.data;
-          let rank = 1;
-          for (let i = 0; i < this.studentsResultsArr.length; i++) {
-            //only add rank if not failed
-            studentNames.push(
-              `${this.studentsResultsArr[i]["name"]} (${this.studentsResultsArr[
-                i
-              ]["htn"].slice(-2)}) #${this.studentsResultsArr[i].sgpa > 0 ? rank : "na"
-              }`
-            );
-            studentSGPAs.push(this.studentsResultsArr[i].sgpa);
-            if (this.studentsResultsArr[i + 1])
-              if (
-                this.studentsResultsArr[i].sgpa !=
-                this.studentsResultsArr[i + 1].sgpa
-              )
-                rank++;
-          }
-          // res.data.forEach((ele,i) => {
-          //   studentNames.push(`${ele["name"]} (${ele["htn"].slice(-2)}) #${i+1}`);
-          //   studentSGPAs.push(ele["sgpa"]);
-          //   if()
-          //   // console.log(ele.sgpa, ele.name, ele.htn);
-          // });
-        })
-        .then(() => {
-          //scroll bottom
-          setTimeout(() => {
-            window.scrollTo(0, document.body.scrollHeight - 1500);
-          }, 300);
-        })
-        .finally(() => {
-          //create sgpaDataCollection then create subDataCollection
-          this.sgpaDataCollection = {
-            labels: studentNames,
-            datasets: [
-              {
-                data: studentSGPAs,
-                backgroundColor: "#ff4d0155",
-                borderColor: "#ff4d01"
-              }
-            ]
-          };
-          this.changeSort();
-        });
-      console.log(this.sgpaDataCollection);
-    },
-    downloadSheet(option) {
-      //get students in asc order of htn
-      const students = this.studentsResultsArr;
-      students.sort((a, b) => {
-        return a.htn.slice(-2) - b.htn.slice(-2);
-      });
-      //get best attempts of each student
-      students.forEach(s => {
-        const bestAttempt = getBestAttempts(s.attempts);
-        //loop through each subject in best attempt
-        bestAttempt.forEach(attempt => {
-          s["cred-" + attempt["Subject Name"]] = attempt["Credits"];
-          s["grade-" + attempt["Subject Name"]] = attempt["Grade"];
-          s["status-" + attempt["Subject Name"]] = attempt["Result Status"];
-          s["passingMonth-" + attempt["Subject Name"]] = attempt["month"];
-          delete s.attempts;
-          delete s.collegeCode;
-          delete s.lastViewed;
-          delete s.reg;
-          delete s.course;
-          delete s.year;
-          delete s.sem;
-          delete s.viewCount;
-          delete s._id;
-          delete s.__v;
-        });
-      });
-      const batchOverall = {
-        Registered: students.length,
-        attended: students.filter(s => s.sgpa != 0).length,
-        absent: students.filter(s => s.sgpa == 0).length,
-        passed: students.filter(s => s.sgpa > 0).length,
-        failed: students.filter(s => s.sgpa == -1).length,
-        sgpa:
-          students.reduce((acc, s) => acc + s.sgpa, 0) /
-          students.filter(s => s.sgpa > 0).length,
-        passPercentage:
-          (students.filter(s => s.sgpa > 0).length /
-            students.filter(s => s.sgpa != 0).length) *
-          100,
-        failPercentage:
-          (students.filter(s => s.sgpa == -1).length /
-            students.filter(s => s.sgpa != 0).length) *
-          100
-      };
-
-      const fileName =
-        this.selectionInput.reg +
-        "-" +
-        this.selectionInput.course +
-        "-" +
-        this.selectionInput.year +
-        "-" +
-        this.selectionInput.sem +
-        "-" +
-        this.rollPrefix +
-        this.range.min +
-        "-" +
-        this.rollPrefix +
-        this.range.max +
-        "-sgpa.xlsx";
-      const wb = {};
-      wb.SheetNames = ["Students", "overall"];
-      wb.Sheets = {};
-      console.log(students, batchOverall);
-      wb.Sheets["Students"] = XLSX.utils.json_to_sheet(students);
-      wb.Sheets["overall"] = XLSX.utils.json_to_sheet([batchOverall]);
-      XLSX.writeFile(wb, fileName);
-    }
-  }
+  const fileName =
+    selection.value.reg +
+    "-" +
+    selection.value.course +
+    "-" +
+    selection.value.year +
+    "-" +
+    selection.value.sem +
+    "-" +
+    rollPrefix.value +
+    range.value.min +
+    "-" +
+    rollPrefix.value +
+    range.value.max +
+    "-sgpa.xlsx";
+  const wb = {};
+  wb.SheetNames = ["Students", "overall"];
+  wb.Sheets = {};
+  console.log(students, batchOverall);
+  wb.Sheets["Students"] = XLSX.utils.json_to_sheet(students);
+  wb.Sheets["overall"] = XLSX.utils.json_to_sheet([batchOverall]);
+  XLSX.writeFile(wb, fileName);
 };
 </script>
 
