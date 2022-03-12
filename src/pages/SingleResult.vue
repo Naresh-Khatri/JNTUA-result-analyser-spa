@@ -235,7 +235,6 @@
               class="q-mb-xl shadow-2 rounded"
             >
               <q-tab-panel name="radar" class="rounded">
-                {{ chartName }}
                 <VueApexCharts
                   width="100%"
                   height="350"
