@@ -15,7 +15,6 @@
     "apexcharts": "^3.33.1",
     "axios": "^0.21.1",
     "babel-eslint": "^10.1.0",
-    "chart.js": "^3.7.1",
     "core-js": "^3.6.5",
     "eslint-config-prettier": "^8.4.0",
     "eslint-webpack-plugin": "^2.5.4",
@@ -24,11 +23,9 @@
     "jssoup": "^0.0.12",
     "quasar": "2",
     "vue": "3",
-    "vue-chart-3": "^3.1.2",
-    "vue-chartjs": "^3.5.1",
-    "vue-gtag": "^2.0.1",
     "vue-router": "4",
     "vue3-apexcharts": "^1.4.1",
+    "vuex": "4",
     "xlsx": "^0.17.4"
   },
   "devDependencies": {
@@ -44,6 +41,7 @@
     "eslint-plugin-quasar": "^1.0.0",
     "eslint-plugin-vue": "^7.0.0",
     "eslint-webpack-plugin": "^2.4.0",
+    "node-polyfill-webpack-plugin": "^1.1.4",
     "postcss": "^7",
     "prettier": "2.5.1",
     "prettier-eslint": "^13.0.0",
