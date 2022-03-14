@@ -317,6 +317,10 @@ const chartName = ref("radar");
 const chartOptions = ref({
   chart: { id: "vuechart-example" },
   xaxis: {},
+  yaxis: {
+    min: 0,
+    max: 10,
+  },
 });
 const series = ref([]);
 const columns = [

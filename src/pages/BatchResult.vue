@@ -394,6 +394,10 @@ const range = ref({
 const extraRolls = ref(["19fh1a0546"]);
 const chartOptions = ref({
   xaxis: {},
+  yaxis: {
+    min: 0,
+    max: 10,
+  },
 });
 const series = ref([
   {

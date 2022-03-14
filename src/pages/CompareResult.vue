@@ -162,7 +162,7 @@
             <VueApexCharts
               width="100%"
               height="350"
-              :type="chartName"
+              type="area"
               :options="chartOptions"
               :series="series"
             />
@@ -222,6 +222,10 @@ const chartName = ref("radar");
 const chartOptions = ref({
   chart: { id: "vuechart-example" },
   xaxis: {},
+  yaxis: {
+    min: 0,
+    max: 10,
+  },
 });
 const series = ref([]);
 const subjectNames = ref([]);

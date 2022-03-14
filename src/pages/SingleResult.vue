@@ -66,7 +66,7 @@
               />
             </div>
           </div>
-          <div class="flex" style="flex-direction: column;align-items: center;">
+          <div class="flex" style="flex-direction: column; align-items: center">
             <q-card
               class="sgpa-container q-px-lg rounded glass"
               :style="studentName.toUpperCase() == 'NARESH' ? 'bg-cyan-8' : ''"
@@ -130,6 +130,7 @@
 
               <q-table
                 title="Result Table"
+                :dense="$q.screen.lt.md"
                 :rows="rowData"
                 :columns="columns"
                 row-key="name"
@@ -138,10 +139,10 @@
               >
                 <template v-slot:body="props">
                   <q-tr :props="props">
-                    <q-td dense auto-width key="subject_name" :props="props">{{
+                    <q-td auto-width key="subject_name" :props="props">{{
                       props.row.subject_name
                     }}</q-td>
-                    <q-td dense auto-width key="status" :props="props">
+                    <q-td auto-width key="status" :props="props">
                       <q-chip
                         auto-width
                         size="md"
@@ -152,7 +153,7 @@
                         >{{ props.row.status }}</q-chip
                       >
                     </q-td>
-                    <q-td dense auto-width key="marks" :props="props">
+                    <q-td auto-width key="marks" :props="props">
                       <div v-if="!props.row.total" style="font-size: 22px">
                         🤷‍♀️
                       </div>
@@ -161,16 +162,16 @@
                         {{ props.row.internals }})
                       </div>
                     </q-td>
-                    <q-td dense auto-width key="grade" :props="props">{{
+                    <q-td auto-width key="grade" :props="props">{{
                       props.row.grade
                     }}</q-td>
-                    <q-td dense auto-width key="points" :props="props">{{
+                    <q-td auto-width key="points" :props="props">{{
                       props.row.points
                     }}</q-td>
-                    <q-td dense auto-width key="credit" :props="props">
+                    <q-td auto-width key="credit" :props="props">
                       {{ props.row.credit }}
                     </q-td>
-                    <q-td dense auto-width key="month" :props="props">
+                    <q-td auto-width key="month" :props="props">
                       {{ props.row.month }}
                     </q-td>
                   </q-tr>
@@ -217,7 +218,7 @@
                 :style="$q.dark.isActive ? 'color:white' : ''"
               />
               <q-tab
-                name="line"
+                name="area"
                 icon="show_chart"
                 label="Line"
                 :style="$q.dark.isActive ? 'color:white' : ''"
@@ -257,7 +258,7 @@
                 </div>
               </q-tab-panel>
 
-              <q-tab-panel name="line" class="flex flex-center flex-row">
+              <q-tab-panel name="area" class="flex flex-center flex-row">
                 <VueApexCharts
                   width="100%"
                   height="350"
@@ -324,7 +325,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watchEffect } from "vue";
 import { useRoute } from "vue-router";
 import { useQuasar } from "quasar";
 import axios from "axios";
@@ -403,11 +404,32 @@ const pagination = {
 };
 const totalAttempts = ref(0);
 const chartOptions = ref({
-  chart: { id: "vuechart-example" },
+  chart: { id: "result-chart",
+  background:'#0000' },
   xaxis: {},
+  yaxis: {
+    min: 0,
+    max: 10,
+  },
 });
 const series = ref([]);
 const scrollArea = ref(null);
+watchEffect(() => {
+  chartOptions.value = {
+    ...chartOptions.value,
+    tooltip: { theme: $q.dark.isActive ? "dark" : "light" },
+    theme: {
+      mode: $q.dark.isActive ? "dark" : "light",
+      monochrome: {
+        enabled: false,
+        color: "#255aee",
+        shadeTo: $q.dark.isActive ? "dark" : "light",
+        shadeIntensity: 0.65,
+      },
+    },
+  };
+});
+
 const submitBtnStyle = computed(
   () =>
     `${

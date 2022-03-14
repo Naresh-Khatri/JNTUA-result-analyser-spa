@@ -54,6 +54,8 @@
         College code (Searches count)
       </div>
       <VueApexCharts
+        :key="$q.dark.isActive"
+        ref="charts"
         width="100%"
         height="350"
         type="donut"
@@ -84,9 +86,11 @@
         :style="!$q.screen.lt.md ? 'height:400px' : ''"
       >
         <VueApexCharts
+          :key="$q.dark.isActive"
+          ref="charts"
           width="100%"
           height="350"
-          type="line"
+          type="area"
           :options="dailySearchesOptions"
           :series="dailySearchesSeries"
         />
@@ -96,7 +100,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useQuasar } from "quasar";
 import VueApexCharts from "vue3-apexcharts";
 import AnimatedNumber from "../components/AnimatedNumber.vue";
@@ -117,24 +121,42 @@ const dateChart = ref(null);
 const totalSearchesOptions = ref({});
 const totalSearchesSeries = ref();
 const dailySearchesOptions = ref({
-  chart: { id: "vuechart-example" },
-  theme: { palette: "palette1" },
+  chart: {
+    id: "vuechart-example",
+    background: "transparent",
+    stroke: {
+    show: true,
+    curve: 'smooth',
+    lineCap: 'butt',
+    colors: undefined,
+    width: 2,
+    dashArray: 0,      
+}
+    // theme: { palette: "palette1" },
+  },
 });
 const dailySearchesSeries = ref([]);
-// const lineDataCollection = ref({});
-// const pieDataCollection = ref({});
+
+const $q = useQuasar();
 
 const animatedNumber = computed(() => tweenedNumber.value.toFixed(0));
-// watch: {
-//   totalSearches(val) {
-//     gsap.to(this.$data, { duration: 1, tweenedNumber: val });
-//   }
-// };
+//update charts theme when app theme changes
+watch(
+  () => $q.dark.isActive,
+  (val) => {
+    console.log($q.dark.isActive);
+    totalSearchesOptions.value = {
+      ...totalSearchesOptions.value,
+      theme: { mode: $q.dark.isActive ? "dark" : "" },
+    };
+    dailySearchesOptions.value = {
+      ...dailySearchesOptions.value,
+      theme: { mode: $q.dark.isActive ? "dark" : "" },
+      
+    };
+  }
+);
 onMounted(() => {
-  // updateSearchCount();
-  setTimeout(() => {
-    // console.log(pieDataCollection.value);
-  }, 1000);
   axios
     .get(apiRoutes.stats)
     .then((res) => {
@@ -145,30 +167,14 @@ onMounted(() => {
       topColleges.value = res.data.topColleges;
       totalSearches.value = res.data.totalSearches;
       collegesReached.value = res.data.searches.length;
-      // gsap.to(tweenedNumber.value, { duration: 1, tweenedNumber: totalSearches.value });
 
       let counter = 0;
-      // let arr = Object.entries(res.data.colleges);
-      // arr.sort(([a, b], [c, d]) => d - b);
-      // console.log(arr);
       const top30CollegeNames = [];
       const top30CollegeSearchCounts = [];
       res.data.searches.map((item, index) => {
         if (index >= 30) return;
-        // pieDataCollection.value.labels.push(
-        //   `${item["_id"]} (${item["total"]})`
-        // );
-        // console.log("pushing ", item["total"], item["_id"]);
         top30CollegeNames.push(`${item["_id"]} (${item["total"]})`);
         top30CollegeSearchCounts.push(item["total"]);
-        // pieDataCollection.value.datasets[0].data.push(item["total"]);
-
-        // pieDataCollection.value.datasets[0].backgroundColor.push(
-        //   backgroundColors[counter % 7]
-        // );
-        // pieDataCollection.value.datasets[0].borderColor.push(
-        //   borderColors[counter % 7]
-        // );
         counter++;
       });
       console.log(top30CollegeNames);
@@ -181,22 +187,13 @@ onMounted(() => {
       console.log(totalSearchesSeries.value);
       console.log(totalSearchesOptions.value);
 
-      // arr = Object.entries(res.data.searchDates);
       // set the line chart color to primary
-      // lineDataCollection.datasets[0].backgroundColor.push(backgroundColors[1]);
-      // lineDataCollection.datasets[0].borderColor.push(borderColors[1]);
       const dailySeachesDates = [];
       const dailySeachesCounts = [];
       res.data.searchesArr.map((item, index) => {
         dailySeachesDates.push(item["date"].slice(5, 10));
         dailySeachesCounts.push(item["searchCount"]);
-        // lineDataCollection.labels.push(item["date"].slice(5, 10));
-        // lineDataCollection.datasets[0].data.push(item["searchCount"]);
       });
-      // totalSearchesOptions.value = {
-      //   xaxis: { categories: top30CollegeSearchCounts },
-      // };
-      // totalSearchesSeries.value = [{ name: "count", data: top30CollegeNames }];
       dailySearchesOptions.value = {
         xaxis: { categories: dailySeachesDates },
       };
@@ -206,15 +203,6 @@ onMounted(() => {
           data: dailySeachesCounts,
         },
       ];
-      // console.log(dailySearchesOptions.value);
-      // console.log(dailySearchesSeries.value);
-
-      // console.log(lineDataCollection);
-      // arr.map((item) => {
-      //   lineDataCollection.labels.push(item[0]);
-      //   lineDataCollection.datasets[0].data.push(item[1]);
-      //   counter++;
-      // });
       // dateChart.scrollLeft += 300;
       // setTimeout(() => {
       //   document.querySelector(".dateChart").scrollLeft -=
@@ -226,11 +214,13 @@ onMounted(() => {
     .catch((err) => {
       console.log(err);
     });
-  // console.log(this.pieDataCollection);
 });
 </script>
 
 <style>
+.apexcharts-legend-text {
+  color: white;
+}
 @media screen and (min-width: 1000px) {
   .container > div {
     width: 1000px;
