@@ -88,7 +88,7 @@
         <VueApexCharts
           :key="$q.dark.isActive"
           ref="charts"
-          width="100%"
+          width="1000px"
           height="350"
           type="area"
           :options="dailySearchesOptions"
