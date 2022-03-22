@@ -262,7 +262,7 @@
                 :style="!$q.screen.lt.md ? '' : ''"
               >
                 <VueApexCharts
-                  width="100%"
+                  width="1000"
                   height="350"
                   type="line"
                   :options="chartOptions"
@@ -297,7 +297,7 @@
                 :style="!$q.screen.lt.md ? 'height:700px' : ''"
               >
                 <VueApexCharts
-                  width="100%"
+                  :width="chartWidthPercentage"
                   height="350"
                   type="line"
                   :options="subChartOptions"
@@ -363,7 +363,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useQuasar } from "quasar";
 import { useRoute } from "vue-router";
 
@@ -402,7 +402,7 @@ const chartOptions = ref({
 const series = ref([
   {
     name: "Grade Point",
-    data: [7, 7, 6, 6, 6, 6, 6, 6, 6, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0],
+    data: [],
   },
 ]);
 const subChartOptions = ref({
@@ -420,6 +420,24 @@ const rollInput = ref(null);
 
 const $q = useQuasar();
 const $route = useRoute();
+
+watch(
+  () => $q.dark.isActive,
+  (val) => {
+    console.log($q.dark.isActive);
+    subChartOptions.value = {
+      ...subChartOptions.value,
+      theme: { mode: $q.dark.isActive ? "dark" : "" },
+    };
+    subChartOptions.value = {
+      ...subChartOptions.value,
+      theme: { mode: $q.dark.isActive ? "dark" : "" },
+    };
+    console.log(subChartOptions.value);
+    
+  }
+);
+
 onMounted(() => {
   // this.$q.dialog({
   //   title: "Section Currently disabled😢😭",
