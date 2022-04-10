@@ -371,7 +371,7 @@ import ApexCharts from "apexcharts";
 import VueApexCharts from "vue3-apexcharts";
 
 import axios from "axios";
-import XLSX from "XLSX";
+import XLSX from "xlsx";
 import apiRoutes from "src/apiRoutes";
 
 import Tip from "../components/Tip.vue";
@@ -434,7 +434,7 @@ watch(
       theme: { mode: $q.dark.isActive ? "dark" : "" },
     };
     console.log(subChartOptions.value);
-    
+
   }
 );
 
